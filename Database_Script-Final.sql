@@ -8,60 +8,12 @@ create table Category
 	ID				int				not null AUTO_INCREMENT,
 	`Name`			varchar(35)		not null,
 	Description		varchar(60),
+	ParentID		int,
 
 	PRIMARY KEY(ID),
-	Unique(`Name`)
+	Unique(`Name`),
+	FOREIGN KEY (ParentID) REFERENCES Category(ID) 
 );
-
-INSERT INTO Category (`Name`) VALUES ("Clothing");
-INSERT INTO Category (`Name`) VALUES ("Womenswear");
-INSERT INTO Category (`Name`) VALUES ("Menswear");
-INSERT INTO Category (`Name`) VALUES ("Personal Care");
-INSERT INTO Category (`Name`) VALUES ("Skin Care");
-INSERT INTO Category (`Name`) VALUES ("Hair Care");
-INSERT INTO Category (`Name`) VALUES ("Cosmetics");
-INSERT INTO Category (`Name`) VALUES ("Deodorants and Anti Perspirants");
-INSERT INTO Category (`Name`) VALUES ("Soap, Bath and Shower Products");
-INSERT INTO Category (`Name`) VALUES ("Household");
-INSERT INTO Category (`Name`) VALUES ("Air Fresheners");
-INSERT INTO Category (`Name`) VALUES ("Furniture");
-INSERT INTO Category (`Name`) VALUES ("Household Cleaners");
-INSERT INTO Category (`Name`) VALUES ("Consumer Electronics");
-INSERT INTO Category (`Name`) VALUES ("Audio Equipment");
-INSERT INTO Category (`Name`) VALUES ("Cameras and Camera Equipment");
-INSERT INTO Category (`Name`) VALUES ("Lighting Equipment");
-INSERT INTO Category (`Name`) VALUES ("Computer Accessories");
-INSERT INTO Category (`Name`) VALUES ("Car Electronics and GPS");
-INSERT INTO Category (`Name`) VALUES ("Video Games and Consoles");
-INSERT INTO Category (`Name`) VALUES ("Stationery and Greeting Cards");
-INSERT INTO Category (`Name`) VALUES ("Jewelry and Watches");
-INSERT INTO Category (`Name`) VALUES ("Food");
-INSERT INTO Category (`Name`) VALUES ("Snacks and Confectionery");
-INSERT INTO Category (`Name`) VALUES ("Health Food and Sports Nutrition");
-INSERT INTO Category (`Name`) VALUES ("Canned Food");
-INSERT INTO Category (`Name`) VALUES ("Frozen Food");
-INSERT INTO Category (`Name`) VALUES ("Meat, Poultry and Eggs");
-INSERT INTO Category (`Name`) VALUES ("Fruit and Vegetables");
-INSERT INTO Category (`Name`) VALUES ("Baked Goods");
-INSERT INTO Category (`Name`) VALUES ("Cereals");
-INSERT INTO Category (`Name`) VALUES ("Soup");
-INSERT INTO Category (`Name`) VALUES ("Rice and Rice Products");
-INSERT INTO Category (`Name`) VALUES ("Nuts, Seeds and Dried Fruit");
-INSERT INTO Category (`Name`) VALUES ("Sugar and Sweeteners");
-INSERT INTO Category (`Name`) VALUES ("Beverage");
-INSERT INTO Category (`Name`) VALUES ("Soft Drinks");
-INSERT INTO Category (`Name`) VALUES ("Hot Drinks");
-INSERT INTO Category (`Name`) VALUES ("Bottled Water");
-INSERT INTO Category (`Name`) VALUES ("Sport, Energy and Functional Drinks");
-INSERT INTO Category (`Name`) VALUES ("Juice");
-INSERT INTO Category (`Name`) VALUES ("Alcoholic Beverages");
-INSERT INTO Category (`Name`) VALUES ("Tobacco");
-INSERT INTO Category (`Name`) VALUES ("Cigarettes");
-INSERT INTO Category (`Name`) VALUES ("Dairy Products");
-INSERT INTO Category (`Name`) VALUES ("Milk and Cream");
-INSERT INTO Category (`Name`) VALUES ("Yogurt");
-INSERT INTO Category (`Name`) VALUES ("Cheese");
-INSERT INTO Category (`Name`) VALUES ("Butter");
 
 /*-------------------------- SUPPLIER -----------------------------*/
 create table Supplier
@@ -76,6 +28,7 @@ create table Supplier
 	Email			varchar(50),
 	`Status`		varchar(9)		not null DEFAULT 'Active',
     MinimumOrderCost	double		not null,
+	DeliveryCost		double		DEFAULT 0,
 	
 	PRIMARY KEY(ID),
 	CONSTRAINT CK_Supplier_PhoneNumber check (PhoneNumber like '[0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'),
@@ -83,22 +36,6 @@ create table Supplier
     CONSTRAINT CK_Supplier_Status check (`Status` = "Active" OR `Status` = "In-Active" OR `Status` = "InActive"),
 	Unique(`Name`, Street, PhoneNumber)
 );
-
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (1,"Et PC","P.O. Box 790, 297 Adipiscing Road","Melton Mowbray","LE","98530","1-824-231-7933","et.libero.Proin@doloregestasrhoncus.com",450);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (2,"Et Institute","P.O. Box 873, 6994 Donec Ave","Hamilton","NI","357844","1-620-884-606","ac@semmollisdui.ca",200);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (3,"Tellus LLP","516-6342 At Ave","Wanaka","South Island","61305","1-674-427-6341","ipsum.Suspendisse@Nunc.edu",400);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (4,"Odio Institute","331-9577 Accumsan Ave","Matamata","NI","07118","1-718-798-0048","Curabitur@nulla.ca",390);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (5,"Velit Aliquam Consulting","Ap #924-8262 Nonummy Rd.","Istanbul","Istanbul","97502","1-911-459-0148","magna.Phasellus.dolor@malesuada.org",240);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (6,"Metus Company","7374 Consectetuer Road","Kingussie","Inverness-shire","85277","1-554-196-3620","non.quam@conguea.com",177);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (7,"Et Ultrices Company","1073 Non Avenue","Motueka","South Island","5061","1-481-861-5492","est@nuncnullavulputate.edu",464);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (8,"Eget Varius Ultrices LLP","1714 A Rd.","Cañas","G","72-844","1-676-371-9467","penatibus.et.magnis@nisimagnased.net",341);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (9,"Egestas Urna Justo Associates","410-2391 Varius. Ave","Port Augusta","South Australia","01355","1-250-644-5093","congue@anteVivamusnon.net",367);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (10,"Etiam Imperdiet Incorporated","818-3805 Semper Street","Wałbrzych","Dolnośląskie","43320-331","1-511-785-7444","lectus@magnaseddui.net",492);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (11,"Cras Eu Tellus LLP","253-9944 Lacus. Rd.","Brecon","BR","90-975","1-205-524-5003","eget.massa.Suspendisse@risusIn.com",467);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (12,"Eu Nulla LLC","5457 Interdum Avenue","Ciplet","Luik","K1E 3Y2","1-323-969-8097","sem.Nulla@vitaevelitegestas.ca",289);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (13,"Nunc Quis Ltd","Ap #671-3809 Ligula Street","Aserrí","SJ","57383","1-407-971-8500","arcu@euismod.co.uk",309);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (14,"Dolor Elit Pellentesque Associates","Ap #643-8558 Sed Av.","Gary","IN","7865","1-387-167-3362","placerat.eget@idenim.edu",448);
-INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (15,"Malesuada Fames Ac Institute","5052 Nec, Ave","Bama","Borno","12513","1-937-322-2195","risus.Nulla@rutrumnon.org",408);
 
 /*-------------------------- CONTACT -----------------------------*/
 create table Contact
@@ -116,26 +53,7 @@ create table Contact
 	Unique(PhoneNumber)
 );
 
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (1,"Kyle","Suarez","1-404-990-1890","neque.pellentesque.massa@Curae.net",1);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (2,"Whilemina","Harrell","1-935-584-3889","orci.tincidunt.adipiscing@Integerin.com",12);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (3,"Jorden","Hebert","1-469-234-6519","rhoncus.Donec.est@morbi.ca",3);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (4,"Baxter","Stark","1-729-860-4675","Integer@auctorvelit.co.uk",15);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (5,"Christian","Cotton","1-201-925-5715","ornare.placerat.orci@accumsanlaoreetipsum.org",15);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (6,"Demetria","Cervantes","1-167-685-6629","Nunc.sed@diamatpretium.com",13);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (7,"Lunea","Cantu","1-552-501-5624","Cras@etrutrum.edu",13);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (8,"Marny","Hess","1-447-121-5893","Nunc.pulvinar@viverra.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (9,"Elliott","Floyd","1-327-257-2761","nascetur.ridiculus@nunc.com",4);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (10,"Preston","Mccall","1-813-388-0610","libero.Integer@eget.org",4);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (11,"Bernard","Lara","1-981-450-4017","Class@interdumenimnon.ca",11);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (12,"Haley","Fox","1-261-450-5355","ut.nulla.Cras@Nullam.com",7);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (13,"Chelsea","Blake","1-226-549-2210","ultricies@quamCurabitur.edu",12);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (14,"Tyler","Mcintyre","1-789-890-1458","at.velit@velvenenatisvel.ca",9);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (15,"Genevieve","Butler","1-195-311-1140","Lorem@non.org",6);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (16,"Fulton","Buchanan","1-479-734-8332","Aliquam.nisl.Nulla@eliteratvitae.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (17,"Jenna","Randolph","1-267-129-8724","vehicula.et@aaliquet.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (18,"Amena","Stark","1-170-910-5565","venenatis@euodio.edu",14);
-
-/*-------------------------- PRODUCT -----------------------------*/
+/*-------------------------- PRODUCTS/INVENTORY -----------------------------*/
 create table Product
 (
 	ID				int(8)				not null,
@@ -143,51 +61,41 @@ create table Product
 	Description		varchar(80),
 	CategoryID		int					not null,
 	SubCategoryID	int,			
-	UnitCost		double				not null,
 	SalePrice		double				not null,
-	Quantity		int					DEFAULT 0,
-	SupplierID		int					not null,
+	Quantity		int					DEFAULT 0,	
 	Notes			varchar(80),
 	
 	PRIMARY KEY(ID),
 	FOREIGN KEY (CategoryID) REFERENCES Category(ID),
 	FOREIGN KEY (SubCategoryID) REFERENCES Category(ID),
-	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
 	CONSTRAINT CK_Product_Categories check(CategoryID != SubCategoryID),
-	CONSTRAINT CK_Product_UnitCost check(UnitCost > 0),
-	CONSTRAINT CK_Product_SalePrice check(SalePrice > 0),
-    CONSTRAINT CK_Product_priceCheck check(SalePrice > UnitCost), /*Does not work.*/
-	CONSTRAINT CK_Product_Quantity check(Quantity > 0)
+	CONSTRAINT CK_Product_SalePrice check(SalePrice > 0)
 );
 
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000001, 'Bisacodyl', 'Second malig neo liver', 32, 45, 36.5, 137.19, 238, 9, 'Choledochoplasty');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000002, 'Lisinopril', 'Opn skl/oth fx-deep coma', 45, 22, 196.74, 157.84, 349, 1, 'Medical induction of labor');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000003, 'Triclosan', 'Ac polio NOS-type NOS', 16, 22, 24.39, 186.22, 25, 13, '[Endoscopic] polypectomy of rectum');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000004, 'Argentum Quartz', 'Late eff wrist/hand burn', 39, 8, 110.09, 178.88, 11, 4, 'Revision of stoma of small intestine');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000005, 'Sodium Sulfacetamide', 'Poxvirus infections NEC', 41, 29, 86.51, 134.29, 294, 8, null);
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000006, 'TITANIUM DIOXIDE ZINC OXIDE', 'Hodg lymph-histio pelvic', 14, 39, 81.24, 80.58, 44, 8, 'Electronystagmogram [ENG]');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000007, 'Tolcapone', 'AMI NOS, subsequent', 40, 3, 19.11, 184.47, 256, 15, 'Other salpingo-oophoroplasty');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000008, 'Phentermine Hydrochloride', 'Fracture of ilium-open', 5, 8, 59.52, 143.97, 153, 9, null);
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000009, 'RANITIDINE', 'Emotional dis child NEC', 14, 48, 44.21, 189.09, 462, 9, 'Intrathoracic lymphangiogram');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000010, 'GLYCERIN', 'Acc poison-barbiturates', 38, 24, 189.24, 76.25, 59, 15, 'Open and other sigmoidectomy');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000011, 'AMOXICILLIN', 'Jt derangment NOS-shlder', 19, 42, 93.18, 118.95, 481, 15, 'Excision or destruction of lesion of sclera');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000012, 'Dopamine HCl', 'Cataract NOS', 13, 18, 62.51, 3.28, 4, 4, 'Other local destruction or excision of renal lesion or tissue');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000013, 'DORZOLAMIDE HYDROCHLORIDE and TIMOLOL MALEATE', 'Adv eff skelet musc relx', 36, 10, 13.57, 5.29, 329, 5, 'Other incision of vulva and perineum');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000014, 'zolpidem tartrate', 'Mal neo soft tissue leg', 18, 26, 37.87, 195.66, 146, 9, 'Intravascular imaging of intrathoracic vessels');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000015, 'Acetaminophen and Phenylephrine Hydrochloride', 'Gonococcal pericarditis', 23, 29, 178.31, 96.46, 42, 5, 'Other repair of joint');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000016, 'ARNICA MONTANA', 'Anaplastic lymph multip', 17, 1, 111.22, 107.27, 365, 5, null);
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000017, 'Alendronate Sodium', 'Med exam NEC-admin purp', 17, 17, 168.64, 178.11, 283, 15, 'Microscopic examination of specimen from lung, and other thoracic specimen');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000018, 'Titanium Dioxide', 'Disorders of sacrum', 46, 21, 183.05, 197.63, 496, 14, 'Other total reconstruction of breast');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000019, 'Aspirin', 'Encountr palliative care', 29, 12, 165.34, 134.77, 238, 7, null);
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000020, 'Menthol', 'Algoneurodystrophy', 1, 47, 66.28, 13.69, 294, 11, 'Laparoscopy');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000021, 'ARNICA MONTANA', 'Drusen (degenerative)', 13, 21, 106.22, 147.48, 323, 15, 'Gastrotomy');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000022, 'BENZALKONIUM CHLORIDE', 'Cross country skiing', 11, 43, 30.79, 92.82, 257, 14, 'Reconstruction of eyelid with mucous membrane flap or graft');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000023, 'Benztropine Mesylate', 'N-traf brd/alight-mocycl', 2, 39, 31.62, 95.57, 220, 14, 'Ileostomy, not otherwise specified');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000024, 'Acetaminophen Phenylephrine HCl', 'Racquet/hand sports', 19, 19, 109.72, 53.69, 53, 13, 'Revision of ureterointestinal anastomosis');
-insert into product (id, `Name`, Description, CategoryID, SubCategoryID, UnitCost, SalePrice, Quantity, SupplierID, Notes) values (10000025, 'Cefprozil', 'Loss labyrn react unilat', 9, 45, 68.78, 147.52, 161, 13, null);
+create table Product_Supplier
+(
+	ProductID		int(8)		not null, 
+	SupplierID		int			not null,
+	UnitCost		double		not null,
+	Quantity		int			DEFAULT 0,
+	
+	PRIMARY KEY(ProductID, SupplierID),
+	FOREIGN KEY (ProductID) REFERENCES Product(ID),
+	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
+    CONSTRAINT CK_Product_UnitCost check(UnitCost > 0),
+    CONSTRAINT CK_Product_Quantity check(Quantity >= 0)
+);
 
-update product set unitcost = saleprice - (saleprice * 0.2)
-where unitcost > saleprice;
+DELIMITER $$
+CREATE TRIGGER Product_Supplier
+    AFTER INSERT ON Product_Supplier
+    FOR EACH ROW 
+BEGIN
+    Update Product p
+    SET p.Quantity = p.Quantity + NEW.Quantity
+	WHERE p.ID = NEW.ProductID;
+END$$
+DELIMITER ;
 
 /*-------------------------- PRICE_HISTORY -----------------------------*/
 create table PriceHistory
@@ -213,6 +121,7 @@ IF (NEW.SalePrice != OLD.SalePrice) THEN
 END IF;
 END$$
 DELIMITER ;
+
 /*-------------------------- QUALITY_ADJUSTMENT -----------------------------*/
 create table QAdjustment
 (
@@ -254,12 +163,6 @@ create table Promotion
 										(DiscountValue = 0 and DiscountPercent > 0))
 );
 
-insert into Promotion (DiscountValue) values (5.00);
-insert into Promotion (DiscountValue) values (10.00);
-insert into Promotion (DiscountValue) values (20.00);
-insert into Promotion (DiscountPercent) values (25);
-insert into Promotion (DiscountPercent) values (50);
-
 /*-------------------------- POSITIONS -----------------------------*/
 create table Positions
 (
@@ -269,11 +172,6 @@ create table Positions
 	
 	PRIMARY KEY(ID)
 );
-insert into Positions (`Name`, Description) values ('Sales Associate', 'Assists customers and Maintains store display');
-insert into Positions (`Name`, Description) values ('Cashier', 'Handles cash register and process transactions');
-insert into Positions (`Name`, Description) values ('Manager', 'Manages employees and store operations');
-insert into Positions (`Name`, Description) values ('Owner', 'Person who owns store and manages its performance');
-insert into Positions (`Name`, Description) values ('Accountant', 'Manages stores account related work, ex: taxes');
 
 /*-------------------------- EMPLOYEE -----------------------------*/
 create table Employee
@@ -303,6 +201,428 @@ create table Employee
 	CONSTRAINT CK_Employee_ContectNumbers check (HomePhoneNumber != CellPhoneNumber)
 );
 
+/*-------------------------- TRANSACTION -----------------------------*/
+create table `Transaction`
+(
+	ID				int				not null	AUTO_INCREMENT,
+	CreateDate		DATETIME		not null,
+	SubTotal		double			not null,
+	Tax				double			not null,
+	Total			double			not null,
+	TransactionType	varchar(15),
+	Method			varchar(15)		DEFAULT 'CASH',
+	PromotionID		int,
+	EmployeeID		int 			not null,
+
+	PRIMARY KEY(ID),
+	FOREIGN KEY (PromotionID) REFERENCES Promotion(ID),
+	FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
+	CONSTRAINT CK_Transaction_SubTotal check(SubTotal > 0),
+	CONSTRAINT CK_Transaction_Tax check(Tax > 0),
+	CONSTRAINT CK_Transaction_Total check(Total > 0)
+);
+
+/*-------------------------- TRANSACTION_RECORD -----------------------------*/
+create table TransactionRecord
+(
+	TransactionID	int				not null,
+	ProductID		int(8)			not null,
+	QuantitySold	int 			not null,
+	UnitPrice		decimal(6, 2)	not null,
+    Returned		boolean			DEFAULT False,
+    DateReturned	Date,
+    EmployeeID		int,
+	
+	PRIMARY KEY(TransactionID, ProductID),
+	FOREIGN KEY (TransactionID) REFERENCES Transaction(ID),
+	FOREIGN KEY (ProductID) REFERENCES Product(ID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
+	CONSTRAINT CK_TransactionRecord_Quantity check (QuantitySold > 0),
+	CONSTRAINT CK_TransactionRecord_UnitPrice check(UnitPrice > 0)
+);
+
+/*-------------------------- ORDER AND PAYMENT RELATED CONTENT -----------------------------*/
+create table Invoice
+(
+	ID				int				not null	AUTO_INCREMENT,
+	AmountDue		double						DEFAULT 0,
+	AmountPaid		double						DEFAULT 0,
+	ReceivedDate	timestamp		DEFAULT current_timestamp,
+	SupplierID		int 			not null,
+	
+	PRIMARY KEY(ID),
+	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
+	CONSTRAINT CK_Invoice_AmountDue check (AmountDue > 0),
+	CONSTRAINT CK_Invoice_AmountPaid check (AmountPaid > 0)	
+);
+
+create table `Order`
+(
+	ID				int				not null	AUTO_INCREMENT,
+	SupplierID		int				not null,
+	EmployeeID		int				not null,
+	CreateDate		DATETIME		not null,
+	ReceivedDate	DATETIME,
+	Cost			double			not null,
+	AmountPaid		double,
+	InvoiceID		int,
+	
+	PRIMARY KEY(ID),
+	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
+	FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
+	FOREIGN KEY (InvoiceID) REFERENCES Invoice(ID),
+	CONSTRAINT CK_Order_Cost check (Cost > 0),
+	CONSTRAINT CK_Order_AmountPaid check (AmountPaid > 0 and AmountPaid <= Cost)
+);
+
+DELIMITER $$
+CREATE TRIGGER Change_Amount_Due 
+	AFTER UPDATE ON `Order`
+	FOR EACH ROW
+BEGIN
+IF NEW.InvoiceID IS NOT NULL THEN
+	    UPDATE Invoice
+		SET AmountDue = (select Sum(o.Cost) from `Order` o 
+						where Invoice.ID = o.InvoiceID),
+			AmountPaid = (select Sum(IFNULL(o.AmountPaid, 0)) from `Order` o 
+						where Invoice.ID = o.InvoiceID);
+END IF;
+END $$
+DELIMITER ;
+
+/*-------------------------- ORDER_DETAIL -----------------------------*/
+create table OrderDetail
+(
+
+	OrderID				int			not null,
+	ProductID			int(8) 		not null,
+	OrderedQuantity		int 		not null,
+	ReceivedQuantity	int,
+	Cost				double,
+	
+	PRIMARY KEY(OrderID, ProductID),
+	FOREIGN KEY (OrderID) REFERENCES `Order`(ID),
+	FOREIGN KEY (ProductID) REFERENCES Product(ID),
+	CONSTRAINT CK_OrderDetail_Cost check (Cost > 0)
+);
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------INSERTING TEST DATA-----------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-------------------------- CATEGORY TABLE-----------------------------*/
+INSERT INTO Category (ID, `Name`) VALUES (1, "Clothing");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (2, "Womenswear", 1);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (3, "Menswear", 1);
+INSERT INTO Category (ID, `Name`) VALUES (4, "Personal Care");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (5, "Skin Care", 4);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (6, "Hair Care", 4);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (7, "Cosmetics", 4);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (8, "Deodorants and Anti Perspirants", 4);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (9, "Soap, Bath and Shower Products", 4);
+INSERT INTO Category (ID, `Name`) VALUES (10, "Household");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (11, "Air Fresheners", 10);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (12, "Furniture", 10);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (13, "Household Cleaners", 10);
+INSERT INTO Category (ID, `Name`) VALUES (14, "Consumer Electronics");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (15, "Audio Equipment", 14);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (16, "Cameras and Camera Equipment", 14);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (17, "Lighting Equipment", 14);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (18, "Computer Accessories", 14);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (19, "Car Electronics and GPS", 14);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (20, "Video Games and Consoles", 14);
+INSERT INTO Category (ID, `Name`) VALUES (21, "Stationery and Greeting Cards");
+INSERT INTO Category (ID, `Name`) VALUES (22, "Jewelry and Watches");
+INSERT INTO Category (ID, `Name`) VALUES (23, "Food");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (24, "Snacks and Confectionery", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (25, "Health Food and Sports Nutrition", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (26, "Canned Food", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (27, "Frozen Food", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (28, "Meat, Poultry and Eggs", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (29, "Fruit and Vegetables", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (30, "Baked Goods", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (31, "Cereals", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (32, "Soup", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (33, "Rice and Rice Products", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (34, "Nuts, Seeds and Dried Fruit", 23);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (35, "Sugar and Sweeteners", 23);
+INSERT INTO Category (ID, `Name`) VALUES (36, "Beverage");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (37, "Soft Drinks", 36);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (38, "Hot Drinks", 36);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (39, "Bottled Water", 36);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (40, "Sport, Energy and Functional Drinks", 36);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (41, "Juice", 36);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (42, "Alcoholic Beverages", 36);
+INSERT INTO Category (ID, `Name`) VALUES (43, "Tobacco");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (44, "Cigarettes", 43);
+INSERT INTO Category (ID, `Name`) VALUES (45, "Dairy Products");
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (46, "Milk and Cream", 45);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (47, "Yogurt", 45);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (48, "Cheese", 45);
+INSERT INTO Category (ID, `Name`, ParentID) VALUES (49, "Butter", 45);
+
+/*-------------------------- SUPPLIER -----------------------------*/
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (1,"Et PC","P.O. Box 790, 297 Adipiscing Road","Melton Mowbray","LE","98530","1-824-231-7933","et.libero.Proin@doloregestasrhoncus.com",450);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (2,"Et Institute","P.O. Box 873, 6994 Donec Ave","Hamilton","NI","357844","1-620-884-606","ac@semmollisdui.ca",200);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (3,"Tellus LLP","516-6342 At Ave","Wanaka","South Island","61305","1-674-427-6341","ipsum.Suspendisse@Nunc.edu",400);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (4,"Odio Institute","331-9577 Accumsan Ave","Matamata","NI","07118","1-718-798-0048","Curabitur@nulla.ca",390);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (5,"Velit Aliquam Consulting","Ap #924-8262 Nonummy Rd.","Istanbul","Istanbul","97502","1-911-459-0148","magna.Phasellus.dolor@malesuada.org",240);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (6,"Metus Company","7374 Consectetuer Road","Kingussie","Inverness-shire","85277","1-554-196-3620","non.quam@conguea.com",177);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (7,"Et Ultrices Company","1073 Non Avenue","Motueka","South Island","5061","1-481-861-5492","est@nuncnullavulputate.edu",464);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (8,"Eget Varius Ultrices LLP","1714 A Rd.","Cañas","G","72-844","1-676-371-9467","penatibus.et.magnis@nisimagnased.net",341);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (9,"Egestas Urna Justo Associates","410-2391 Varius. Ave","Port Augusta","South Australia","01355","1-250-644-5093","congue@anteVivamusnon.net",367);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (10,"Etiam Imperdiet Incorporated","818-3805 Semper Street","Wałbrzych","Dolnośląskie","43320-331","1-511-785-7444","lectus@magnaseddui.net",492);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (11,"Cras Eu Tellus LLP","253-9944 Lacus. Rd.","Brecon","BR","90-975","1-205-524-5003","eget.massa.Suspendisse@risusIn.com",467);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (12,"Eu Nulla LLC","5457 Interdum Avenue","Ciplet","Luik","K1E 3Y2","1-323-969-8097","sem.Nulla@vitaevelitegestas.ca",289);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (13,"Nunc Quis Ltd","Ap #671-3809 Ligula Street","Aserrí","SJ","57383","1-407-971-8500","arcu@euismod.co.uk",309);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (14,"Dolor Elit Pellentesque Associates","Ap #643-8558 Sed Av.","Gary","IN","7865","1-387-167-3362","placerat.eget@idenim.edu",448);
+INSERT INTO Supplier (ID,`Name`,Street,City,State_Province,PostalCode,PhoneNumber,Email,MinimumOrderCost) VALUES (15,"Malesuada Fames Ac Institute","5052 Nec, Ave","Bama","Borno","12513","1-937-322-2195","risus.Nulla@rutrumnon.org",408);
+
+update storedb.supplier
+set DeliveryCost = ROUND((MinimumOrderCost * 0.2));
+
+/*-------------------------- CONTACT -----------------------------*/
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (1,"Kyle","Suarez","1-404-990-1890","neque.pellentesque.massa@Curae.net",1);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (2,"Whilemina","Harrell","1-935-584-3889","orci.tincidunt.adipiscing@Integerin.com",12);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (3,"Jorden","Hebert","1-469-234-6519","rhoncus.Donec.est@morbi.ca",3);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (4,"Baxter","Stark","1-729-860-4675","Integer@auctorvelit.co.uk",15);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (5,"Christian","Cotton","1-201-925-5715","ornare.placerat.orci@accumsanlaoreetipsum.org",15);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (6,"Demetria","Cervantes","1-167-685-6629","Nunc.sed@diamatpretium.com",13);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (7,"Lunea","Cantu","1-552-501-5624","Cras@etrutrum.edu",13);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (8,"Marny","Hess","1-447-121-5893","Nunc.pulvinar@viverra.co.uk",14);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (9,"Elliott","Floyd","1-327-257-2761","nascetur.ridiculus@nunc.com",4);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (10,"Preston","Mccall","1-813-388-0610","libero.Integer@eget.org",4);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (11,"Bernard","Lara","1-981-450-4017","Class@interdumenimnon.ca",11);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (12,"Haley","Fox","1-261-450-5355","ut.nulla.Cras@Nullam.com",7);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (13,"Chelsea","Blake","1-226-549-2210","ultricies@quamCurabitur.edu",12);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (14,"Tyler","Mcintyre","1-789-890-1458","at.velit@velvenenatisvel.ca",9);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (15,"Genevieve","Butler","1-195-311-1140","Lorem@non.org",6);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (16,"Fulton","Buchanan","1-479-734-8332","Aliquam.nisl.Nulla@eliteratvitae.co.uk",14);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (17,"Jenna","Randolph","1-267-129-8724","vehicula.et@aaliquet.co.uk",14);
+INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (18,"Amena","Stark","1-170-910-5565","venenatis@euodio.edu",14);
+
+/*-------------------------- PRODUCTS/INVENTORY -----------------------------*/
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000001, 'Pollens - Trees, Ash, White Fraxinus americana', 'Jubilant HollisterStier LLC', 18, 19, 248.13, 'Path fx tibia fibula');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000002, 'Cellex-C Sun Shade', 'Cellex-C International Inc', 22, 40, 144.45, 'Acc poisn-cns depres NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000003, 'Prevacid', 'Bryant Ranch Prepack', 10, 26, 91.6, 'Jt derangment NEC-shlder');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000004, 'GUNA-ADDICT 2', 'Guna spa', 42, 23, 76.83, 'NB intraven hem NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000005, 'Tamiflu', 'Dispensing Solutions, Inc.', 40, 10, 92.02, 'Induced malaria');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000006, 'DR.G DEWRINKLE BOOSTER AMPLE', 'GOWOONSESANG COSMETICS CO., LTD.', 20, 11, 218.93, 'Amniocentesis affect NB');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000007, 'Diphenhydramine HCL', 'SDA Laboratories, Inc.', 6, 49, 135.13, 'Acc cut/hem in surgery');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000008, 'Stay Perfect Foundation Sunscreen', 'Boots Retail USA Inc', 14, 46, 244.14, 'Hourglass stricture stom');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000009, 'Gabapentin', 'Cardinal Health', 33, 49, 175.52, 'Herpangina');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000010, 'ISOVUE', 'BRACCO DIAGNOSTICS INC', 42, 1, 269.41, 'Poison-capillary act agt');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000011, 'ADSOL Red Cell Preservation Solution System', 'Fenwal, Inc.', 49, 23, 251.75, 'Fx arm mult/NOS-closed');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000012, 'Radiogardase', 'Heyl Chem.-pharm. Fabrik GmbH & Co. KG', 32, 39, 113.59, 'Liver laceration, minor');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000013, 'Contac Cold and Flu', 'Meda Consumer Healthcare Inc.', 21, 41, 75.49, 'Acc-powered lawn mower');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000014, 'MEDROXYPROGESTERONE ACETATE', 'Physicians Total Care, Inc.', 28, 47, 114.69, 'Sprain interphalangeal');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000015, 'clindamycin phosphate', 'Physicians Total Care, Inc.', 25, 24, 104.49, 'Retina layer separat NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000016, 'Adult Low Strength Aspirin', 'Ilex Consumer Products Group, LLC', 19, 38, 97.28, 'Late ef CV dis-cognf def');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000017, 'Perphenazine', 'Qualitest Pharmaceuticals', 31, 24, 94.2, 'Walking,marching,hiking');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000018, 'Cetirizine Hydrochloride', 'Pharmaceutical Associates, Inc.', 47, 41, 90.75, 'TB urinary NEC-cult dx');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000019, 'Meprobamate', 'Watson Laboratories, Inc.', 45, 9, 263.04, 'Opn wnd hip/thigh w tend');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000020, 'Depo-Medrol', 'Pharmacia and Upjohn Company', 39, 32, 162.29, 'TB of adrenal-no exam');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000021, 'Hydrochlorothiazide', 'Contract Pharmacy Services-PA', 42, 13, 57.68, 'Intestinal TB NEC-unspec');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000022, 'Baclofen', 'REMEDYREPACK INC.', 34, 29, 31.81, 'Wrist drop');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000023, 'Drosera comp.', 'Uriel Pharmacy Inc.', 12, 47, 105.38, 'Passive-aggressiv person');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000024, 'CHRIOLOGY Shiatsu Magic Point', 'Chrio Korea Co., Ltd', 18, 4, 257.13, 'Fx fibula NOS-open');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000025, 'Bryophyllum e fol. 10', 'Uriel Pharmacy Inc.', 24, 24, 103.04, 'Monoc exotrop w v pattrn');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000026, 'SOFTSOAP', 'Colgate-Palmolive Company', 26, 48, 108.27, 'Oth spcf dsdr urethra');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000027, 'Oxygen', 'Machine & Welding Supply Company', 37, 38, 229.23,  '3rd brn w loss-hand NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000028, 'Zep Professional Healthcare Worker', 'Zep Inc.', 38, 9, 203.38, 'Renal hyperten-del p/p');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000029, 'Eszopiclone', 'Dr. Reddy''s Laboratories Limited', 9, 36, 74.92, 'Burn NOS head-unspec');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000030, 'SPOT REMOVER ACNE TREATMENT PADS', 'ORIGINS NATURAL RESOURCES INC.', 45, 46, 299.55, 'Ca in situ skin ear');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000031, 'Arnica Aurum 20/30', 'Uriel Pharmacy Inc.', 24, 22, 47.52, 'Post dislocation of lens');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000032, 'Chlorpheniramine Maleate', 'Rugby Laboratories Inc.', 35, 9, 151.34, 'Post-trauma headache NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000033, 'DELFLEX', 'Fresenius Medical Care North America', 3, 38, 219.45, 'Uter dystocia NOS-unspec');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000034, 'DEXTROMETHORPHAN HYDROBROMIDE', 'SPIRIT PHARMACEUTICALS,LLC', 40, 48, 93.94, 'Alt esotropia w v pattrn');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000035, 'LAMICTAL', 'GlaxoSmithKline LLC', 3, 30, 63.72, 'Crushing injury NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000036, 'medroxyprogesterone acetate', 'American Health Packaging', 27, 19, 102.46, 'TB sp crd abscess-unspec');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000037, 'Benazepril Hydrochloride', 'Amneal Pharmaceuticals', 31, 26, 240.85, 'Malignant neopl jejunum');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000038, 'Common Sagebrush', 'Nelco Laboratories, Inc.', 18, 32, 136.98, 'Oth curr cond-delivered');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000039, 'Histamine', 'BioActive Nutritional, Inc.', 3, 18, 243.6, 'Fam hx MEN syndrome');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000040, 'Cephalexin', 'Blenheim Pharmacal, Inc.', 28, 46, 58.56, 'Arizona enteritis');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000041, 'Botanics Daily Hand Therapy Sunscreen SPF 10', 'Boots Retail USA Inc', 19, 1, 60.39, 'Local salmonella inf NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000042, 'Robitussin Peak Cold', 'Richmond Division of Wyeth', 13, 21, 214.24, 'Lymphangitis');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000043, 'ShopKo Absolute Daily Moisturizing Broad Spectrum', 'Shopko Stores Operating Co., LLC', 34, 35, 224.5, 'Progressive iris atrophy');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000044, 'Lortab', 'Cardinal Health', 13, 40, 155.17, 'Ftl cmp in utro-del-p/p');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000045, 'Supremacie', 'Ventura International LTD', 39, 29, 261.06, 'Abdmnal pain lft up quad');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000046, 'Advanced Antiseptic', 'Demoulas Super Markets, Inc', 12, 47, 43.39, '3rd deg burn face NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000047, 'Antiperspirant Cedarwood', 'Every man jack', 49, 11, 219.68, 'Follow-up exam NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000048, 'Gabapentin', 'MedVantx, Inc.', 40, 3, 165.86, 'Sports,athletics NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000049, 'Citrus and Olive Antibacterial Foaming Hand Wash', 'SJ Creations, Inc.', 10, 4, 64.63, 'Superficial injury NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000050, 'Stool Softener', 'TOP CARE (Topco Associates LLC)', 24, 47, 169.78, 'Chr iridocyclitis NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000051, 'Visine', 'Johnson & Johnson Healthcare Products, Division of McNEIL-PPC, Inc.', 40, 32, 196.13, 'Retina microaneurysm NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000052, 'Bac Stop', 'Wayne Concept Manufacturing Co Inc', 28, 18, 264.16, '1st deg burn upper arm');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000053, 'Up and Up Nicotine', 'Target Corporation', 16, 2, 110.56, 'Sprain calcaneofibular');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000054, 'Granisetron Hydrochloride', 'Roxane Laboratories, Inc', 49, 40, 270.34, 'Perinatal jaundice NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000055, 'Business Elite Amenity', 'Hangzhou Zhuwen Inflight & Travel Products Co., Ltd.', 21, 23, 83.74, 'Abort NOS w hemorr-inc');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000056, 'YOUTH SURGE', 'CLINIQUE LABORATORIES INC.', 29, 41, 133.53, 'Ben carcinoid duodenum');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000057, 'rexall ibuprofen', 'Dolgencorp, LLC', 26, 43, 128.35, 'Fx corpus cavrnosm penis');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000058, 'Mirtazapine', 'REMEDYREPACK INC.', 1, 14, 142.82, 'Oth placent cond-deliver');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000059, 'Contact Allergy', 'Apotheca Company', 11, 11, 85.14, 'Family hx-skin condition');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000060, 'Prednisone', 'REMEDYREPACK INC.', 13, 37, 62.03, 'Papilledema w decr press');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000061, 'EAD', 'European Perfume Works Co. L.L.C', 36, 12, 276.48, 'Hyperem w metab dis-del');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000062, 'Molds, Rusts and Smuts, Stemphylium botryosum', 'Jubilant HollisterStier LLC', 12, 24, 95.22, 'Dependent personality');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000063, 'milk of magnesia', 'CVS Pharmacy', 21, 18, 218.11, 'Staphylcocc septicem NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000064, 'Metformin Hydrochloride', 'Aphena Pharma Solutions - Tennessee, LLC', 11, 10, 247.9, 'Pap smear vagina w ASC-H');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000065, 'MBM 2 Gallbladder', 'The Wellness Center', 3, 6, 205.77, 'Subdural hem w opn wound');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000066, 'LAZANDA', 'Archimedes Pharma US Inc.', 20, 10, 134.09, 'Mv traff acc NEC-driver');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000067, 'ZYPREXA', 'STAT RX USA LLC', 5, 7, 168.35, 'Burn NOS multiple site');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000068, 'SEEQUIN 2', 'Vivier Pharma, Inc.', 30, 8, 59.48, 'Fall striking sharp obj');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000069, 'Somnitab', 'FRED''S, INC.', 14, 15, 163.26, 'Reentrant coll-ped cycl');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000070, 'LMX4', 'Ferndale Laboratories, Inc.', 39, 42, 165.97, 'Avulsion of eye');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000071, 'Fluticasone Propionate', 'Global Pharmaceuticals, Division of IMPAX Laboratories Inc.', 49, 2, 201.91, 'Iliac artery aneurysm');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000072, 'hydroxyzine pamoate', 'NCS HealthCare of KY, Inc dba Vangard Labs', 4, 19, 247.36, 'Personl hx infection CNS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000073, 'Gabapentin', 'Breckenridge Pharmaceutical, Inc.', 20, 5, 182.06, 'Corneal dsdr contct lens');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000074, 'Effexor', 'Physicians Total Care, Inc.', 20, 10, 272.1, 'Surg compl-body syst NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000075, 'Diphenhydramine Hydrochloride', 'Hospira, Inc.', 49, 29, 264.63, 'BMI 26.0-26.9,adult');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000076, 'ROBINIA PSEUDOACACIA POLLEN', 'ALK-Abello, Inc.', 5, 6, 66.17, 'Acq neck deformity');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000077, 'Piroxicam', 'Golden State Medical Supply, Inc.', 1, 33, 56.78, 'Voice/resonance dis NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000078, 'Neutrogena Complete Acne Therapy Solution', 'Neutrogena Corporation', 37, 1, 35.7,  'Subarach hem-coma NOS');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000079, 'hydrocortisone', 'Preferred Pharmaceuticals, Inc.', 22, 47, 152.64, 'Fx distal radius NEC-cl');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000080, 'Evtox', 'BioActive Nutritional, Inc.', 48, 18, 176.88, 'Syphilitic encephalitis');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000081, 'Vitamin A and D', 'H and P Industries, Inc. dba Triad Group', 28, 11, 199.59, 'Mv traff acc-pers NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000082, 'ketamine hydrochloride', 'JHP Pharmaceuticals, LLC', 3, 48, 144.82, 'Pulmon TB NOS-histo dx');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000083, 'AMITRIPTYLINE HYDROCHLORIDE', 'Direct Rx', 44, 44, 211.15, 'Gambling and betting');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000084, 'nighttime cold and flu relief', 'Walgreen Company', 8, 31, 235.52, 'Cerebrosp fluid otorrhea');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000085, 'Fusarium compactum', 'Nelco Laboratories, Inc.', 26, 5, 98.22, 'Rickettsioses NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000086, 'Dove Ultimate Sensitive Care Fragrance Free', 'Conopco Inc. d/b/a Unilever', 25, 2, 129.33, 'Brain hem NEC-brief coma');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000087, 'Pro-Den Rx', 'Zila Therapeutics, Inc.', 43, 20, 46.86, 'Toxoplasm chorioretinit');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000088, 'Zolpidem Tartrate', 'REMEDYREPACK INC.', 6, 13, 235.8, 'Longitud defic phalanges');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000089, 'Bio Willow', 'Apotheca Company', 1, 28, 131.11, 'Fit contact lens/glasses');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000090, 'Galentic Vitamin A D', 'Galentic Pharma (India) Priva Te Limited', 22, 33, 46.53, 'Cerebrovasc disease NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000091, 'Sulwhasoo Lumitouch', 'AMOREPACIFIC CO.', 43, 11, 270.54, 'Hemorrhage from throat');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000092, 'FOSINOPRIL Na', 'Apotex Corp.', 25, 9, 238.15, 'NB acidosis NEC');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000093, 'IRIS', 'AMERIFOODS TRADING COMPANY', 34, 41, 176.29, 'Cl skull vlt fx-mod coma');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000094, 'Nutricel Additive System - CP2D', 'Medsep Corporation', 36, 4, 294.8, 'Prader-willi syndrome');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000095, 'Collagen', 'VIATREXX BIO INCORPORATED', 5, 34, 104.96, 'Oth acq limb deformity');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000096, 'Sunmark Nicotine', 'McKesson', 13, 49, 152.04, 'Schizo NOS-subchr/exacer');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000097, 'Metoclopramide', 'American Health Packaging', 20, 38, 126.32, 'Bact arthritis-hand');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000098, 'Pollens - Rough Redroot Amaranthus retroflexus', 'Jubilant HollisterStier LLC', 2, 22, 230.88, 'Open wnd knee/leg/ankle');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000099, 'Ionosol and Dextrose', 'Hospira, Inc.', 33, 35, 294.74, 'Joint replaced ankle');
+insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000100, 'Uncoated Aspirin', 'WOONSOCKET PRESCRIPTION CENTER,INCORPORATED', 40, 40, 151.75, 'Acoustic nerve disorders');
+
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000001, 13, 42.97, 2);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000002, 10, 57.96, 22);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000003, 3, 37.14, 27);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000004, 15, 115.34, 81);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000005, 10, 39.75, 48);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000006, 1, 168.73, 55);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000007, 13, 131.31, 82);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000008, 4, 89.77, 30);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000009, 3, 197.3, 3);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000010, 3, 57.82, 89);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000011, 8, 239.8, 87);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000012, 12, 167.64, 31);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000013, 9, 246.91, 6);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000014, 4, 108.26, 62);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000015, 11, 57.5, 78);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000016, 4, 97.73, 52);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000017, 4, 146.7, 22);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000018, 2, 43.75, 57);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000019, 5, 203.96, 49);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000020, 8, 144.98, 80);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000021, 15, 87.06, 79);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000022, 7, 115.61, 89);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000023, 12, 240.64, 26);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000024, 5, 62.54, 38);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000025, 2, 144.07, 17);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000026, 10, 66.67, 12);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000027, 14, 76.67, 30);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000028, 11, 132.56, 32);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000029, 9, 50.21, 22);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000030, 8, 42.88, 71);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000031, 9, 74.85, 13);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000032, 2, 163.15, 36);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000033, 11, 176.06, 78);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000034, 12, 227.81, 73);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000035, 4, 50.92, 24);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000036, 14, 161.69, 57);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000037, 5, 152.11, 57);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000038, 1, 68.8, 87);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000039, 14, 249.13, 20);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000040, 3, 200.66, 38);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000041, 14, 34.04, 78);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000042, 14, 113.09, 3);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000043, 13, 86.36, 6);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000044, 8, 130.24, 15);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000045, 5, 234.31, 27);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000046, 4, 212.85, 93);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000047, 9, 174.77, 29);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000048, 8, 39.13, 63);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000049, 5, 107.05, 52);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000050, 5, 176.98, 47);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000051, 10, 87.03, 2);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000052, 11, 91.8, 44);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000053, 4, 172.72, 49);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000054, 4, 43.41, 26);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000055, 7, 234.32, 80);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000056, 10, 228.84, 15);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000057, 13, 97.51, 38);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000058, 13, 59.62, 59);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000059, 4, 76.23, 1);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000060, 7, 81.37, 66);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000061, 2, 116.45, 57);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000062, 15, 157.19, 23);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000063, 7, 195.08, 9);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000064, 1, 245.34, 86);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000065, 10, 197.31, 74);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000066, 10, 43.26, 46);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000067, 7, 38.09, 85);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000068, 4, 210.4, 49);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000069, 11, 179.01, 62);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000070, 2, 95.32, 28);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000071, 13, 57.94, 81);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000072, 9, 43.23, 4);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000073, 1, 207.8, 92);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000074, 4, 177.32, 23);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000075, 12, 80.77, 53);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000076, 14, 190.59, 70);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000077, 15, 212.46, 77);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000078, 8, 218.67, 38);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000079, 6, 94.85, 9);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000080, 10, 160.92, 36);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000081, 10, 49.02, 91);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000082, 7, 34.11, 12);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000083, 5, 246.67, 26);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000084, 9, 106.71, 63);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000085, 10, 96.77, 17);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000086, 2, 69.57, 50);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000087, 13, 53.99, 22);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000088, 1, 67.42, 2);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000089, 12, 208.44, 26);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000090, 5, 199.62, 12);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000091, 13, 55.82, 70);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000092, 12, 45.3, 32);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000093, 14, 91.55, 23);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000094, 5, 134.22, 54);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000095, 14, 245.83, 47);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000096, 1, 169.16, 64);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000097, 7, 74.5, 41);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000098, 1, 99.37, 91);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000099, 4, 152.4, 42);
+insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000100, 11, 42.39, 89);
+
+update product_supplier ps, product p 
+set ps.unitcost = ROUND(p.saleprice - (p.saleprice * 0.2), 2)
+where ps.ProductID = p.ID AND unitcost > saleprice;
+
+/*-------------------------- PROMOTION -----------------------------*/
+insert into Promotion (DiscountValue) values (5.00);
+insert into Promotion (DiscountValue) values (10.00);
+insert into Promotion (DiscountValue) values (20.00);
+insert into Promotion (DiscountPercent) values (25);
+insert into Promotion (DiscountPercent) values (50);
+
+/*-------------------------- POSITIONS -----------------------------*/
+insert into Positions (`Name`, Description) values ('Sales Associate', 'Assists customers and Maintains store display');
+insert into Positions (`Name`, Description) values ('Cashier', 'Handles cash register and process transactions');
+insert into Positions (`Name`, Description) values ('Manager', 'Manages employees and store operations');
+insert into Positions (`Name`, Description) values ('Owner', 'Person who owns store and manages its performance');
+insert into Positions (`Name`, Description) values ('Accountant', 'Manages stores account related work, ex: taxes');
+
+/*-------------------------- EMPLOYEE -----------------------------*/
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jean', 'Ross', '5 West Trail', 'Hamilton', 'Ontario', 'y9E 6h6', '8-658-082-9509', '2-714-792-6349', null, '4', 'Casual ', 'jross0', 'r', '2014-11-23', null);
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Wayne', 'Chavez', '439 Almo Pass', 'Hamilton', 'Ontario', 'd0F 7V2', '3-827-631-4796', '7-597-451-9742', null, '5', 'Part Time ', 'wchavez1', 'c', '2014-10-01', null);
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Diane', 'Ward', '6516 Hallows Junction', 'Hamilton', 'Ontario', 'P6q 5I6', '7-241-553-3824', '5-147-251-3652', 'dward2@mysql.com', '5', 'Casual ', 'dward2', 'P', '2015-07-25', null);
@@ -330,26 +650,6 @@ insert into Employee (FirstName, LastName, Street, City, State_Province, PostalC
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jeremy', 'Mason', '8 Sycamore Center', 'Orangeville', 'Ontario', 'X9X 8H2', '6-213-244-1460', '9-217-912-9031', null, '5', 'Full Time ', 'jmasono', 'P', '2015-08-12', null);
 
 /*-------------------------- TRANSACTION -----------------------------*/
-create table `Transaction`
-(
-	ID				int				not null	AUTO_INCREMENT,
-	CreateDate		DATETIME		not null,
-	SubTotal		double			not null,
-	Tax				double			not null,
-	Total			double			not null,
-	TransactionType	varchar(15),
-	Method			varchar(15)		DEFAULT 'CASH',
-	PromotionID		int,
-	EmployeeID		int 			not null,
-
-	PRIMARY KEY(ID),
-	FOREIGN KEY (PromotionID) REFERENCES Promotion(ID),
-	FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
-	CONSTRAINT CK_Transaction_SubTotal check(SubTotal > 0),
-	CONSTRAINT CK_Transaction_Tax check(Tax > 0),
-	CONSTRAINT CK_Transaction_Total check(Total > 0)
-);
-
 INSERT INTO `Transaction` (`CreateDate`,`SubTotal`,`Tax`,`Total`,`TransactionType`,`Method`,`EmployeeID`) VALUES ("2016-06-01 05:10:11","390.28",ROUND(50.7364,2),ROUND(SubTotal + Tax,2),"Sale","Credit Card",23);
 INSERT INTO `Transaction` (`CreateDate`,`SubTotal`,`Tax`,`Total`,`TransactionType`,`Method`,`EmployeeID`) VALUES ("2015-11-12 05:15:48","333.76",ROUND(43.3888,2),ROUND(SubTotal + Tax,2),"Sale","Master Card",11);
 INSERT INTO `Transaction` (`CreateDate`,`SubTotal`,`Tax`,`Total`,`TransactionType`,`Method`,`EmployeeID`) VALUES ("2015-04-03 22:48:44","6.81",ROUND(0.8853,2),ROUND(SubTotal + Tax,2),"Sale","Visa Card",13);
@@ -452,24 +752,6 @@ INSERT INTO `Transaction` (`CreateDate`,`SubTotal`,`Tax`,`Total`,`TransactionTyp
 INSERT INTO `Transaction` (`CreateDate`,`SubTotal`,`Tax`,`Total`,`TransactionType`,`Method`,`EmployeeID`) VALUES ("2015-02-13 15:12:14","163.75",ROUND(21.2875,2),ROUND(SubTotal + Tax,2),"Payment","Credit Card",17);
 
 /*-------------------------- TRANSACTION_RECORD -----------------------------*/
-create table TransactionRecord
-(
-	TransactionID	int				not null,
-	ProductID		int(8)			not null,
-	QuantitySold	int 			not null,
-	UnitPrice		decimal(6, 2)	not null,
-    Returned		boolean			DEFAULT False,
-    DateReturned	Date,
-    EmployeeID		int,
-	
-	PRIMARY KEY(TransactionID, ProductID),
-	FOREIGN KEY (TransactionID) REFERENCES Transaction(ID),
-	FOREIGN KEY (ProductID) REFERENCES Product(ID),
-    FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
-	CONSTRAINT CK_TransactionRecord_Quantity check (QuantitySold > 0),
-	CONSTRAINT CK_TransactionRecord_UnitPrice check(UnitPrice > 0)
-);
-
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 50,10000018,3, saleprice from product where product.ID = 10000018;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 32,10000023,2, saleprice from product where product.ID = 10000023;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 88,10000010,1, saleprice from product where product.ID = 10000010;
@@ -571,7 +853,6 @@ INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`Uni
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 25,10000014,1, saleprice from product where product.ID = 10000014;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 58,10000024,5, saleprice from product where product.ID = 10000024;
 
-/*------------------- UPDATING TRANSACTION -----------------------*/
 UPDATE Transaction t 
 SET SubTotal = (SELECT IFNULL(SUM(UnitPrice * QuantitySold), 0) 
 			FROM TransactionRecord tr WHERE tr.TransactionId = t.ID);
@@ -579,56 +860,8 @@ SET SubTotal = (SELECT IFNULL(SUM(UnitPrice * QuantitySold), 0)
 UPDATE Transaction t 
 SET Tax = ROUND(SubTotal * 0.13, 2),
     Total = ROUND(SubTotal + Tax, 2);
-    
+	
 /*-------------------------- ORDER AND PAYMENT RELATED CONTENT -----------------------------*/
-create table Invoice
-(
-	ID				int				not null	AUTO_INCREMENT,
-	AmountDue		double						DEFAULT 0,
-	AmountPaid		double						DEFAULT 0,
-	ReceivedDate	timestamp		DEFAULT current_timestamp,
-	SupplierID		int 			not null,
-	
-	PRIMARY KEY(ID),
-	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
-	CONSTRAINT CK_Invoice_AmountDue check (AmountDue > 0),
-	CONSTRAINT CK_Invoice_AmountPaid check (AmountPaid > 0)	
-);
-
-create table `Order`
-(
-	ID				int				not null	AUTO_INCREMENT,
-	SupplierID		int				not null,
-	EmployeeID		int				not null,
-	CreateDate		DATETIME		not null,
-	ReceivedDate	DATETIME,
-	Cost			double			not null,
-	AmountPaid		double,
-	InvoiceID		int,
-	
-	PRIMARY KEY(ID),
-	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
-	FOREIGN KEY (EmployeeID) REFERENCES Employee(ID),
-	FOREIGN KEY (InvoiceID) REFERENCES Invoice(ID),
-	CONSTRAINT CK_Order_Cost check (Cost > 0),
-	CONSTRAINT CK_Order_AmountPaid check (AmountPaid > 0 and AmountPaid <= Cost)
-);
-
-DELIMITER $$
-CREATE TRIGGER Change_Amount_Due 
-	AFTER UPDATE ON `Order`
-	FOR EACH ROW
-BEGIN
-IF NEW.InvoiceID IS NOT NULL THEN
-	    UPDATE Invoice
-		SET AmountDue = (select Sum(o.Cost) from `Order` o 
-						where Invoice.ID = o.InvoiceID),
-			AmountPaid = (select Sum(IFNULL(o.AmountPaid, 0)) from `Order` o 
-						where Invoice.ID = o.InvoiceID);
-END IF;
-END $$
-DELIMITER ;
-
 insert into Invoice (ID, ReceivedDate, SupplierID) values (1, '2015-09-15 18:22:47', 1);
 insert into Invoice (ID, ReceivedDate, SupplierID) values (2, '2015-10-07 03:45:23', 1);
 insert into Invoice (ID, ReceivedDate, SupplierID) values (3, '2016-01-11 06:08:44', 1);
@@ -771,23 +1004,8 @@ insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, Amo
 insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, AmountPaid) values (4, 11, '2016-03-02 22:44:11', null, 650.96, null);
 insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, AmountPaid) values (15, 8, '2016-02-28 04:25:48', null, 664.4, null);
 insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, AmountPaid) values (3, 4, '2016-02-21 10:05:31', null, 642.61, null);
-
-/*-------------------------- ORDER_DETAIL -----------------------------*/
-create table OrderDetail
-(
-
-	OrderID				int			not null,
-	ProductID			int(8) 		not null,
-	OrderedQuantity		int 		not null,
-	ReceivedQuantity	int,
-	Cost				double,
 	
-	PRIMARY KEY(OrderID, ProductID),
-	FOREIGN KEY (OrderID) REFERENCES `Order`(ID),
-	FOREIGN KEY (ProductID) REFERENCES Product(ID),
-	CONSTRAINT CK_OrderDetail_Cost check (Cost > 0)
-);
-
+/*-------------------------- ORDER_DETAIL -----------------------------*/
 INSERT INTO `OrderDetail` (`OrderID`,`ProductID`,`OrderedQuantity`,`ReceivedQuantity`,`Cost`) VALUES (29,10000018,47,81,"608.78");
 INSERT INTO `OrderDetail` (`OrderID`,`ProductID`,`OrderedQuantity`,`ReceivedQuantity`,`Cost`) VALUES (12,10000006,60,57,"878.66");
 INSERT INTO `OrderDetail` (`OrderID`,`ProductID`,`OrderedQuantity`,`ReceivedQuantity`,`Cost`) VALUES (24,10000025,63,50,"814.64");
