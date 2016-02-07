@@ -12,5 +12,5 @@
 - Use command "git pull origin" to grab latest changes from this repo to your directory.
 - Copy and paste your files to apporiate location in the git directory (project files you want to add to repo).
 - Use command "git add --all" to add all changes you made.
-- use command "git commit -m *"(write small message about what changes you made)"*".
+- use command "git commit -m *"(write small message about what changes you made)"* ".
 - Finally use command "git push origin master" to push your changes to repo on master branch.
