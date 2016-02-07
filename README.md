@@ -9,7 +9,8 @@
 - Use command "git remote add origin https://github.com/Krev/PRJ666Visions.git" to add link to this repository.
 
 ### How to add files to repository
-- Use command "git pull origin" to grab latest changes from this repo to your directory.
+- Use command "git pull origin" to grab latest changes from this repo.
+- Use command "git merge origin/master" to merge changes to your git directory.
 - Copy and paste your files to apporiate location in the git directory (project files you want to add to repo).
 - Use command "git add --all" to add all changes you made.
 - use command "git commit -m *"(write small message about what changes you made)"* ".
