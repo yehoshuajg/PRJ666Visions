@@ -122,31 +122,6 @@ END IF;
 END$$
 DELIMITER ;
 
-/*-------------------------- PRODUCT_COST_HISTORY -----------------------------*/
-create table ProductCostHistory
-(
-	ChangeDate		timestamp		DEFAULT current_timestamp,
-	ProductID		int(8)			not null,
-	OldCost			double			not null,
-	
-	PRIMARY KEY(ChangeDate, ProductID),
-	CONSTRAINT CK_Product_Cost_History_CK check(OldCost > 0)
-);
-
-DELIMITER $$
-CREATE TRIGGER Product_Cost_Updated 
-    AFTER UPDATE ON Product_Supplier
-    FOR EACH ROW 
-BEGIN
-IF (NEW.UnitCost != OLD.UnitCost) THEN
-    INSERT INTO ProductCostHistory
-    SET ChangeDate = NOW(),
-		ProductID = OLD.ProductID,
-        OldCost = NEW.UnitCost;
-END IF;
-END$$
-DELIMITER ;
-
 /*-------------------------- QUALITY_ADJUSTMENT -----------------------------*/
 create table QAdjustment
 (
@@ -1109,6 +1084,14 @@ where ID not in (select OrderID from OrderDetail group by OrderID);
 
 delete from `transaction`
 where SubTotal = 0;
+
+/*------- ADDED COST COLUMN TO GET ACCURATE REVENUE REPORT -------*/
+alter table transactionrecord
+add UnitCost double not null default 0;
+
+update transactionrecord tr, product_supplier p
+set tr.UnitCost = p.UnitCost
+where tr.ProductID = p.ProductID;
 
 /*--------------- CONNECTING INVOICE WITH ORDERS -----------------*/
 update `Order` SET InvoiceID = 24 where ID = 3;
