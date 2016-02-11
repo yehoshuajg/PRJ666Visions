@@ -934,7 +934,6 @@ public class Home extends JFrame implements KeyListener{
 				}
 			//}
 		});
-		System.out.println("TEST");
 		/*
 		keypad_2 = new JButton("2");
 		keypad_2.setFocusable(false);
