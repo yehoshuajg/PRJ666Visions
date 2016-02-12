@@ -86,17 +86,6 @@ create table Product_Supplier
     CONSTRAINT CK_Product_Quantity check(Quantity >= 0)
 );
 
-DELIMITER $$
-CREATE TRIGGER Product_Supplier
-    AFTER INSERT ON Product_Supplier
-    FOR EACH ROW 
-BEGIN
-    Update Product p
-    SET p.Quantity = p.Quantity + NEW.Quantity
-	WHERE p.ID = NEW.ProductID;
-END$$
-DELIMITER ;
-
 /*-------------------------- PRICE_HISTORY -----------------------------*/
 create table PriceHistory
 (
@@ -607,6 +596,9 @@ insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values 
 update product_supplier ps, product p 
 set ps.unitcost = ROUND(p.saleprice - (p.saleprice * 0.2), 2)
 where ps.ProductID = p.ID AND unitcost > saleprice;
+
+alter table product_supplier
+drop column Quantity;
 
 /*-------------------------- PROMOTION -----------------------------*/
 insert into Promotion (DiscountValue) values (5.00);

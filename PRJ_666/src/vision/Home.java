@@ -1115,13 +1115,10 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setActionCommand("1");
 		keypad_2.setActionCommand("2");
 		*/
-		JPanel panel_reports = new JPanel();
+		Reports report_sec = new Reports(); 
+		JPanel panel_reports = report_sec.getWindow();
 		tabbedPane.addTab("Reports", null, panel_reports, null);
 		panel_reports.setLayout(null);
-		
-		JButton btnNewButton = new JButton("New button");
-		btnNewButton.setBounds(10, 24, 89, 23);
-		panel_reports.add(btnNewButton);
 		
 		JPanel panel_staff = new JPanel();
 		tabbedPane.addTab("Staff", null, panel_staff, null);
