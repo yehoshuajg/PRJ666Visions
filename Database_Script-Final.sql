@@ -593,6 +593,10 @@ insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values 
 insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000099, 4, 152.4, 42);
 insert into Product_Supplier (ProductID, SupplierID, UnitCost, Quantity) values (10000100, 11, 42.39, 89);
 
+update product
+set Quantity = 9 + CEIL(RAND() * 90)
+where ID <> 0;
+
 update product_supplier ps, product p 
 set ps.unitcost = ROUND(p.saleprice - (p.saleprice * 0.2), 2)
 where ps.ProductID = p.ID AND unitcost > saleprice;
