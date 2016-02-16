@@ -418,7 +418,6 @@ public class Home extends JFrame implements KeyListener{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							System.out.println("TEST");
 							Runnable doHighlight = new Runnable() {
 								@Override
 								public void run() {
