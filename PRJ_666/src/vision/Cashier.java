@@ -37,13 +37,14 @@ public class Cashier {
 			String tempDescription = rs.getString("Description");
 			int tempCategoryID = rs.getInt("CategoryID");
 			int tempSubCategoryID = rs.getInt("SubCategoryID");
-			double tempUnitCost = rs.getDouble("UnitCost");
+			//double tempUnitCost = rs.getDouble("UnitCost");
 			double tempSalePrice = rs.getDouble("SalePrice");
 			int tempQuantity = rs.getInt("Quantity");
-			int tempSupplierID = rs.getInt("SupplierID");
+			//int tempSupplierID = rs.getInt("SupplierID");
 			String tempNotes = rs.getString("Notes");
 			
-			productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempUnitCost,tempSalePrice,tempQuantity,tempSupplierID,tempNotes);
+			//productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempUnitCost,tempSalePrice,tempQuantity,tempSupplierID,tempNotes);
+			productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempSalePrice,tempQuantity,tempNotes);
 			count++;
 		}
 		//Clean-up environment
@@ -72,13 +73,14 @@ public class Cashier {
 			String tempDescription = rs.getString("Description");
 			int tempCategoryID = rs.getInt("CategoryID");
 			int tempSubCategoryID = rs.getInt("SubCategoryID");
-			double tempUnitCost = rs.getDouble("UnitCost");
+			//double tempUnitCost = rs.getDouble("UnitCost");
 			double tempSalePrice = rs.getDouble("SalePrice");
 			int tempQuantity = rs.getInt("Quantity");
-			int tempSupplierID = rs.getInt("SupplierID");
+			//int tempSupplierID = rs.getInt("SupplierID");
 			String tempNotes = rs.getString("Notes");
 			
-			productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempUnitCost,tempSalePrice,tempQuantity,tempSupplierID,tempNotes);
+			//productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempUnitCost,tempSalePrice,tempQuantity,tempSupplierID,tempNotes);
+			productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempSalePrice,tempQuantity,tempNotes);
 			count++;
 		}
 		//Clean-up environment
