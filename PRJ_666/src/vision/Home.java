@@ -404,7 +404,7 @@ public class Home extends JFrame implements KeyListener{
 						else if(tempInput.length() > idLength){
 							JOptionPane.showMessageDialog(null,"Length of Product ID is not valid.","Error",JOptionPane.ERROR_MESSAGE);
 						}
-						else{
+						else if(tempInput.length() == idLength){
 							int tempInt = Integer.parseInt(tempInput);
 							
 							try {
@@ -418,7 +418,7 @@ public class Home extends JFrame implements KeyListener{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							
+							System.out.println("TEST");
 							Runnable doHighlight = new Runnable() {
 								@Override
 								public void run() {
@@ -435,7 +435,7 @@ public class Home extends JFrame implements KeyListener{
 													break;
 												}
 												else{
-													//System.out.println("Not Found in vector");
+													System.out.println("Not Found in vector");
 												}
 											}
 										}
