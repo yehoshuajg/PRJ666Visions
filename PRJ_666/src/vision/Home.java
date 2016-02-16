@@ -102,7 +102,7 @@ public class Home extends JFrame implements KeyListener{
 	private Product tempProductSearch = new Product();
 	private Product productByName;// = new Product();
 	
-	private int idLength = 1;
+	private int idLength = 8;
 	
 	private JPanel contentPane;
 	private Employees employee;
@@ -335,7 +335,7 @@ public class Home extends JFrame implements KeyListener{
 		item_info.add(separator_2);
 		
 		productQuantityPurchased = new JTextField();
-		productQuantityPurchased.setText("Quantity Purchased: ");
+		productQuantityPurchased.setText("Quantity Remaining: ");
 		productQuantityPurchased.setEditable(false);
 		productQuantityPurchased.setBounds(10, 133, 119, 20);
 		item_info.add(productQuantityPurchased);
@@ -401,7 +401,7 @@ public class Home extends JFrame implements KeyListener{
 						else if(checkForNumbers(tempInput) == false){
 							JOptionPane.showMessageDialog(null,"Product ID entered cannot contain alphabets.","Error",JOptionPane.ERROR_MESSAGE);
 						}
-						else if(tempInput.length() != idLength){
+						else if(tempInput.length() > idLength){
 							JOptionPane.showMessageDialog(null,"Length of Product ID is not valid.","Error",JOptionPane.ERROR_MESSAGE);
 						}
 						else{
@@ -1835,7 +1835,7 @@ public class Home extends JFrame implements KeyListener{
 					int proID = (int) model.getValueAt(i, id_column);
 					if(proID == productBySearch.get(j).getID()){
 						//System.out.println(productBySearch.get(j).getQuantity());
-						if(productBySearch.get(j).getQuantity() > 0){
+						/*if(productBySearch.get(j).getQuantity() > 0){
 							//System.out.println("Above 0");
 							int onHand = productBySearch.get(j).getQuantity();
 							
@@ -1857,8 +1857,8 @@ public class Home extends JFrame implements KeyListener{
 							
 							//System.out.println("Product Quantity: " + productBySearch.get(j).getQuantity());
 							//System.out.println("PreviousValue: " + previousValue.get(j).toString());
-						}
-							/*
+						}*/
+							
 							int onHand = productBySearch.get(j).getQuantity();
 							
 							String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
@@ -1871,19 +1871,11 @@ public class Home extends JFrame implements KeyListener{
 							previousValue.remove(j);
 							previousValue.insertElementAt(need, j);
 							
-
-
-							if(productBySearch.get(j).getQuantity() < 0){
-								JOptionPane.showMessageDialog(null,"Inventory quantity for product " + productBySearch.get(j).getName() + ", has reached 0. This product is no longer in stock.");
-								productBySearch.get(j).setQuantity(0);
-								//model.setValueAt(previousValue.get(j), j, productQuantity_column);
-							}
-					        int row = table.getSelectionModel().getLeadSelectionIndex();
+							int row = table.getSelectionModel().getLeadSelectionIndex();
 							textField_name_input.setText(productBySearch.get(row).getName());
 							textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
 							textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
 							break;	
-							*/
 					}	
 				}
 			}
