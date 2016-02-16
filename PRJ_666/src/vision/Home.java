@@ -494,8 +494,9 @@ public class Home extends JFrame implements KeyListener{
 													if(productBySearch.size() > 0){
 														if(tempProductSearch.getID() == productBySearch.get(i).getID()){
 															productBySearch.get(i).setQuantity(tempProductSearch.getQuantity());
-															//previousValue.add(i, productBySearch.get(i).getQuantity());
-															//previousValue.insertElementAt(quantity, i);
+															String tQ = model.getValueAt(i, productQuantity_column).toString();
+															int tempQ = Integer.parseInt(tQ);
+															previousValue.insertElementAt(tempQ, i);
 															eCheck = true;
 															break;
 														}
@@ -506,7 +507,6 @@ public class Home extends JFrame implements KeyListener{
 												}
 												if(eCheck == false){
 													productBySearch.add(tempProductSearch);
-													//previousValue.add(tempProductSearch.getQuantity());
 													previousValue.add(quantity);
 												}
 												
@@ -687,6 +687,7 @@ public class Home extends JFrame implements KeyListener{
 											if(productBySearch.size() > 0){
 												if(idValue == productBySearch.get(i).getID()){
 													productBySearch.remove(j);
+													previousValue.remove(j);
 													break;
 												}
 											}
@@ -927,7 +928,6 @@ public class Home extends JFrame implements KeyListener{
 										
 											if(tableListenerCount == 1){
 												calculateSubtotal();
-												//alculateInventoryQuantity(row,tQ);
 												calculateInventoryQuantity();
 											}
 											else if(tableListenerCount == 0){
@@ -1002,10 +1002,6 @@ public class Home extends JFrame implements KeyListener{
 						}
 					}*/
 				//}
-				
-				for(int i = 0; i < productBySearch.size(); i++){
-					System.out.println(productBySearch.get(i).getQuantity());
-				}
 				
 				
 				
@@ -1826,214 +1822,31 @@ public class Home extends JFrame implements KeyListener{
 		total = Math.round(total * 100.0) / 100.0;
 		total_textField.setText("Total: $" + total);	
 	}
-	//public void calculateInventoryQuantity(int row, int required){
 	public void calculateInventoryQuantity(){
-		//System.out.println("ENTERING");
-		//System.out.println("test1");
 		if(model.getRowCount() > 0 && productBySearch.size() > 0 && !table.isEditing()){
-			//System.out.println("test2");
 			for(int i = 0; i < model.getRowCount(); i++){
-				//System.out.println("test3");
 				for(int j = 0; j < productBySearch.size(); j++){
-					//System.out.println("test4");
 					int proID = (int) model.getValueAt(i, id_column);
 					if(proID == productBySearch.get(j).getID()){
-						//System.out.println("test5");
-						//System.out.println("-");
-						//System.out.println("I: " + i + ", ProductBySearch: " + j);
 						int onHand = productBySearch.get(j).getQuantity();
 						String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
 						int need = Integer.parseInt(tempNeed);
-						//System.out.println("onHand: " + onHand);
-						//System.out.println("Need: " + need);
-						//System.out.println("Table Element: " + i);
 						
-						//System.out.println("Element J: " + j);
-						//System.out.println("Size: " + previousValue.size());
-						//System.out.println("Previous: " + previousValue.get(j).toString());
 						int difference = need - previousValue.get(j);
 						int newQuantity = onHand - difference;
 						productBySearch.get(j).setQuantity(newQuantity);
-						//System.out.println("----------ProductBySearch: " + productBySearch.get(j).getQuantity());
 						
-						//System.out.println("New Quantity: " + productBySearch.get(j).getQuantity());
-						//previousQuantity = need;
-						//previousValue.remove(j);
-						for(int k= 0; k < previousValue.size(); k++){
-							//System.out.println("PreviousLoop: "+ k + " : " + previousValue.get(k));
-						}
-						//System.out.println("Size1.5: " + previousValue.size());
 						previousValue.remove(j);
 						previousValue.insertElementAt(need, j);
 						
-						//System.out.println("Size2: " + previousValue.size());
-						//System.out.println("Value: " + previousValue.get(j).toString());
-						//previousRow = i;
-						
-						//System.out.println("-----" + "\n\n\n");
-						//System.out.println("test5.5");
 				        int row = table.getSelectionModel().getLeadSelectionIndex();
 						textField_name_input.setText(productBySearch.get(row).getName());
 						textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
 						textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
 						break;
-					}
-					else{
-						//System.out.println("NOT");
-						//System.out.println("ProID: " + proID);
-						//System.out.println("it");
-					}
-					//System.out.println("test6");
-				}
-				//System.out.println("test7");
-			}
-			//System.out.println("test8");
-		}
-		//System.out.println("test9");
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*
-		if(!table.isEditing()){
-			int proID = (int) model.getValueAt(row, id_column);
-			if(productBySearch.size() > 0){
-				for(int i = 0; i < productBySearch.size(); i++){
-					if(proID == productBySearch.get(i).getID()){
-						//Sub
-						String r = String.valueOf(row);
-						String p = String.valueOf(previousRow);
-						//System.out.println("R: " + r + ", P: " + p);
-						if(r.equals(p)){
-							//System.out.println("Same");
-							if(previousQuantity < required){
-								if(r.equals(p)){
-									System.out.println("1");
-									int difference = required - previousQuantity;
-									int onHand = productBySearch.get(i).getQuantity();
-									int newQuantity = onHand - difference;
-									productBySearch.get(i).setQuantity(newQuantity);
-									previousQuantity = required;
-									
-									textField_name_input.setText(productBySearch.get(i).getName());
-									textField_price_input.setText("$" + String.valueOf(productBySearch.get(i).getSalePrice()));		
-									textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
-									previousRow = row;
-									break;
-								}
-							}
-							//Add
-							else if(previousQuantity > required){
-								//previousQuantity = 0;
-								int difference = 0;
-								if(required == 1){
-									difference = (previousQuantity - required) + 1;
-									previousQuantity = required-1;
-								}
-								else{
-									difference = previousQuantity - required;
-									previousQuantity = required;
-								}
-								
-								int onHand = productBySearch.get(i).getQuantity();
-								int newQuantity = onHand + difference;
-								productBySearch.get(i).setQuantity(newQuantity);
-								
-								textField_name_input.setText(productBySearch.get(i).getName());
-								textField_price_input.setText("$" + String.valueOf(productBySearch.get(i).getSalePrice()));		
-								textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
-								previousRow = row;
-								break;
-							}
-							//Equal
-							else if(previousQuantity == required){
-								System.out.println("3");
-							}
-							else{
-								System.out.println("4");
-							}
-						}
-						
-						else{
-							System.out.println("Different");
-							System.out.println("Row: " + row);
-							System.out.println("PreviousRow: " + previousRow);
-							System.out.println("different Row");
-							
-							
-							if(previousQuantity < required){
-								int difference = required - previousQuantity;
-								int onHand = productBySearch.get(i).getQuantity();
-								int newQuantity = onHand - difference;
-								productBySearch.get(i).setQuantity(newQuantity);
-								previousQuantity = required;
-								
-								textField_name_input.setText(productBySearch.get(i).getName());
-								textField_price_input.setText("$" + String.valueOf(productBySearch.get(i).getSalePrice()));		
-								textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
-								previousRow = row;
-								break;
-							}
-							//Add
-							else if(previousQuantity > required){
-								int difference = 0;
-								if(required == 1){
-									difference = (previousQuantity - required) + 1;
-									previousQuantity = required-1;
-								}
-								else{
-									difference = previousQuantity - required;
-									previousQuantity = required;
-								}
-								
-								int onHand = productBySearch.get(i).getQuantity();
-								int newQuantity = onHand + difference;
-								productBySearch.get(i).setQuantity(newQuantity);
-								
-								textField_name_input.setText(productBySearch.get(i).getName());
-								textField_price_input.setText("$" + String.valueOf(productBySearch.get(i).getSalePrice()));		
-								textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
-								previousRow = row;
-								break;
-							}
-							//Equal
-							else if(previousQuantity == required){
-								System.out.println("3");
-							}
-							else{
-								System.out.println("4");
-							}
-						}
-					}
+					}	
 				}
 			}
 		}
-		*/
 	}
 }
