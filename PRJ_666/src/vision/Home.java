@@ -100,7 +100,7 @@ public class Home extends JFrame implements KeyListener{
 	private Vector<Product> productBySearch = new Vector<Product>();
 	private Vector<Integer> previousValue = new Vector<Integer>();
 	private Product tempProductSearch = new Product();
-	//private Product productBySearch = new Product();
+	private Product productByName;// = new Product();
 	
 	private int idLength = 1;
 	
@@ -441,7 +441,7 @@ public class Home extends JFrame implements KeyListener{
 										}
 										
 										if(tempProductSearch != null){
-											if(tempProductSearch.getQuantity() == 0){
+											if(tempProductSearch.getQuantity() < 0){
 												JOptionPane.showMessageDialog(null,"Inventory quantity for product " + tempProductSearch.getName() + ", has reached 0. This product is no longer in stock.");
 											}
 											else if(tempProductSearch.getQuantity() > 0){
@@ -558,62 +558,7 @@ public class Home extends JFrame implements KeyListener{
 		item_info.add(textField_name_input);
 		textField_name_input.setColumns(10);
 		textField_name_input.setEditable(false);
-		
-		//Name listener, anything that gets entered goes here
-		/*Thread t2 = new Thread(new Runnable(){
-			public void run(){
-				textField_name_input.getDocument().addDocumentListener(new DocumentListener() {
-					@Override
-					public void removeUpdate(DocumentEvent e) {
-						// TODO Auto-generated method stub
-						checkName();
-					}
-					@Override
-					public void insertUpdate(DocumentEvent e) {
-						// TODO Auto-generated method stub
-						checkName();
-					}
-					@Override
-					public void changedUpdate(DocumentEvent e) {
-						// TODO Auto-generated method stub
-						checkName();
-					}
-					public void checkName(){
-						try{
-							String tempInput = textField_name_input.getText();
-							if(!tempInput.isEmpty()){
-								cashierProductByID = new Cashier();
-								productBySearch = new Product();
-								productBySearch = cashierProductByID.findProductName(tempInput);
-								Runnable doHighlight = new Runnable() {
-									@Override
-								    public void run() {
-									    if(productBySearch != null){
-									    	textField_productID_input.setText(String.valueOf(productBySearch.getID()));
-											textField_price_input.setText(String.valueOf(productBySearch.getSalePrice()));		
-											textField_quantity_input.setText(String.valueOf(productBySearch.getQuantity()));								
-									    }
-									    /*
-									    else{
-									    	textField_productID_input.setText(null);
-											textField_price_input.setText(null);		
-											textField_quantity_input.setText(null);
-									    }
-									    */
-			/*						}
-								};       
-									SwingUtilities.invokeLater(doHighlight);
-								}
-							}
-						catch(Exception e){
-							System.out.println(e);
-						}
-					}
-				});
-			}
-		});
-		t2.start();
-		*/
+	
 		textField_price_input = new JTextField();
 		textField_price_input.setBounds(58, 91, 86, 20);
 		textField_price_input.setEditable(false);
@@ -627,7 +572,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_quantity_input.setColumns(10);
 		
 		JTabbedPane tabbedPane_3 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_3.setBounds(854, 11, 198, 192);
+		tabbedPane_3.setBounds(854, 11, 198, 259);
 		cashier_submenu.add(tabbedPane_3);
 		
 		JPanel cashier_commands = new JPanel();
@@ -744,6 +689,58 @@ public class Home extends JFrame implements KeyListener{
 		textField_discount.setBounds(6, 77, 165, 63);
 		cashier_commands.add(textField_discount);
 		textField_discount.setColumns(10);
+		
+		JSeparator separator_3 = new JSeparator();
+		separator_3.setBounds(0, 152, 264, 20);
+		cashier_commands.add(separator_3);
+		
+		JButton btnFindByName = new JButton("Find by Name");
+		btnFindByName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Find Product by Name
+				try{
+					boolean check = false;
+					if(!table.isEditing()){
+						do{
+							String productNameInput = (String)JOptionPane.showInputDialog(null, "Product Name:", "Find product by name",JOptionPane.PLAIN_MESSAGE);
+							if(validateEmpty(productNameInput) == false){
+								JOptionPane.showMessageDialog(null,"Product name cannot be empty. Please enter a product name.");
+								check = false;
+							}
+							else if(productNameInput.trim().matches("^[0-9A-Za-z]*$")){
+								try {
+									cashierProductByID = new Cashier();
+									productByName = new Product();
+									productByName = cashierProductByID.findProductName(productNameInput);
+								} catch (Exception e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								if(productByName != null){
+									if(!String.valueOf(productByName.getID()).isEmpty()){
+										textField_productID_input.setText(String.valueOf(productByName.getID()));
+										check = true;
+									}
+								}
+								else{
+									JOptionPane.showMessageDialog(null, productNameInput + " could not be found.");
+									check = false;
+								}
+							}
+							else{
+								JOptionPane.showMessageDialog(null,"Please enter a valid product name.");
+								check = false;
+							}
+						}while(check == false);
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+					}
+				}catch(Exception e1){}
+			}
+		});
+		btnFindByName.setBounds(10, 170, 117, 29);
+		cashier_commands.add(btnFindByName);
 		
 		JTabbedPane tabbedPane_5 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_5.setBounds(854, 399, 198, 150);
@@ -1312,7 +1309,7 @@ public class Home extends JFrame implements KeyListener{
 	}
 	public boolean validateEmpty(String temp){
 		temp = temp.trim();
-		if(temp.isEmpty() || temp == null || temp.length() == 0){
+		if(temp.isEmpty() || temp == null || temp.length() <= 0){
 			return false;
 		}
 		else{
@@ -1837,22 +1834,56 @@ public class Home extends JFrame implements KeyListener{
 				for(int j = 0; j < productBySearch.size(); j++){
 					int proID = (int) model.getValueAt(i, id_column);
 					if(proID == productBySearch.get(j).getID()){
-						int onHand = productBySearch.get(j).getQuantity();
-						String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
-						int need = Integer.parseInt(tempNeed);
-						
-						int difference = need - previousValue.get(j);
-						int newQuantity = onHand - difference;
-						productBySearch.get(j).setQuantity(newQuantity);
-						
-						previousValue.remove(j);
-						previousValue.insertElementAt(need, j);
-						
-				        int row = table.getSelectionModel().getLeadSelectionIndex();
-						textField_name_input.setText(productBySearch.get(row).getName());
-						textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
-						textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
-						break;
+						//System.out.println(productBySearch.get(j).getQuantity());
+						if(productBySearch.get(j).getQuantity() > 0){
+							//System.out.println("Above 0");
+							int onHand = productBySearch.get(j).getQuantity();
+							
+							String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
+							int need = Integer.parseInt(tempNeed);
+							
+							int difference = need - previousValue.get(j);
+							int newQuantity = onHand - difference;
+							productBySearch.get(j).setQuantity(newQuantity);
+							
+							previousValue.remove(j);
+							previousValue.insertElementAt(need, j);
+							
+							System.out.println("After: " + productBySearch.get(j).getQuantity());
+						}
+						else{
+							//System.out.println("Quantity has reached under 0");
+							//productBySearch.get(j).setQuantity(0);
+							
+							//System.out.println("Product Quantity: " + productBySearch.get(j).getQuantity());
+							//System.out.println("PreviousValue: " + previousValue.get(j).toString());
+						}
+							/*
+							int onHand = productBySearch.get(j).getQuantity();
+							
+							String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
+							int need = Integer.parseInt(tempNeed);
+							
+							int difference = need - previousValue.get(j);
+							int newQuantity = onHand - difference;
+							productBySearch.get(j).setQuantity(newQuantity);
+							
+							previousValue.remove(j);
+							previousValue.insertElementAt(need, j);
+							
+
+
+							if(productBySearch.get(j).getQuantity() < 0){
+								JOptionPane.showMessageDialog(null,"Inventory quantity for product " + productBySearch.get(j).getName() + ", has reached 0. This product is no longer in stock.");
+								productBySearch.get(j).setQuantity(0);
+								//model.setValueAt(previousValue.get(j), j, productQuantity_column);
+							}
+					        int row = table.getSelectionModel().getLeadSelectionIndex();
+							textField_name_input.setText(productBySearch.get(row).getName());
+							textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
+							textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
+							break;	
+							*/
 					}	
 				}
 			}
