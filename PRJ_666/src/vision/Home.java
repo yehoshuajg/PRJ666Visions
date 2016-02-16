@@ -679,19 +679,25 @@ public class Home extends JFrame implements KeyListener{
 										total = subTotal + tax;
 										total = Math.round(total * 100.0) / 100.0;
 										total_textField.setText("Total: $" + total);	
-	
-										model.removeRow(i);
 										
-										int idValue = (int) model.getValueAt(i, id_column);
-										for(int j = 0; j < productBySearch.size(); j++){
-											if(productBySearch.size() > 0){
-												if(idValue == productBySearch.get(i).getID()){
+										if(productBySearch.size() > 0){
+											for(int j = 0; j < productBySearch.size(); j++){
+												//Convert to string, other values always cause problem due to object type
+												int idValue = (int) model.getValueAt(i, id_column);
+												String idValueString = String.valueOf(idValue);
+												String productTempID = String.valueOf(productBySearch.get(j).getID());
+												if(idValueString.equals(productTempID)){
+													//Removes product from vector and its previous value
 													productBySearch.remove(j);
 													previousValue.remove(j);
-													break;
+													
 												}
 											}
 										}
+										//Delete at end & put focus back to ID field
+										model.removeRow(i);
+										textField_productID_input.requestFocusInWindow();
+										
 									}
 								}catch(Exception e2){}
 							}
@@ -1002,8 +1008,11 @@ public class Home extends JFrame implements KeyListener{
 						}
 					}*/
 				//}
-				
-				
+				if(productBySearch.size() > 0){
+					for(int i = 0; i < productBySearch.size(); i++){
+						System.out.println(i + ".)" + productBySearch.get(i).getName());
+					}
+				}
 				
 				
 				
