@@ -100,7 +100,7 @@ public class Home extends JFrame implements KeyListener{
 	private Vector<Product> productBySearch = new Vector<Product>();
 	private Vector<Integer> previousValue = new Vector<Integer>();
 	private Product tempProductSearch = new Product();
-	private Product productByName;// = new Product();
+	private Product productByName; // = new Product();
 	
 	private int idLength = 8;
 	
@@ -138,9 +138,6 @@ public class Home extends JFrame implements KeyListener{
 	private int productPrice_column = 4;
 	private int productQuantityAndPrice_column = 5;
 	private int productRemove_column = 6;
-	
-	//Checkbox
-	private JCheckBox remove;
 	
 	//Sales Total
 	private double subTotal = 0;
@@ -856,13 +853,13 @@ public class Home extends JFrame implements KeyListener{
 	  	
 	    //Column Width
 	  	TableColumnModel columnModel = table.getColumnModel();
-	  	columnModel.getColumn(0).setPreferredWidth(10); //ID
-	 	columnModel.getColumn(1).setPreferredWidth(30); //Product ID
-	  	columnModel.getColumn(2).setPreferredWidth(200); //Name
-        columnModel.getColumn(3).setPreferredWidth(30); //Quantity 
-	  	columnModel.getColumn(4).setPreferredWidth(50); //Price
-	  	columnModel.getColumn(5).setPreferredWidth(30); //Price * Quantity
-	  	columnModel.getColumn(6).setPreferredWidth(10); //Remove
+	  	columnModel.getColumn(indent_column).setPreferredWidth(10); //ID
+	 	columnModel.getColumn(id_column).setPreferredWidth(30); //Product ID
+	  	columnModel.getColumn(productName_column).setPreferredWidth(200); //Name
+        columnModel.getColumn(productQuantity_column).setPreferredWidth(30); //Quantity 
+	  	columnModel.getColumn(productPrice_column).setPreferredWidth(50); //Price
+	  	columnModel.getColumn(productQuantityAndPrice_column).setPreferredWidth(30); //Price * Quantity
+	  	columnModel.getColumn(productRemove_column).setPreferredWidth(10); //Remove
 
 	    //Columns won't be able to moved around
 	  	table.getTableHeader().setReorderingAllowed(false);
@@ -870,13 +867,13 @@ public class Home extends JFrame implements KeyListener{
 	    //Center table data 
 	  	DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 	  	centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
-	  	table.getColumnModel().getColumn(0).setCellRenderer( centerRenderer ); //ID
-	  	table.getColumnModel().getColumn(1).setCellRenderer( centerRenderer ); //Product ID
-	  	table.getColumnModel().getColumn(2).setCellRenderer( centerRenderer ); //Name
-	  	table.getColumnModel().getColumn(3).setCellRenderer( centerRenderer ); //Quantity
-	  	table.getColumnModel().getColumn(4).setCellRenderer( centerRenderer ); //Price
-	  	table.getColumnModel().getColumn(5).setCellRenderer( centerRenderer ); //Quantity * Price
-	  	table.getColumnModel().getColumn(6).setCellRenderer( centerRenderer ); //Remove
+	  	table.getColumnModel().getColumn(indent_column).setCellRenderer( centerRenderer ); //ID
+	  	table.getColumnModel().getColumn(id_column).setCellRenderer( centerRenderer ); //Product ID
+	  	table.getColumnModel().getColumn(productName_column).setCellRenderer( centerRenderer ); //Name
+	  	table.getColumnModel().getColumn(productQuantity_column).setCellRenderer( centerRenderer ); //Quantity
+	  	table.getColumnModel().getColumn(productPrice_column).setCellRenderer( centerRenderer ); //Price
+	  	table.getColumnModel().getColumn(productQuantityAndPrice_column).setCellRenderer( centerRenderer ); //Quantity * Price
+	  	table.getColumnModel().getColumn(productRemove_column).setCellRenderer( centerRenderer ); //Remove
 	  	
 	    //Center table column names
 	  	centerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
