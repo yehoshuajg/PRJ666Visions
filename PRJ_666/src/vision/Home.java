@@ -418,6 +418,7 @@ public class Home extends JFrame implements KeyListener{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+
 							Runnable doHighlight = new Runnable() {
 								@Override
 								public void run() {
@@ -434,14 +435,14 @@ public class Home extends JFrame implements KeyListener{
 													break;
 												}
 												else{
-													System.out.println("Not Found in vector");
+													//System.out.println("Not Found in vector");
 												}
 											}
 										}
 										
 										if(tempProductSearch != null){
-											if(tempProductSearch.getQuantity() < 0){
-												JOptionPane.showMessageDialog(null,"Inventory quantity for product " + tempProductSearch.getName() + ", has reached 0. This product is no longer in stock.");
+											if(tempProductSearch.getQuantity() <= 0){
+												JOptionPane.showMessageDialog(null,"Inventory quantity for product " + '"'+ tempProductSearch.getName() + '"' + ", has reached 0. This product is no longer in stock.");
 											}
 											else if(tempProductSearch.getQuantity() > 0){
 												boolean qCheck = false;
@@ -1833,48 +1834,36 @@ public class Home extends JFrame implements KeyListener{
 				for(int j = 0; j < productBySearch.size(); j++){
 					int proID = (int) model.getValueAt(i, id_column);
 					if(proID == productBySearch.get(j).getID()){
-						//System.out.println(productBySearch.get(j).getQuantity());
-						/*if(productBySearch.get(j).getQuantity() > 0){
-							//System.out.println("Above 0");
-							int onHand = productBySearch.get(j).getQuantity();
-							
-							String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
-							int need = Integer.parseInt(tempNeed);
-							
-							int difference = need - previousValue.get(j);
-							int newQuantity = onHand - difference;
-							productBySearch.get(j).setQuantity(newQuantity);
-							
+						int onHand = productBySearch.get(j).getQuantity();
+						
+						String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
+						int need = Integer.parseInt(tempNeed);
+						
+						int p = productBySearch.get(j).getQuantity();
+						int p2 = previousValue.get(j);
+						
+						int difference = need - previousValue.get(j);
+						int newQuantity = onHand - difference;
+						productBySearch.get(j).setQuantity(newQuantity);
+						
+						previousValue.remove(j);
+						previousValue.insertElementAt(need, j);
+						
+						if(productBySearch.get(j).getQuantity() < 0){
+							JOptionPane.showMessageDialog(null,"Inventory quantity for product " + '"' + productBySearch.get(j).getName() + '"' + ", has reached 0. This product is no longer in stock.");
+							productBySearch.get(j).setQuantity(p);
+						
 							previousValue.remove(j);
-							previousValue.insertElementAt(need, j);
-							
-							System.out.println("After: " + productBySearch.get(j).getQuantity());
+							previousValue.insertElementAt(p2, j);
+
+							model.setValueAt(p2, j, productQuantity_column);
 						}
-						else{
-							//System.out.println("Quantity has reached under 0");
-							//productBySearch.get(j).setQuantity(0);
-							
-							//System.out.println("Product Quantity: " + productBySearch.get(j).getQuantity());
-							//System.out.println("PreviousValue: " + previousValue.get(j).toString());
-						}*/
-							
-							int onHand = productBySearch.get(j).getQuantity();
-							
-							String tempNeed = model.getValueAt(i, productQuantity_column).toString(); 
-							int need = Integer.parseInt(tempNeed);
-							
-							int difference = need - previousValue.get(j);
-							int newQuantity = onHand - difference;
-							productBySearch.get(j).setQuantity(newQuantity);
-							
-							previousValue.remove(j);
-							previousValue.insertElementAt(need, j);
-							
-							int row = table.getSelectionModel().getLeadSelectionIndex();
-							textField_name_input.setText(productBySearch.get(row).getName());
-							textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
-							textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
-							break;	
+						
+						int row = table.getSelectionModel().getLeadSelectionIndex();
+						textField_name_input.setText(productBySearch.get(row).getName());
+						textField_price_input.setText("$" + String.valueOf(productBySearch.get(row).getSalePrice()));		
+						textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
+						break;
 					}	
 				}
 			}
