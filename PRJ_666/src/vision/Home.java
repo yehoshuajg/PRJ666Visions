@@ -399,7 +399,7 @@ public class Home extends JFrame implements KeyListener{
 							//JOptionPane.showMessageDialog(null,"Product ID entered cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
 						}
 						else if(checkForNumbers(tempInput) == false){
-							JOptionPane.showMessageDialog(null,"Product ID entered cannot contain alphabets.","Error",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,"Product ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
 						}
 						else if(tempInput.length() > idLength){
 							JOptionPane.showMessageDialog(null,"Length of Product ID is not valid.","Error",JOptionPane.ERROR_MESSAGE);
@@ -902,6 +902,8 @@ public class Home extends JFrame implements KeyListener{
 								@Override
 								public void run() {
 									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
+									char c = tempQuantity.charAt(0);
+									char c2 = tempQuantity.charAt(tempQuantity.length()-1);
 									if(validateEmpty(tempQuantity) == false){
 										JOptionPane.showMessageDialog(null,"Quantity field cannot be left empty. "
 												+ "Please enter a quantity above 0 for row #" + (row+1) + ".");
@@ -911,7 +913,13 @@ public class Home extends JFrame implements KeyListener{
 									}
 									else if(checkForNumbers(tempQuantity) == false){
 										JOptionPane.showMessageDialog(null,"Quantity entered for row #" + (row+1) + 
-												" cannot contain alphabets.","Error",JOptionPane.ERROR_MESSAGE);
+												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+										model.setValueAt(1, row, col);
+										table.setRowSelectionInterval(row, row);
+										table.setColumnSelectionInterval(0, 0);
+									}
+									else if(c == '0' && c2 >= '0'){
+										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
 										model.setValueAt(1, row, col);
 										table.setRowSelectionInterval(row, row);
 										table.setColumnSelectionInterval(0, 0);
@@ -921,7 +929,6 @@ public class Home extends JFrame implements KeyListener{
 										int tQ = Integer.parseInt(tempQuantity);
 										if(tQ > 0){
 											double tP = Double.parseDouble(tempPrice);
-											//tQ = Math.round(tQ * 100.0) / 100.0;
 											tP = Math.round(tP * 100.0) / 100.0;
 											
 											tempTotal = tQ * tP;
