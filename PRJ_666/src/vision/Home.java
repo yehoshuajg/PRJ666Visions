@@ -147,6 +147,7 @@ public class Home extends JFrame implements KeyListener{
 	
 	//JFrame/Dialog
 	JDialog d3;
+	JDialog d4;
 	/**
 	 * Launch the application.
 	 */
@@ -765,7 +766,7 @@ public class Home extends JFrame implements KeyListener{
 					}
 					//Cash
 					else if(cashCredit == JOptionPane.CANCEL_OPTION){
-						loadCheckoutFrame();
+						loadCheckoutFrame(e);
 					}
 					//tabbedPane_7.setVisible(true);
 				}
@@ -1226,6 +1227,7 @@ public class Home extends JFrame implements KeyListener{
 				String message2 = sb2.toString();
 				int cashTransaction = JOptionPane.showOptionDialog(null,message2,"Checkout using Cash",
 				JOptionPane.PLAIN_MESSAGE,JOptionPane.PLAIN_MESSAGE,null,optionsTransactionCash,optionsTransactionCash[0]);
+				d4.dispose();
 			}
 			//frame_cashCheckout.dispose();
 		}
@@ -1566,7 +1568,7 @@ public class Home extends JFrame implements KeyListener{
 		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
 	}
 	
-	public void loadCheckoutFrame(){
+	public void loadCheckoutFrame(ActionEvent e){
 		JPanel panel_checkout = new JPanel();
 		panel_checkout.setLayout(null);
 		
@@ -1779,19 +1781,29 @@ public class Home extends JFrame implements KeyListener{
 				calculateCashCheckout();
 			}
 		});
-		
+		/*
 		frame_cashCheckout = new JFrame();
 		frame_cashCheckout.getContentPane().add(panel_checkout);
 		//frame_cashCheckout.setSize(w/2, h/2);
 		frame_cashCheckout.setSize(475, 400);
 		frame_cashCheckout.setVisible(true);
 		frame_cashCheckout.setLocationRelativeTo(null);
-		
+		*/
 		//setEnabled(false);
 		//frame_cashCheckout.setEnabled(true);
 		
 		//selects default button
-		frame_cashCheckout.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+		//frame_cashCheckout.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+		
+		
+		Component component = (Component) e.getSource();
+        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+		d4 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d4.getContentPane().add(panel_checkout);
+		d4.setSize(475, 400);
+		d4.setVisible(true);
+		d4.setLocationRelativeTo(null);
+		d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
 	}
 	public void calculateSubtotal(){
 		double sub = 0;
