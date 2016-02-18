@@ -952,6 +952,11 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		keypad_1.setBounds(0, 0, 87, 93);
 		keypad_panel.add(keypad_1);
+		
+		JPanel panel = new JPanel();
+		tabbedPane_1.addTab("Refund", null, panel, null);
+		panel.setLayout(null);
+		
 		keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//String i = e.getActionCommand();
@@ -1171,7 +1176,7 @@ public class Home extends JFrame implements KeyListener{
 		*/
 		Reports report_sec = new Reports(); 
 		JPanel panel_reports = report_sec.getWindow();
-		tabbedPane.addTab("Reports", null, panel_reports, null);
+		tabbedPane.addTab("Reports", panel_reports);
 		panel_reports.setLayout(null);
 		
 		JPanel panel_staff = new JPanel();
