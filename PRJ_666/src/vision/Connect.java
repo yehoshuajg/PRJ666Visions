@@ -17,9 +17,10 @@ public class Connect {
 	
 	private Connection con;
 	
-	public Connect() throws Exception{
+	public Connect() {
 		
 	}
+	
 	public static Connection connectionSetup() throws Exception{
 		try{
 			//Register JDBC driver
@@ -35,6 +36,7 @@ public class Connect {
 		}
 		return null;
 	}
+	
 	public Connection getConnection(){
 		return con;
 	}

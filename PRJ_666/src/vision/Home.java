@@ -36,8 +36,6 @@ import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
 
 import org.omg.Messaging.SyncScopeHelper;
 
-import vision.SpinnerEditor;
-
 import javax.swing.JTabbedPane;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
