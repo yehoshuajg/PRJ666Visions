@@ -1,6 +1,5 @@
 package vision;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -12,81 +11,40 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
-
-import org.omg.Messaging.SyncScopeHelper;
 
 import javax.swing.JTabbedPane;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Vector;
-import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerListModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.KeyboardFocusManager;
-import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.Window;
 
-import javax.swing.border.BevelBorder;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 
 public class Home extends JFrame implements KeyListener{
 	
@@ -186,6 +144,9 @@ public class Home extends JFrame implements KeyListener{
 	
 	//Runnable
 	Runnable run1;
+	
+	//JFrame/Dialog
+	JDialog d3;
 	/**
 	 * Launch the application.
 	 */
@@ -673,7 +634,8 @@ public class Home extends JFrame implements KeyListener{
 					textField_productID_input.requestFocusInWindow();
 				}
 				else{
-					loadDiscountFrame();
+					//MOD FRAME
+					loadDiscountFrame(e);
 				}
 			}	
 		});
@@ -1007,15 +969,17 @@ public class Home extends JFrame implements KeyListener{
 						}
 					}*/
 				//}
-				if(productBySearch.size() > 0){
-					for(int i = 0; i < productBySearch.size(); i++){
-						System.out.println(i + ".)" + productBySearch.get(i).getName());
-					}
-				}
+				/*JDialog d2 = new JDialog();
+				d2.setBounds(0, 0, 500, 500);
+				d2.setVisible(true);
+				*/
 				
-				
-				
-				
+				/*Component component = (Component) e.getSource();
+		        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
+				JDialog d3 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
+				d3.setBounds(0, 0, 300, 300);
+				d3.setVisible(true);
+				*/
 			}
 		});
 		/*
@@ -1268,6 +1232,7 @@ public class Home extends JFrame implements KeyListener{
 	}
 	
 	public void calculateOneTimeDiscount(){
+		boolean check = false;
 		String discountInput = discount_option.getText();
 		
 		if(oneTimeDiscountCheck == true){
@@ -1275,7 +1240,7 @@ public class Home extends JFrame implements KeyListener{
 		}
 		else if (validateEmpty(discountInput) == false){
 			JOptionPane.showMessageDialog(null,"Value entered cannot be Empty","Error",JOptionPane.ERROR_MESSAGE);
-			discount_option.setFocusable(true);
+			//discount_option.setFocusable(true);
 		}
 		else{
 			Discount oneTimeDiscount = new Discount();
@@ -1292,15 +1257,17 @@ public class Home extends JFrame implements KeyListener{
 			total = subTotal + tax;
 			total = Math.round(total * 100.0) / 100.0;
 			total_textField.setText("Total: $" + total);
-				
-			oneTimeDiscountCheck = true;
-				
+					
 			if(subTotal < previous){
 				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
+				oneTimeDiscountCheck = true;
+				d3.dispose();
 			}
 		}
 		//textField_productID_input.requestFocusInWindow();
 		//frame_discount.dispose();
+		//d3.dispose();
+		
 	}
 	
 	public boolean checkForNumbers(String input){
@@ -1343,7 +1310,7 @@ public class Home extends JFrame implements KeyListener{
 	public void keyTyped(KeyEvent e) {	
 	}
 	
-	public void loadDiscountFrame(){
+	public void loadDiscountFrame(ActionEvent e){
 		JPanel panel_discount = new JPanel();
 		panel_discount.setLayout(null);
 		
@@ -1550,7 +1517,7 @@ public class Home extends JFrame implements KeyListener{
 			}
 		});
 		
-		frame_discount = new JFrame();
+		/*frame_discount = new JFrame();
 		frame_discount.getContentPane().add(panel_discount);
 		//frame_discount.setSize(w/2, h/2);
 		frame_discount.setSize(475, 400);
@@ -1559,12 +1526,13 @@ public class Home extends JFrame implements KeyListener{
 		
 		//selects default button
 		frame_discount.getRootPane().setDefaultButton(discountOption_btnEnter);
-		
+		*/
 		//setEnabled(false);
 		//panel_discount.setEnabled(true);
 		
 		Discount d = new Discount();
 		int count = d.getPromotionCount();
+		
 		discount = new Vector<Discount>();
 		for(int i = 1; i <= count; i++){
 			Discount temp = new Discount();
@@ -1587,6 +1555,15 @@ public class Home extends JFrame implements KeyListener{
 		}
 		String toDisplay=sb1.toString();
 		discount_message1.setText(toDisplay);
+		
+		Component component = (Component) e.getSource();
+        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
+		d3 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d3.getContentPane().add(panel_discount);
+		d3.setBounds(0, 0, 475, 400);
+		d3.setVisible(true);
+		d3.setLocationRelativeTo(null);
+		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
 	}
 	
 	public void loadCheckoutFrame(){
