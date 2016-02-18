@@ -148,6 +148,7 @@ public class Home extends JFrame implements KeyListener{
 	//JFrame/Dialog
 	JDialog d3;
 	JDialog d4;
+	private JTextField textField_transaction_input;
 	/**
 	 * Launch the application.
 	 */
@@ -214,7 +215,7 @@ public class Home extends JFrame implements KeyListener{
 		welcome = new JTextField();
 		welcome.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		welcome.setText("Welcome, ");
-		welcome.setBounds(6, 6, 492, 43);
+		welcome.setBounds(413, 218, 492, 43);
 		welcome.setEditable(false);
 		panel_home.add(welcome);
 		welcome.setColumns(10);
@@ -235,7 +236,7 @@ public class Home extends JFrame implements KeyListener{
 				
 			}
 		});
-		btnSignOut.setBounds(738, 6, 276, 45);
+		btnSignOut.setBounds(521, 273, 276, 45);
 		panel_home.add(btnSignOut);
 		
 		JPanel panel_cashier = new JPanel();
@@ -956,6 +957,80 @@ public class Home extends JFrame implements KeyListener{
 		JPanel panel = new JPanel();
 		tabbedPane_1.addTab("Refund", null, panel, null);
 		panel.setLayout(null);
+		
+		JTabbedPane tabbedPane_8 = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_8.setBounds(6, 6, 412, 93);
+		panel.add(tabbedPane_8);
+		
+		JPanel panel_1 = new JPanel();
+		tabbedPane_8.addTab("Find Transaction:", null, panel_1, null);
+		panel_1.setLayout(null);
+		
+		JTextPane txtpnTransactionId = new JTextPane();
+		txtpnTransactionId.setText("Transaction ID:");
+		txtpnTransactionId.setBounds(6, 10, 96, 16);
+		txtpnTransactionId.setBackground(Color.decode(defaultColor));
+		panel_1.add(txtpnTransactionId);
+		
+		textField_transaction_input = new JTextField();
+		textField_transaction_input.setBounds(114, 6, 130, 26);
+		panel_1.add(textField_transaction_input);
+		textField_transaction_input.setColumns(10);
+		
+		//Places cursor in ID field as soon as page loads, like focus in html
+		textField_transaction_input.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void ancestorMoved(AncestorEvent event) {
+				// TODO Auto-generated method stub	
+			}
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				SwingUtilities.invokeLater(new Runnable() {
+		            @Override
+		            public void run() {
+		            	textField_transaction_input.requestFocusInWindow();
+		            }
+				});
+			}
+		});
+		Thread t3 = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				textField_transaction_input.getDocument().addDocumentListener(new DocumentListener() {
+					
+					@Override
+					public void removeUpdate(DocumentEvent e) {
+						checkTransactionID();
+					}
+					
+					@Override
+					public void insertUpdate(DocumentEvent e) {
+						// TODO Auto-generated method stub
+						checkTransactionID();
+					}
+					
+					@Override
+					public void changedUpdate(DocumentEvent e) {
+						// TODO Auto-generated method stub
+						checkTransactionID();
+					}
+					public void checkTransactionID(){
+						//System.out.println(textField_transaction_input.getText());
+					}
+				});
+			}
+		});
+		t3.start();
+		
+		JButton transaction_search_button = new JButton("Search");
+		transaction_search_button.setBounds(256, 6, 117, 29);
+		panel_1.add(transaction_search_button);
 		
 		keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
