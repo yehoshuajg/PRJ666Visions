@@ -600,6 +600,11 @@ public class Home extends JFrame implements KeyListener{
 										model.removeRow(i);
 										textField_productID_input.requestFocusInWindow();
 										
+										//Empty the product details field
+										textField_productID_input.setText("");
+										textField_name_input.setText("");
+										textField_price_input.setText("$0.00");		
+										textField_quantity_input.setText("0");
 									}
 								}catch(Exception e2){}
 							}
@@ -1264,6 +1269,7 @@ public class Home extends JFrame implements KeyListener{
 				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
 				oneTimeDiscountCheck = true;
 				d3.dispose();
+				textField_productID_input.requestFocusInWindow();
 			}
 		}
 		//textField_productID_input.requestFocusInWindow();
