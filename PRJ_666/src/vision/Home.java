@@ -143,12 +143,27 @@ public class Home extends JFrame implements KeyListener{
 	private int previousRow = 0;
 	
 	//Runnable
-	Runnable run1;
+	Runnable run1; //make it local later
 	
 	//JFrame/Dialog
-	JDialog d3;
-	JDialog d4;
+	private JDialog d3;
+	private JDialog d4;
 	private JTextField textField_transaction_input;
+	
+	//Refund
+	private JPanel panel_refund;
+	
+	//Refund Table
+	private Vector<String> refund_column_name = new Vector<String>();
+	private Vector<String> refund_row_data = new Vector<String>();
+	private JTable table_refund;
+	private DefaultTableModel model_refund;	
+	
+	//Refund Total Fields
+	private JTextField refund_subtotal_textField;
+	private JTextField refund_tax_textField;
+	private JTextField refund_total_textField;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -981,13 +996,13 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setBounds(0, 0, 87, 93);
 		keypad_panel.add(keypad_1);
 		
-		JPanel panel = new JPanel();
-		tabbedPane_1.addTab("Refund", null, panel, null);
-		panel.setLayout(null);
+		panel_refund = new JPanel();
+		tabbedPane_1.addTab("Refund", null, panel_refund, null);
+		panel_refund.setLayout(null);
 		
 		JTabbedPane tabbedPane_8 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_8.setBounds(6, 6, 412, 93);
-		panel.add(tabbedPane_8);
+		panel_refund.add(tabbedPane_8);
 		
 		JPanel panel_1 = new JPanel();
 		tabbedPane_8.addTab("Find Transaction:", null, panel_1, null);
@@ -1070,6 +1085,9 @@ public class Home extends JFrame implements KeyListener{
 		JButton transaction_search_button = new JButton("Search");
 		transaction_search_button.setBounds(256, 6, 117, 29);
 		panel_1.add(transaction_search_button);
+		
+		loadTransactionTable();
+		loadRefundTotal();
 		
 		keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1290,7 +1308,7 @@ public class Home extends JFrame implements KeyListener{
 		*/
 		Reports report_sec = new Reports(); 
 		JPanel panel_reports = report_sec.getWindow();
-		tabbedPane.addTab("Reports", panel_reports);
+		tabbedPane.addTab("Reports", null,panel_reports,null);
 		panel_reports.setLayout(null);
 		
 		JPanel panel_staff = new JPanel();
@@ -1987,5 +2005,111 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		}
+	}
+	public void loadTransactionTable(){
+		JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_refund_table.setBounds(20, 204, 822, 375);
+		panel_refund.add(tabbedPane_refund_table);
+		
+		JPanel panel_table_refund = new JPanel(new BorderLayout());
+		tabbedPane_refund_table.addTab("List of purchased items, quantity and price: ", null, panel_table_refund, null);
+		
+		refund_column_name.addElement("#");
+		refund_column_name.addElement("Product ID");
+		refund_column_name.addElement("Name");
+		refund_column_name.addElement("Quantity");
+		refund_column_name.addElement("Price");
+		refund_column_name.addElement("Quantity * Price");
+		refund_column_name.addElement("Remove");
+		
+		table_refund = new JTable(refund_row_data, refund_column_name){
+			public boolean isCellEditable(int row, int column) {
+				//Return true if the column (number) is editable, else false
+		        if(column == 3 || column == 6){ 
+		        	return true;
+		        }
+		        else{
+		        	return false;
+		        }
+		    }
+		};
+		panel_table_refund.add(table_refund.getTableHeader(), BorderLayout.NORTH);
+		panel_table_refund.add(table_refund, BorderLayout.CENTER);
+		
+		//Row Height
+		table_refund.setRowHeight(30);
+	  	
+	    //Column Width
+	  	TableColumnModel columnModel_refund = table_refund.getColumnModel();
+	  	columnModel_refund.getColumn(indent_column).setPreferredWidth(10); //ID
+	 	columnModel_refund.getColumn(id_column).setPreferredWidth(30); //Product ID
+	  	columnModel_refund.getColumn(productName_column).setPreferredWidth(200); //Name
+        columnModel_refund.getColumn(productQuantity_column).setPreferredWidth(30); //Quantity 
+	  	columnModel_refund.getColumn(productPrice_column).setPreferredWidth(50); //Price
+	  	columnModel_refund.getColumn(productQuantityAndPrice_column).setPreferredWidth(30); //Price * Quantity
+	  	columnModel_refund.getColumn(productRemove_column).setPreferredWidth(10); //Remove
+
+	    //Columns won't be able to moved around
+	  	table_refund.getTableHeader().setReorderingAllowed(false);
+	  	
+	    //Center table data 
+	  	DefaultTableCellRenderer centerRenderer_refund = new DefaultTableCellRenderer();
+	  	centerRenderer_refund.setHorizontalAlignment( SwingConstants.CENTER );
+	  	table_refund.getColumnModel().getColumn(indent_column).setCellRenderer( centerRenderer_refund ); //ID
+	  	table_refund.getColumnModel().getColumn(id_column).setCellRenderer( centerRenderer_refund ); //Product ID
+	  	table_refund.getColumnModel().getColumn(productName_column).setCellRenderer( centerRenderer_refund ); //Name
+	  	table_refund.getColumnModel().getColumn(productQuantity_column).setCellRenderer( centerRenderer_refund ); //Quantity
+	  	table_refund.getColumnModel().getColumn(productPrice_column).setCellRenderer( centerRenderer_refund ); //Price
+	  	table_refund.getColumnModel().getColumn(productQuantityAndPrice_column).setCellRenderer( centerRenderer_refund ); //Quantity * Price
+	  	table_refund.getColumnModel().getColumn(productRemove_column).setCellRenderer( centerRenderer_refund ); //Remove
+	  	
+	    //Center table column names
+	  	centerRenderer_refund = (DefaultTableCellRenderer) table_refund.getTableHeader().getDefaultRenderer();
+	  	centerRenderer_refund.setHorizontalAlignment(JLabel.CENTER);
+	  	
+		JScrollPane jsp = new JScrollPane(table_refund);
+		jsp.setBounds(2, 2, 810, 344);
+		jsp.setVisible(true);
+		panel_table_refund.add(jsp);
+	   
+		model_refund = (DefaultTableModel) table_refund.getModel();
+	}
+	public void loadRefundTotal(){
+		JTabbedPane tabbedPane_refund_total = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_refund_total.setBounds(854, 399, 198, 150);
+		panel_refund.add(tabbedPane_refund_total);
+		
+		JPanel refund_total = new JPanel();
+		tabbedPane_refund_total.addTab("Sales Total: ", null, refund_total, null);
+		refund_total.setLayout(null);
+		
+		refund_subtotal_textField = new JTextField();
+		refund_subtotal_textField.setText("Subtotal: $" + subTotal);
+		refund_subtotal_textField.setEditable(false);
+		refund_subtotal_textField.setBounds(10, 11, 103, 20);
+		refund_total.add(refund_subtotal_textField);
+		refund_subtotal_textField.setColumns(10);
+		
+		refund_tax_textField = new JTextField();
+		refund_tax_textField.setText("Tax: $" + tax);
+		refund_tax_textField.setEditable(false);
+		refund_tax_textField.setBounds(10, 50, 103, 20);
+		refund_total.add(refund_tax_textField);
+		refund_tax_textField.setColumns(10);
+		
+		refund_total_textField = new JTextField();
+		refund_total_textField.setText("Total: $" + total);
+		refund_total_textField.setEditable(false);
+		refund_total_textField.setBounds(10, 91, 103, 20);
+		refund_total.add(refund_total_textField);
+		refund_total_textField.setColumns(10);
+		
+		JSeparator separator_7 = new JSeparator();
+		separator_7.setBounds(0, 39, 258, 20);
+		refund_total.add(separator_7);
+		
+		JSeparator separator_8 = new JSeparator();
+		separator_8.setBounds(0, 81, 258, 20);
+		refund_total.add(separator_8);
 	}
 }
