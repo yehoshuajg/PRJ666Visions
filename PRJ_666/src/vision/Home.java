@@ -159,10 +159,17 @@ public class Home extends JFrame implements KeyListener{
 	private JTable table_refund;
 	private DefaultTableModel model_refund;	
 	
-	//Refund Total Fields
-	private JTextField refund_subtotal_textField;
-	private JTextField refund_tax_textField;
-	private JTextField refund_total_textField;
+	//Refund details:
+	private JTextField textField_transactionID;
+	private JTextField textField_createDate;
+	private JTextField textField_transaction_subtotal;
+	private JTextField textField_transaction_tax;
+	private JTextField textField_transaction_total;
+	private JTextField textField_transactionType;
+	private JTextField textField_method;
+	private JTextField textField_promotionID;
+	private JTextField textField_employeeID;
+	private int tracker = 1;
 	
 	/**
 	 * Launch the application.
@@ -369,7 +376,7 @@ public class Home extends JFrame implements KeyListener{
 					public void checkID(){
 						String tempInput = textField_productID_input.getText();
 						if(validateEmpty(tempInput) == false){
-							//JOptionPane.showMessageDialog(null,"Product ID entered cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+							//JOptionPane.showMessageDialog(null,"Product ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
 							textField_name_input.setText(null);
 							textField_price_input.setText(null);		
 							textField_quantity_input.setText(null);
@@ -1040,41 +1047,56 @@ public class Home extends JFrame implements KeyListener{
 				});
 			}
 		});
+		
+		JButton transaction_search_button = new JButton("Search");
+		transaction_search_button.setBounds(256, 6, 117, 29);
+		panel_1.add(transaction_search_button);
+		
+		
+		loadTransactionTable();
+		loadRefundInfo();
+		
 		Thread t3 = new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
-				textField_transaction_input.getDocument().addDocumentListener(new DocumentListener() {
-					
-					@Override
-					public void removeUpdate(DocumentEvent e) {
-						checkTransactionID();
-					}
-					
-					@Override
-					public void insertUpdate(DocumentEvent e) {
-						// TODO Auto-generated method stub
-						checkTransactionID();
-					}
-					
-					@Override
-					public void changedUpdate(DocumentEvent e) {
-						// TODO Auto-generated method stub
-						checkTransactionID();
-					}
-					public void checkTransactionID(){
+				// TODO Auto-generated method stub
+				transaction_search_button.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						//Find Transaction
 						String tempInput = textField_transaction_input.getText();
 						if(validateEmpty(tempInput) == false){
-							//JOptionPane.showMessageDialog(null,"Product ID entered cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,"Transaction ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
 						}
 						else if(checkForNumbers(tempInput) == false){
-							JOptionPane.showMessageDialog(null,"Product ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,"Transaction ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
 						}
-						else if(tempInput.length() > idLength){
-							JOptionPane.showMessageDialog(null,"Length of Product ID is not valid.","Error",JOptionPane.ERROR_MESSAGE);
-						}
-						else if(tempInput.length() == idLength){
-							int tempInt = Integer.parseInt(tempInput);
+						else{
+							int tempTransactionID = Integer.parseInt(tempInput);
+							Transaction t = new Transaction();
+							if(t.getTransactionDetails(tempTransactionID) == true){
+								textField_transactionID.setText(String.valueOf(t.getId()));
+								textField_createDate.setText(t.getCreateDate());
+								textField_transaction_subtotal.setText(String.valueOf(t.getSubTotal()));
+								textField_transaction_tax.setText(String.valueOf(t.getTax()));
+								textField_transaction_total.setText(String.valueOf(t.getTotal()));
+								textField_transactionType.setText(t.getTransactionType());
+								textField_method.setText(t.getMethod());
+								textField_promotionID.setText(String.valueOf(t.getPromotionID()));
+								textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
+								
+								TransactionRecord tr = new TransactionRecord();
+								tr.getTransactionRecord(tempTransactionID);
+								
+								model_refund.addRow(new Object[]{
+								tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
+								
+								
+								tracker++;
+							}
+							else{
+								JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+							}
 						}
 					}
 				});
@@ -1082,22 +1104,15 @@ public class Home extends JFrame implements KeyListener{
 		});
 		t3.start();
 		
-		JButton transaction_search_button = new JButton("Search");
-		transaction_search_button.setBounds(256, 6, 117, 29);
-		panel_1.add(transaction_search_button);
-		
-		loadTransactionTable();
-		loadRefundTotal();
-		
 		keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//String i = e.getActionCommand();
-				/*
+				String i = e.getActionCommand();
+				
 				if(textField_productID_input.hasFocus()){
 					String input = textField_productID_input.getText();
 					textField_productID_input.setText(input+i);
 				}
-				*/
+				
 				//else{
 					/*requestFocusInWindow();
 					int col = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
@@ -1125,7 +1140,7 @@ public class Home extends JFrame implements KeyListener{
 				*/
 			}
 		});
-		/*
+		
 		keypad_2 = new JButton("2");
 		keypad_2.setFocusable(false);
 		keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -1297,7 +1312,7 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		});
-		*/
+		
 		/*ActionClass actionEvent = new ActionClass();
 		
 		keypad_1.addActionListener(actionEvent);
@@ -1308,7 +1323,7 @@ public class Home extends JFrame implements KeyListener{
 		*/
 		Reports report_sec = new Reports(); 
 		JPanel panel_reports = report_sec.getWindow();
-		tabbedPane.addTab("Reports", null,panel_reports,null);
+		tabbedPane.addTab("Reports",panel_reports);
 		panel_reports.setLayout(null);
 		
 		JPanel panel_staff = new JPanel();
@@ -2016,11 +2031,11 @@ public class Home extends JFrame implements KeyListener{
 		
 		refund_column_name.addElement("#");
 		refund_column_name.addElement("Product ID");
-		refund_column_name.addElement("Name");
-		refund_column_name.addElement("Quantity");
-		refund_column_name.addElement("Price");
-		refund_column_name.addElement("Quantity * Price");
-		refund_column_name.addElement("Remove");
+		refund_column_name.addElement("Quantity Sold");
+		refund_column_name.addElement("Unit Price");
+		refund_column_name.addElement("Returned");
+		refund_column_name.addElement("Date Returned");
+		refund_column_name.addElement("Employee ID");
 		
 		table_refund = new JTable(refund_row_data, refund_column_name){
 			public boolean isCellEditable(int row, int column) {
@@ -2041,13 +2056,13 @@ public class Home extends JFrame implements KeyListener{
 	  	
 	    //Column Width
 	  	TableColumnModel columnModel_refund = table_refund.getColumnModel();
-	  	columnModel_refund.getColumn(indent_column).setPreferredWidth(10); //ID
-	 	columnModel_refund.getColumn(id_column).setPreferredWidth(30); //Product ID
-	  	columnModel_refund.getColumn(productName_column).setPreferredWidth(200); //Name
-        columnModel_refund.getColumn(productQuantity_column).setPreferredWidth(30); //Quantity 
-	  	columnModel_refund.getColumn(productPrice_column).setPreferredWidth(50); //Price
-	  	columnModel_refund.getColumn(productQuantityAndPrice_column).setPreferredWidth(30); //Price * Quantity
-	  	columnModel_refund.getColumn(productRemove_column).setPreferredWidth(10); //Remove
+	  	columnModel_refund.getColumn(0).setPreferredWidth(10); //ID
+	 	columnModel_refund.getColumn(1).setPreferredWidth(30); //Product ID
+	  	columnModel_refund.getColumn(2).setPreferredWidth(200); //Name
+        columnModel_refund.getColumn(3).setPreferredWidth(30); //Quantity 
+	  	columnModel_refund.getColumn(4).setPreferredWidth(50); //Price
+	  	columnModel_refund.getColumn(5).setPreferredWidth(30); //Price * Quantity
+	  	columnModel_refund.getColumn(6).setPreferredWidth(10); //Remove
 
 	    //Columns won't be able to moved around
 	  	table_refund.getTableHeader().setReorderingAllowed(false);
@@ -2055,13 +2070,13 @@ public class Home extends JFrame implements KeyListener{
 	    //Center table data 
 	  	DefaultTableCellRenderer centerRenderer_refund = new DefaultTableCellRenderer();
 	  	centerRenderer_refund.setHorizontalAlignment( SwingConstants.CENTER );
-	  	table_refund.getColumnModel().getColumn(indent_column).setCellRenderer( centerRenderer_refund ); //ID
-	  	table_refund.getColumnModel().getColumn(id_column).setCellRenderer( centerRenderer_refund ); //Product ID
-	  	table_refund.getColumnModel().getColumn(productName_column).setCellRenderer( centerRenderer_refund ); //Name
-	  	table_refund.getColumnModel().getColumn(productQuantity_column).setCellRenderer( centerRenderer_refund ); //Quantity
-	  	table_refund.getColumnModel().getColumn(productPrice_column).setCellRenderer( centerRenderer_refund ); //Price
-	  	table_refund.getColumnModel().getColumn(productQuantityAndPrice_column).setCellRenderer( centerRenderer_refund ); //Quantity * Price
-	  	table_refund.getColumnModel().getColumn(productRemove_column).setCellRenderer( centerRenderer_refund ); //Remove
+	  	table_refund.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_refund ); //ID
+	  	table_refund.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_refund ); //Product ID
+	  	table_refund.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_refund ); //Name
+	  	table_refund.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_refund ); //Quantity
+	  	table_refund.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_refund ); //Price
+	  	table_refund.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_refund ); //Quantity * Price
+	  	table_refund.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_refund ); //Remove
 	  	
 	    //Center table column names
 	  	centerRenderer_refund = (DefaultTableCellRenderer) table_refund.getTableHeader().getDefaultRenderer();
@@ -2074,42 +2089,140 @@ public class Home extends JFrame implements KeyListener{
 	   
 		model_refund = (DefaultTableModel) table_refund.getModel();
 	}
-	public void loadRefundTotal(){
-		JTabbedPane tabbedPane_refund_total = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_refund_total.setBounds(854, 399, 198, 150);
-		panel_refund.add(tabbedPane_refund_total);
+	public void loadRefundInfo(){
 		
-		JPanel refund_total = new JPanel();
-		tabbedPane_refund_total.addTab("Sales Total: ", null, refund_total, null);
-		refund_total.setLayout(null);
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(881, 6, 313, 524);
+		panel_refund.add(tabbedPane);
 		
-		refund_subtotal_textField = new JTextField();
-		refund_subtotal_textField.setText("Subtotal: $" + subTotal);
-		refund_subtotal_textField.setEditable(false);
-		refund_subtotal_textField.setBounds(10, 11, 103, 20);
-		refund_total.add(refund_subtotal_textField);
-		refund_subtotal_textField.setColumns(10);
+		JPanel panel_transactionDetail = new JPanel();
+		tabbedPane.addTab("Transaction details:", null, panel_transactionDetail, null);
+		panel_transactionDetail.setLayout(null);
 		
-		refund_tax_textField = new JTextField();
-		refund_tax_textField.setText("Tax: $" + tax);
-		refund_tax_textField.setEditable(false);
-		refund_tax_textField.setBounds(10, 50, 103, 20);
-		refund_total.add(refund_tax_textField);
-		refund_tax_textField.setColumns(10);
+		JTextPane txtpnTransactionId_1 = new JTextPane();
+		txtpnTransactionId_1.setText("Transaction ID:");
+		txtpnTransactionId_1.setBackground(Color.decode(defaultColor));
+		txtpnTransactionId_1.setBounds(6, 10, 96, 18);
+		panel_transactionDetail.add(txtpnTransactionId_1);
 		
-		refund_total_textField = new JTextField();
-		refund_total_textField.setText("Total: $" + total);
-		refund_total_textField.setEditable(false);
-		refund_total_textField.setBounds(10, 91, 103, 20);
-		refund_total.add(refund_total_textField);
-		refund_total_textField.setColumns(10);
+		JTextPane txtpnSubtotal = new JTextPane();
+		txtpnSubtotal.setText("Create Date:");
+		txtpnSubtotal.setBackground(Color.decode(defaultColor));
+		txtpnSubtotal.setBounds(6, 58, 77, 18);
+		panel_transactionDetail.add(txtpnSubtotal);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(0, 38, 292, 12);
+		panel_transactionDetail.add(separator);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(0, 86, 292, 12);
+		panel_transactionDetail.add(separator_1);
+		
+		textField_transactionID = new JTextField();
+		textField_transactionID.setBounds(105, 6, 130, 26);
+		panel_transactionDetail.add(textField_transactionID);
+		textField_transactionID.setColumns(10);
+		
+		textField_createDate = new JTextField();
+		textField_createDate.setBounds(87, 52, 199, 26);
+		panel_transactionDetail.add(textField_createDate);
+		textField_createDate.setColumns(10);
+		
+		JTextPane txtpnSubtotal_1 = new JTextPane();
+		txtpnSubtotal_1.setText("Subtotal:");
+		txtpnSubtotal_1.setBounds(6, 110, 61, 18);
+		panel_transactionDetail.add(txtpnSubtotal_1);
+		
+		JTextPane txtpnTax = new JTextPane();
+		txtpnTax.setText("Tax:");
+		txtpnTax.setBounds(6, 162, 32, 18);
+		panel_transactionDetail.add(txtpnTax);
+		
+		JTextPane txtpnTotal = new JTextPane();
+		txtpnTotal.setText("Total:");
+		txtpnTotal.setBounds(6, 220, 41, 18);
+		panel_transactionDetail.add(txtpnTotal);
+		
+		textField_transaction_subtotal = new JTextField();
+		textField_transaction_subtotal.setBounds(70, 105, 130, 26);
+		panel_transactionDetail.add(textField_transaction_subtotal);
+		textField_transaction_subtotal.setColumns(10);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setBounds(0, 138, 292, 12);
+		panel_transactionDetail.add(separator_2);
+		
+		textField_transaction_tax = new JTextField();
+		textField_transaction_tax.setBounds(40, 158, 130, 26);
+		panel_transactionDetail.add(textField_transaction_tax);
+		textField_transaction_tax.setColumns(10);
+		
+		JSeparator separator_3 = new JSeparator();
+		separator_3.setBounds(0, 196, 292, 12);
+		panel_transactionDetail.add(separator_3);
+		
+		textField_transaction_total = new JTextField();
+		textField_transaction_total.setBounds(50, 215, 130, 26);
+		panel_transactionDetail.add(textField_transaction_total);
+		textField_transaction_total.setColumns(10);
+		
+		JSeparator separator_4 = new JSeparator();
+		separator_4.setBounds(0, 253, 292, 12);
+		panel_transactionDetail.add(separator_4);
+		
+		JTextPane txtpnTransactionType = new JTextPane();
+		txtpnTransactionType.setText("Transaction Type:");
+		txtpnTransactionType.setBounds(6, 277, 112, 18);
+		panel_transactionDetail.add(txtpnTransactionType);
+		
+		textField_transactionType = new JTextField();
+		textField_transactionType.setBounds(120, 272, 130, 26);
+		panel_transactionDetail.add(textField_transactionType);
+		textField_transactionType.setColumns(10);
+		
+		JSeparator separator_5 = new JSeparator();
+		separator_5.setBounds(0, 310, 292, 12);
+		panel_transactionDetail.add(separator_5);
+		
+		JTextPane txtpnMethod = new JTextPane();
+		txtpnMethod.setText("Method:");
+		txtpnMethod.setBounds(6, 334, 51, 18);
+		panel_transactionDetail.add(txtpnMethod);
+		
+		textField_method = new JTextField();
+		textField_method.setBounds(60, 329, 130, 26);
+		panel_transactionDetail.add(textField_method);
+		textField_method.setColumns(10);
+		
+		JSeparator separator_6 = new JSeparator();
+		separator_6.setBounds(0, 367, 292, 12);
+		panel_transactionDetail.add(separator_6);
+		
+		JTextPane txtpnPromotionId = new JTextPane();
+		txtpnPromotionId.setText("Promotion ID:");
+		txtpnPromotionId.setBounds(6, 391, 87, 18);
+		panel_transactionDetail.add(txtpnPromotionId);
+		
+		textField_promotionID = new JTextField();
+		textField_promotionID.setBounds(95, 386, 130, 26);
+		panel_transactionDetail.add(textField_promotionID);
+		textField_promotionID.setColumns(10);
 		
 		JSeparator separator_7 = new JSeparator();
-		separator_7.setBounds(0, 39, 258, 20);
-		refund_total.add(separator_7);
+		separator_7.setBounds(0, 424, 292, 12);
+		panel_transactionDetail.add(separator_7);
 		
-		JSeparator separator_8 = new JSeparator();
-		separator_8.setBounds(0, 81, 258, 20);
-		refund_total.add(separator_8);
+		JTextPane txtpnEmployeeId = new JTextPane();
+		txtpnEmployeeId.setText("Employee ID:");
+		txtpnEmployeeId.setBounds(6, 448, 85, 18);
+		panel_transactionDetail.add(txtpnEmployeeId);
+		
+		textField_employeeID = new JTextField();
+		textField_employeeID.setBounds(95, 443, 130, 26);
+		panel_transactionDetail.add(textField_employeeID);
+		textField_employeeID.setColumns(10);
+		
+		
 	}
 }
