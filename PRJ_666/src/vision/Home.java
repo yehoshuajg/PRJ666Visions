@@ -1063,6 +1063,9 @@ public class Home extends JFrame implements KeyListener{
 				// TODO Auto-generated method stub
 				transaction_search_button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						for (int i = model_refund.getRowCount()-1; i >= 0; --i) {
+							model_refund.removeRow(i);
+						}
 						//Find Transaction
 						String tempInput = textField_transaction_input.getText();
 						if(validateEmpty(tempInput) == false){
@@ -1086,10 +1089,12 @@ public class Home extends JFrame implements KeyListener{
 								textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
 								
 								TransactionRecord tr = new TransactionRecord();
-								tr.getTransactionRecord(tempTransactionID);
-								
+								for(int i = 0; i < tr.getTransactionCount(tempTransactionID); i++){
+									tr.getTransactionRecord(tempTransactionID, i);
 								model_refund.addRow(new Object[]{
 								tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
+								}
+								
 								
 								
 								tracker++;

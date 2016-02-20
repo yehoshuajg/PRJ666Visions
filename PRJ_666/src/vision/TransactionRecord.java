@@ -8,35 +8,62 @@ import java.util.Vector;
 
 public class TransactionRecord {
 	private int transactionID;
-	private Vector<Integer> productID = new Vector<Integer>();
-	private Vector<Integer> quantitySold = new Vector<Integer>();
-	private Vector<Double> unitPrice = new Vector<Double>();
-	private Vector<Integer> returned = new Vector<Integer>();
-	private Vector<String> dateReturned = new Vector<String>();
-	private Vector<Integer> employeeID = new Vector<Integer>();
-	private Vector<Double> unitCost = new Vector<Double>();
+	private int productID;
+	private int quantitySold;
+	private double unitPrice;
+	private int returned;
+	private String dateReturned;
+	private int employeeID;
+	private double unitCost;
 	
 	public TransactionRecord(){
 		transactionID = 0;
-		productID.clear();
-		quantitySold.clear();
-		unitPrice.clear();
-		returned.clear();
-		dateReturned.clear();
-		employeeID.clear();
-		unitCost.clear();
+		productID = 0;
+		quantitySold = 0;
+		unitPrice = 0;
+		returned = 0;
+		dateReturned = null;
+		employeeID = 0;
+		unitCost = 0;
 	}
 	public TransactionRecord(int transactionID, int productID, int quantitySold, double unitPrice, int returned, String dateReturned, int employeeID, double unitCost){
 		this.transactionID = transactionID;
-		this.productID.add(productID);
-		this.quantitySold.add(quantitySold);
-		this.unitPrice.addElement(unitPrice);
-		this.returned.add(returned);
-		this.dateReturned.add(dateReturned);
-		this.employeeID.add(employeeID);
-		this.unitCost.addElement(unitCost);
+		this.productID = productID;
+		this.quantitySold = quantitySold;
+		this.unitPrice = unitPrice;
+		this.returned = returned;
+		this.dateReturned = dateReturned;
+		this.employeeID = employeeID;
+		this.unitCost = unitCost;
 	}
-	public void getTransactionRecord(int id){
+	public int getTransactionCount(int id){
+		int count = 0;
+		try {
+			Connect connect = new Connect();
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			Statement state = null;
+			
+			state = con.createStatement();
+			String sql;
+			sql = "SELECT * FROM transactionrecord where TransactionID = '" + id + "'";
+			ResultSet rs = state.executeQuery(sql);
+			
+			//Extract data from result set
+			while(rs.next()){
+				count++;
+			}
+			//Clean-up environment
+			rs.close();
+			state.close();
+			con.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return count;
+	}
+	public void getTransactionRecord(int id, int row){
 		int count = 0;
 		try {
 			Connect connect = new Connect();
@@ -52,14 +79,17 @@ public class TransactionRecord {
 			while(rs.next()){
 				//Retrieve by column name
 				this.transactionID = rs.getInt("TransactionID");
-				this.productID.add(rs.getInt("ProductID"));
-				this.quantitySold.add(rs.getInt("QuantitySold"));
-				this.unitPrice.addElement(rs.getDouble("UnitPrice"));
-				this.returned.add(rs.getInt("Returned"));
-				this.dateReturned.add(rs.getString("DateReturned"));
-				this.employeeID.add(rs.getInt("EmployeeID"));
-				this.unitCost.addElement(rs.getDouble("UnitCost"));
+				this.productID = rs.getInt("ProductID");
+				this.quantitySold = rs.getInt("QuantitySold");
+				this.unitPrice = rs.getDouble("UnitPrice");
+				this.returned = rs.getInt("Returned");
+				this.dateReturned = rs.getString("DateReturned");
+				this.employeeID = rs.getInt("EmployeeID");
+				this.unitCost = rs.getDouble("UnitCost");
 				count++;
+				if(count == row){
+					break;
+				}
 			}
 			//Clean-up environment
 			rs.close();
@@ -77,47 +107,46 @@ public class TransactionRecord {
 	public void setTransactionID(int transactionID) {
 		this.transactionID = transactionID;
 	}
-	public Vector<Integer> getProductID() {
+	public int getProductID() {
 		return productID;
 	}
-	public void setProductID(Vector<Integer> productID) {
+	public void setProductID(int productID) {
 		this.productID = productID;
 	}
-	public Vector<Integer> getQuantitySold() {
+	public int getQuantitySold() {
 		return quantitySold;
 	}
-	public void setQuantitySold(Vector<Integer> quantitySold) {
+	public void setQuantitySold(int quantitySold) {
 		this.quantitySold = quantitySold;
 	}
-	public Vector<Double> getUnitPrice() {
+	public double getUnitPrice() {
 		return unitPrice;
 	}
-	public void setUnitPrice(Vector<Double> unitPrice) {
+	public void setUnitPrice(double unitPrice) {
 		this.unitPrice = unitPrice;
 	}
-	public Vector<Integer> getReturned() {
+	public int getReturned() {
 		return returned;
 	}
-	public void setReturned(Vector<Integer> returned) {
+	public void setReturned(int returned) {
 		this.returned = returned;
 	}
-	public Vector<String> getDateReturned() {
+	public String getDateReturned() {
 		return dateReturned;
 	}
-	public void setDateReturned(Vector<String> dateReturned) {
+	public void setDateReturned(String dateReturned) {
 		this.dateReturned = dateReturned;
 	}
-	public Vector<Integer> getEmployeeID() {
+	public int getEmployeeID() {
 		return employeeID;
 	}
-	public void setEmployeeID(Vector<Integer> employeeID) {
+	public void setEmployeeID(int employeeID) {
 		this.employeeID = employeeID;
 	}
-	public Vector<Double> getUnitCost() {
+	public double getUnitCost() {
 		return unitCost;
 	}
-	public void setUnitCost(Vector<Double> unitCost) {
+	public void setUnitCost(double unitCost) {
 		this.unitCost = unitCost;
 	}
-	
 }
