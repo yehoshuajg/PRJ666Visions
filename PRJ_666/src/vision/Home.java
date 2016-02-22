@@ -1,6 +1,5 @@
 package vision;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -12,81 +11,40 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.TabbedPaneUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
-
-import org.omg.Messaging.SyncScopeHelper;
 
 import javax.swing.JTabbedPane;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Vector;
-import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerListModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.KeyboardFocusManager;
-import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.Window;
 
-import javax.swing.border.BevelBorder;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 
 public class Home extends JFrame implements KeyListener{
 	
@@ -185,7 +143,34 @@ public class Home extends JFrame implements KeyListener{
 	private int previousRow = 0;
 	
 	//Runnable
-	Runnable run1;
+	Runnable run1; //make it local later
+	
+	//JFrame/Dialog
+	private JDialog d3;
+	private JDialog d4;
+	private JTextField textField_transaction_input;
+	
+	//Refund
+	private JPanel panel_refund;
+	
+	//Refund Table
+	private Vector<String> refund_column_name = new Vector<String>();
+	private Vector<String> refund_row_data = new Vector<String>();
+	private JTable table_refund;
+	private DefaultTableModel model_refund;	
+	
+	//Refund details:
+	private JTextField textField_transactionID;
+	private JTextField textField_createDate;
+	private JTextField textField_transaction_subtotal;
+	private JTextField textField_transaction_tax;
+	private JTextField textField_transaction_total;
+	private JTextField textField_transactionType;
+	private JTextField textField_method;
+	private JTextField textField_promotionID;
+	private JTextField textField_employeeID;
+	private int tracker = 1;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -252,7 +237,7 @@ public class Home extends JFrame implements KeyListener{
 		welcome = new JTextField();
 		welcome.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		welcome.setText("Welcome, ");
-		welcome.setBounds(6, 6, 492, 43);
+		welcome.setBounds(413, 218, 492, 43);
 		welcome.setEditable(false);
 		panel_home.add(welcome);
 		welcome.setColumns(10);
@@ -273,7 +258,7 @@ public class Home extends JFrame implements KeyListener{
 				
 			}
 		});
-		btnSignOut.setBounds(738, 6, 276, 45);
+		btnSignOut.setBounds(521, 273, 276, 45);
 		panel_home.add(btnSignOut);
 		
 		JPanel panel_cashier = new JPanel();
@@ -391,13 +376,27 @@ public class Home extends JFrame implements KeyListener{
 					public void checkID(){
 						String tempInput = textField_productID_input.getText();
 						if(validateEmpty(tempInput) == false){
-							//JOptionPane.showMessageDialog(null,"Product ID entered cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+							//JOptionPane.showMessageDialog(null,"Product ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+							textField_name_input.setText(null);
+							textField_price_input.setText(null);		
+							textField_quantity_input.setText(null);
 						}
 						else if(checkForNumbers(tempInput) == false){
 							JOptionPane.showMessageDialog(null,"Product ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+							textField_name_input.setText(null);
+							textField_price_input.setText(null);		
+							textField_quantity_input.setText(null);
+						}
+						else if(tempInput.length() < idLength){
+							textField_name_input.setText(null);
+							textField_price_input.setText(null);		
+							textField_quantity_input.setText(null);
 						}
 						else if(tempInput.length() > idLength){
 							JOptionPane.showMessageDialog(null,"Length of Product ID is not valid.","Error",JOptionPane.ERROR_MESSAGE);
+							textField_name_input.setText(null);
+							textField_price_input.setText(null);		
+							textField_quantity_input.setText(null);
 						}
 						else if(tempInput.length() == idLength){
 							int tempInt = Integer.parseInt(tempInput);
@@ -418,124 +417,137 @@ public class Home extends JFrame implements KeyListener{
 								@Override
 								public void run() {
 									if(!table.isEditing()){
-										//Check if the product exists in table
-										//If it does, adjust the quantity and send it
-										//Else send it without adjusting
-										if(productBySearch.size() > 0){
-											for(int j = 0; j < model.getRowCount(); j++){
-												if(productBySearch.get(j).getID() == tempProductSearch.getID()){
-													//System.out.println(productBySearch.get(j).getName() + " found in vector");
-													tempProductSearch.setQuantity(productBySearch.get(j).getQuantity());
-													//System.out.println(tempProductSearch.getQuantity());
-													break;
-												}
-												else{
-													//System.out.println("Not Found in vector");
-												}
-											}
-										}
-										
 										if(tempProductSearch != null){
 											if(tempProductSearch.getQuantity() <= 0){
-												JOptionPane.showMessageDialog(null,"Inventory quantity for product " + '"'+ tempProductSearch.getName() + '"' + ", has reached 0. This product is no longer in stock.");
+												JOptionPane.showMessageDialog(null,"" + '"'+ tempProductSearch.getName() + '"' + ", is currently out of stock.");
+												textField_name_input.setText(tempProductSearch.getName());
+												textField_price_input.setText(String.valueOf(tempProductSearch.getSalePrice()));		
+												textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
 											}
-											else if(tempProductSearch.getQuantity() > 0){
-												boolean qCheck = false;
-												if(model.getRowCount() == 0){
-													model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
-													//System.out.println("Before: " + tempProductSearch.getQuantity());
-													tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
-													//System.out.println("After: " + tempProductSearch.getQuantity());
-												}
-												else if(model.getRowCount() > 0){
-													for (int i = model.getRowCount()-1; i >= 0; --i) {
-														//String tName = model.getValueAt(i, productName_column).toString();
-														int tID = (int) model.getValueAt(i,id_column);
-														if(!table.isEditing()){
-															String tQ = model.getValueAt(i, productQuantity_column).toString();
-															int tempQ = Integer.parseInt(tQ);
-															double tempP = tempProductSearch.getSalePrice();
-															if(tID == tempProductSearch.getID()){
-																tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
-																tempQ++;
-																tempP = tempP * tempQ;
-																tempP = Math.round(tempP * 100.0) / 100.0;
-																model.setValueAt(tempQ, i, productQuantity_column);
-																model.setValueAt(tempP, i, productQuantityAndPrice_column);
-																rowCount--;
-																qCheck = true;
-																break;
-															}
-															else{
-																qCheck = false;
-															}
-														}
-													}
-													if(qCheck == false){
-														model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
-														//System.out.println("Before: " + tempProductSearch.getQuantity());
-														tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
-														//System.out.println("After: " + tempProductSearch.getQuantity());												
-													}
-												}
-												
-												//Setting Checkbox
-												TableColumn tc = table.getColumnModel().getColumn(productRemove_column);
-												tc.setCellEditor(table.getDefaultEditor(Boolean.class));
-												tc.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-												
-												boolean eCheck = false;
-												for(int i = 0; i < productBySearch.size(); i++){
-													if(productBySearch.size() > 0){
-														if(tempProductSearch.getID() == productBySearch.get(i).getID()){
-															productBySearch.get(i).setQuantity(tempProductSearch.getQuantity());
-															String tQ = model.getValueAt(i, productQuantity_column).toString();
-															int tempQ = Integer.parseInt(tQ);
-															previousValue.insertElementAt(tempQ, i);
-															eCheck = true;
+											else{
+												//Check if the product exists in table
+												//If it does, adjust the quantity and send it
+												//Else send it without adjusting
+												if(productBySearch.size() > 0){
+													for(int j = 0; j < model.getRowCount(); j++){
+														if(productBySearch.get(j).getID() == tempProductSearch.getID()){
+															//System.out.println(productBySearch.get(j).getName() + " found in vector");
+															tempProductSearch.setQuantity(productBySearch.get(j).getQuantity());
+															//System.out.println(tempProductSearch.getQuantity());
 															break;
 														}
 														else{
-															eCheck = false;
+															//System.out.println("Not Found in vector");
 														}
 													}
 												}
-												if(eCheck == false){
-													productBySearch.add(tempProductSearch);
-													previousValue.add(quantity);
+												
+												if(tempProductSearch != null){
+													if(tempProductSearch.getQuantity() <= 0){
+														JOptionPane.showMessageDialog(null,"Inventory quantity for product " + '"'+ tempProductSearch.getName() + '"' + ", has reached 0. This product is no longer in stock.");
+														textField_name_input.setText(tempProductSearch.getName());
+														textField_price_input.setText("$" + String.valueOf(tempProductSearch.getSalePrice()));		
+														textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
+													}
+													else if(tempProductSearch.getQuantity() > 0){
+														boolean qCheck = false;
+														if(model.getRowCount() == 0){
+															model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
+															//System.out.println("Before: " + tempProductSearch.getQuantity());
+															tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
+															//System.out.println("After: " + tempProductSearch.getQuantity());
+														}
+														else if(model.getRowCount() > 0){
+															for (int i = model.getRowCount()-1; i >= 0; --i) {
+																//String tName = model.getValueAt(i, productName_column).toString();
+																int tID = (int) model.getValueAt(i,id_column);
+																if(!table.isEditing()){
+																	String tQ = model.getValueAt(i, productQuantity_column).toString();
+																	int tempQ = Integer.parseInt(tQ);
+																	double tempP = tempProductSearch.getSalePrice();
+																	if(tID == tempProductSearch.getID()){
+																		tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
+																		tempQ++;
+																		tempP = tempP * tempQ;
+																		tempP = Math.round(tempP * 100.0) / 100.0;
+																		model.setValueAt(tempQ, i, productQuantity_column);
+																		model.setValueAt(tempP, i, productQuantityAndPrice_column);
+																		rowCount--;
+																		qCheck = true;
+																		break;
+																	}
+																	else{
+																		qCheck = false;
+																	}
+																}
+															}
+															if(qCheck == false){
+																model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
+																//System.out.println("Before: " + tempProductSearch.getQuantity());
+																tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
+																//System.out.println("After: " + tempProductSearch.getQuantity());												
+															}
+														}
+														
+														//Setting Checkbox
+														TableColumn tc = table.getColumnModel().getColumn(productRemove_column);
+														tc.setCellEditor(table.getDefaultEditor(Boolean.class));
+														tc.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+														
+														boolean eCheck = false;
+														for(int i = 0; i < productBySearch.size(); i++){
+															if(productBySearch.size() > 0){
+																if(tempProductSearch.getID() == productBySearch.get(i).getID()){
+																	productBySearch.get(i).setQuantity(tempProductSearch.getQuantity());
+																	String tQ = model.getValueAt(i, productQuantity_column).toString();
+																	int tempQ = Integer.parseInt(tQ);
+																	previousValue.insertElementAt(tempQ, i);
+																	eCheck = true;
+																	break;
+																}
+																else{
+																	eCheck = false;
+																}
+															}
+														}
+														if(eCheck == false){
+															productBySearch.add(tempProductSearch);
+															previousValue.add(quantity);
+														}
+														
+														textField_name_input.setText(tempProductSearch.getName());
+														textField_price_input.setText("$" + String.valueOf(tempProductSearch.getSalePrice()));		
+														textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
+														
+														//Sales Total
+														subTotal += tempProductSearch.getSalePrice();
+														
+														//subTotal += Double.parseDouble(s);
+														subTotal = Math.round(subTotal * 100.0) / 100.0;
+														subtotal_textField.setText("Subtotal: $" + subTotal);
+														
+														tax = subTotal * 0.13;
+														tax = Math.round(tax * 100.0) / 100.0;
+														tax_textField.setText("Tax: $" + tax);
+														
+														total = subTotal + tax;
+														total = Math.round(total * 100.0) / 100.0;
+														total_textField.setText("Total: $" + total);									
+														
+														//Moves table down as scroll bar appears and more items get added
+														table.scrollRectToVisible(table.getCellRect(table.getRowCount()-1, 0, true));
+														
+														//Leave increments at the end
+														rowCount++;
+														c++;
+													}
 												}
-												
-												textField_name_input.setText(tempProductSearch.getName());
-												textField_price_input.setText("$" + String.valueOf(tempProductSearch.getSalePrice()));		
-												textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
-												
-												//Sales Total
-												subTotal += tempProductSearch.getSalePrice();
-												
-												//subTotal += Double.parseDouble(s);
-												subTotal = Math.round(subTotal * 100.0) / 100.0;
-												subtotal_textField.setText("Subtotal: $" + subTotal);
-												
-												tax = subTotal * 0.13;
-												tax = Math.round(tax * 100.0) / 100.0;
-												tax_textField.setText("Tax: $" + tax);
-												
-												total = subTotal + tax;
-												total = Math.round(total * 100.0) / 100.0;
-												total_textField.setText("Total: $" + total);									
-												
-												//Moves table down as scroll bar appears and more items get added
-												table.scrollRectToVisible(table.getCellRect(table.getRowCount()-1, 0, true));
-												
-												//Leave increments at the end
-												rowCount++;
-												c++;
+												else{
+													textField_name_input.setText(null);
+													textField_price_input.setText(null);		
+													textField_quantity_input.setText(null);
+												}
 											}
-										}
-										else{
-											textField_name_input.setText(null);
-											textField_price_input.setText(null);		
-											textField_quantity_input.setText(null);
 										}
 									}
 								}
@@ -638,6 +650,11 @@ public class Home extends JFrame implements KeyListener{
 										model.removeRow(i);
 										textField_productID_input.requestFocusInWindow();
 										
+										//Empty the product details field
+										textField_productID_input.setText("");
+										textField_name_input.setText("");
+										textField_price_input.setText("$0.00");		
+										textField_quantity_input.setText("0");
 									}
 								}catch(Exception e2){}
 							}
@@ -673,7 +690,8 @@ public class Home extends JFrame implements KeyListener{
 					textField_productID_input.requestFocusInWindow();
 				}
 				else{
-					loadDiscountFrame();
+					//MOD FRAME
+					loadDiscountFrame(e);
 				}
 			}	
 		});
@@ -803,7 +821,7 @@ public class Home extends JFrame implements KeyListener{
 					}
 					//Cash
 					else if(cashCredit == JOptionPane.CANCEL_OPTION){
-						loadCheckoutFrame();
+						loadCheckoutFrame(e);
 					}
 					//tabbedPane_7.setVisible(true);
 				}
@@ -984,15 +1002,122 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		keypad_1.setBounds(0, 0, 87, 93);
 		keypad_panel.add(keypad_1);
+		
+		panel_refund = new JPanel();
+		tabbedPane_1.addTab("Refund", null, panel_refund, null);
+		panel_refund.setLayout(null);
+		
+		JTabbedPane tabbedPane_8 = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_8.setBounds(6, 6, 412, 93);
+		panel_refund.add(tabbedPane_8);
+		
+		JPanel panel_1 = new JPanel();
+		tabbedPane_8.addTab("Find Transaction:", null, panel_1, null);
+		panel_1.setLayout(null);
+		
+		JTextPane txtpnTransactionId = new JTextPane();
+		txtpnTransactionId.setText("Transaction ID:");
+		txtpnTransactionId.setBounds(6, 10, 96, 16);
+		txtpnTransactionId.setBackground(Color.decode(defaultColor));
+		panel_1.add(txtpnTransactionId);
+		
+		textField_transaction_input = new JTextField();
+		textField_transaction_input.setBounds(114, 6, 130, 26);
+		panel_1.add(textField_transaction_input);
+		textField_transaction_input.setColumns(10);
+		
+		//Places cursor in ID field as soon as page loads, like focus in html
+		textField_transaction_input.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+			}
+			@Override
+			public void ancestorMoved(AncestorEvent event) {
+				// TODO Auto-generated method stub	
+			}
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				SwingUtilities.invokeLater(new Runnable() {
+		            @Override
+		            public void run() {
+		            	textField_transaction_input.requestFocusInWindow();
+		            }
+				});
+			}
+		});
+		
+		JButton transaction_search_button = new JButton("Search");
+		transaction_search_button.setBounds(256, 6, 117, 29);
+		panel_1.add(transaction_search_button);
+		
+		
+		loadTransactionTable();
+		loadRefundInfo();
+		
+		Thread t3 = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				transaction_search_button.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						for (int i = model_refund.getRowCount()-1; i >= 0; --i) {
+							model_refund.removeRow(i);
+						}
+						//Find Transaction
+						String tempInput = textField_transaction_input.getText();
+						if(validateEmpty(tempInput) == false){
+							JOptionPane.showMessageDialog(null,"Transaction ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+						}
+						else if(checkForNumbers(tempInput) == false){
+							JOptionPane.showMessageDialog(null,"Transaction ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+						}
+						else{
+							int tempTransactionID = Integer.parseInt(tempInput);
+							Transaction t = new Transaction();
+							if(t.getTransactionDetails(tempTransactionID) == true){
+								textField_transactionID.setText(String.valueOf(t.getId()));
+								textField_createDate.setText(t.getCreateDate());
+								textField_transaction_subtotal.setText(String.valueOf(t.getSubTotal()));
+								textField_transaction_tax.setText(String.valueOf(t.getTax()));
+								textField_transaction_total.setText(String.valueOf(t.getTotal()));
+								textField_transactionType.setText(t.getTransactionType());
+								textField_method.setText(t.getMethod());
+								textField_promotionID.setText(String.valueOf(t.getPromotionID()));
+								textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
+								
+								TransactionRecord tr = new TransactionRecord();
+								for(int i = 0; i < tr.getTransactionCount(tempTransactionID); i++){
+									tr.getTransactionRecord(tempTransactionID, i);
+								model_refund.addRow(new Object[]{
+								tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
+								}
+								
+								
+								
+								tracker++;
+							}
+							else{
+								JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+							}
+						}
+					}
+				});
+			}
+		});
+		t3.start();
+		
 		keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//String i = e.getActionCommand();
-				/*
+				String i = e.getActionCommand();
+				
 				if(textField_productID_input.hasFocus()){
 					String input = textField_productID_input.getText();
 					textField_productID_input.setText(input+i);
 				}
-				*/
+				
 				//else{
 					/*requestFocusInWindow();
 					int col = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
@@ -1007,18 +1132,20 @@ public class Home extends JFrame implements KeyListener{
 						}
 					}*/
 				//}
-				if(productBySearch.size() > 0){
-					for(int i = 0; i < productBySearch.size(); i++){
-						System.out.println(i + ".)" + productBySearch.get(i).getName());
-					}
-				}
+				/*JDialog d2 = new JDialog();
+				d2.setBounds(0, 0, 500, 500);
+				d2.setVisible(true);
+				*/
 				
-				
-				
-				
+				/*Component component = (Component) e.getSource();
+		        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
+				JDialog d3 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
+				d3.setBounds(0, 0, 300, 300);
+				d3.setVisible(true);
+				*/
 			}
 		});
-		/*
+		
 		keypad_2 = new JButton("2");
 		keypad_2.setFocusable(false);
 		keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -1190,7 +1317,7 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		});
-		*/
+		
 		/*ActionClass actionEvent = new ActionClass();
 		
 		keypad_1.addActionListener(actionEvent);
@@ -1201,7 +1328,7 @@ public class Home extends JFrame implements KeyListener{
 		*/
 		Reports report_sec = new Reports(); 
 		JPanel panel_reports = report_sec.getWindow();
-		tabbedPane.addTab("Reports", null, panel_reports, null);
+		tabbedPane.addTab("Reports",panel_reports);
 		panel_reports.setLayout(null);
 		
 		JPanel panel_staff = new JPanel();
@@ -1262,12 +1389,14 @@ public class Home extends JFrame implements KeyListener{
 				String message2 = sb2.toString();
 				int cashTransaction = JOptionPane.showOptionDialog(null,message2,"Checkout using Cash",
 				JOptionPane.PLAIN_MESSAGE,JOptionPane.PLAIN_MESSAGE,null,optionsTransactionCash,optionsTransactionCash[0]);
+				d4.dispose();
 			}
 			//frame_cashCheckout.dispose();
 		}
 	}
 	
 	public void calculateOneTimeDiscount(){
+		boolean check = false;
 		String discountInput = discount_option.getText();
 		
 		if(oneTimeDiscountCheck == true){
@@ -1275,7 +1404,7 @@ public class Home extends JFrame implements KeyListener{
 		}
 		else if (validateEmpty(discountInput) == false){
 			JOptionPane.showMessageDialog(null,"Value entered cannot be Empty","Error",JOptionPane.ERROR_MESSAGE);
-			discount_option.setFocusable(true);
+			//discount_option.setFocusable(true);
 		}
 		else{
 			Discount oneTimeDiscount = new Discount();
@@ -1292,15 +1421,18 @@ public class Home extends JFrame implements KeyListener{
 			total = subTotal + tax;
 			total = Math.round(total * 100.0) / 100.0;
 			total_textField.setText("Total: $" + total);
-				
-			oneTimeDiscountCheck = true;
-				
+					
 			if(subTotal < previous){
 				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
+				oneTimeDiscountCheck = true;
+				d3.dispose();
+				textField_productID_input.requestFocusInWindow();
 			}
 		}
 		//textField_productID_input.requestFocusInWindow();
 		//frame_discount.dispose();
+		//d3.dispose();
+		
 	}
 	
 	public boolean checkForNumbers(String input){
@@ -1343,7 +1475,7 @@ public class Home extends JFrame implements KeyListener{
 	public void keyTyped(KeyEvent e) {	
 	}
 	
-	public void loadDiscountFrame(){
+	public void loadDiscountFrame(ActionEvent e){
 		JPanel panel_discount = new JPanel();
 		panel_discount.setLayout(null);
 		
@@ -1550,7 +1682,7 @@ public class Home extends JFrame implements KeyListener{
 			}
 		});
 		
-		frame_discount = new JFrame();
+		/*frame_discount = new JFrame();
 		frame_discount.getContentPane().add(panel_discount);
 		//frame_discount.setSize(w/2, h/2);
 		frame_discount.setSize(475, 400);
@@ -1559,12 +1691,13 @@ public class Home extends JFrame implements KeyListener{
 		
 		//selects default button
 		frame_discount.getRootPane().setDefaultButton(discountOption_btnEnter);
-		
+		*/
 		//setEnabled(false);
 		//panel_discount.setEnabled(true);
 		
 		Discount d = new Discount();
 		int count = d.getPromotionCount();
+		
 		discount = new Vector<Discount>();
 		for(int i = 1; i <= count; i++){
 			Discount temp = new Discount();
@@ -1587,9 +1720,18 @@ public class Home extends JFrame implements KeyListener{
 		}
 		String toDisplay=sb1.toString();
 		discount_message1.setText(toDisplay);
+		
+		Component component = (Component) e.getSource();
+        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
+		d3 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d3.getContentPane().add(panel_discount);
+		d3.setBounds(0, 0, 475, 400);
+		d3.setVisible(true);
+		d3.setLocationRelativeTo(null);
+		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
 	}
 	
-	public void loadCheckoutFrame(){
+	public void loadCheckoutFrame(ActionEvent e){
 		JPanel panel_checkout = new JPanel();
 		panel_checkout.setLayout(null);
 		
@@ -1802,19 +1944,29 @@ public class Home extends JFrame implements KeyListener{
 				calculateCashCheckout();
 			}
 		});
-		
+		/*
 		frame_cashCheckout = new JFrame();
 		frame_cashCheckout.getContentPane().add(panel_checkout);
 		//frame_cashCheckout.setSize(w/2, h/2);
 		frame_cashCheckout.setSize(475, 400);
 		frame_cashCheckout.setVisible(true);
 		frame_cashCheckout.setLocationRelativeTo(null);
-		
+		*/
 		//setEnabled(false);
 		//frame_cashCheckout.setEnabled(true);
 		
 		//selects default button
-		frame_cashCheckout.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+		//frame_cashCheckout.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+		
+		
+		Component component = (Component) e.getSource();
+        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+		d4 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d4.getContentPane().add(panel_checkout);
+		d4.setSize(475, 400);
+		d4.setVisible(true);
+		d4.setLocationRelativeTo(null);
+		d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
 	}
 	public void calculateSubtotal(){
 		double sub = 0;
@@ -1873,5 +2025,209 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		}
+	}
+	public void loadTransactionTable(){
+		JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_refund_table.setBounds(20, 204, 822, 375);
+		panel_refund.add(tabbedPane_refund_table);
+		
+		JPanel panel_table_refund = new JPanel(new BorderLayout());
+		tabbedPane_refund_table.addTab("List of purchased items, quantity and price: ", null, panel_table_refund, null);
+		
+		refund_column_name.addElement("#");
+		refund_column_name.addElement("Product ID");
+		refund_column_name.addElement("Quantity Sold");
+		refund_column_name.addElement("Unit Price");
+		refund_column_name.addElement("Returned");
+		refund_column_name.addElement("Date Returned");
+		refund_column_name.addElement("Employee ID");
+		
+		table_refund = new JTable(refund_row_data, refund_column_name){
+			public boolean isCellEditable(int row, int column) {
+				//Return true if the column (number) is editable, else false
+		        if(column == 3 || column == 6){ 
+		        	return true;
+		        }
+		        else{
+		        	return false;
+		        }
+		    }
+		};
+		panel_table_refund.add(table_refund.getTableHeader(), BorderLayout.NORTH);
+		panel_table_refund.add(table_refund, BorderLayout.CENTER);
+		
+		//Row Height
+		table_refund.setRowHeight(30);
+	  	
+	    //Column Width
+	  	TableColumnModel columnModel_refund = table_refund.getColumnModel();
+	  	columnModel_refund.getColumn(0).setPreferredWidth(10); //ID
+	 	columnModel_refund.getColumn(1).setPreferredWidth(30); //Product ID
+	  	columnModel_refund.getColumn(2).setPreferredWidth(200); //Name
+        columnModel_refund.getColumn(3).setPreferredWidth(30); //Quantity 
+	  	columnModel_refund.getColumn(4).setPreferredWidth(50); //Price
+	  	columnModel_refund.getColumn(5).setPreferredWidth(30); //Price * Quantity
+	  	columnModel_refund.getColumn(6).setPreferredWidth(10); //Remove
+
+	    //Columns won't be able to moved around
+	  	table_refund.getTableHeader().setReorderingAllowed(false);
+	  	
+	    //Center table data 
+	  	DefaultTableCellRenderer centerRenderer_refund = new DefaultTableCellRenderer();
+	  	centerRenderer_refund.setHorizontalAlignment( SwingConstants.CENTER );
+	  	table_refund.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_refund ); //ID
+	  	table_refund.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_refund ); //Product ID
+	  	table_refund.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_refund ); //Name
+	  	table_refund.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_refund ); //Quantity
+	  	table_refund.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_refund ); //Price
+	  	table_refund.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_refund ); //Quantity * Price
+	  	table_refund.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_refund ); //Remove
+	  	
+	    //Center table column names
+	  	centerRenderer_refund = (DefaultTableCellRenderer) table_refund.getTableHeader().getDefaultRenderer();
+	  	centerRenderer_refund.setHorizontalAlignment(JLabel.CENTER);
+	  	
+		JScrollPane jsp = new JScrollPane(table_refund);
+		jsp.setBounds(2, 2, 810, 344);
+		jsp.setVisible(true);
+		panel_table_refund.add(jsp);
+	   
+		model_refund = (DefaultTableModel) table_refund.getModel();
+	}
+	public void loadRefundInfo(){
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(881, 6, 313, 524);
+		panel_refund.add(tabbedPane);
+		
+		JPanel panel_transactionDetail = new JPanel();
+		tabbedPane.addTab("Transaction details:", null, panel_transactionDetail, null);
+		panel_transactionDetail.setLayout(null);
+		
+		JTextPane txtpnTransactionId_1 = new JTextPane();
+		txtpnTransactionId_1.setText("Transaction ID:");
+		txtpnTransactionId_1.setBackground(Color.decode(defaultColor));
+		txtpnTransactionId_1.setBounds(6, 10, 96, 18);
+		panel_transactionDetail.add(txtpnTransactionId_1);
+		
+		JTextPane txtpnSubtotal = new JTextPane();
+		txtpnSubtotal.setText("Create Date:");
+		txtpnSubtotal.setBackground(Color.decode(defaultColor));
+		txtpnSubtotal.setBounds(6, 58, 77, 18);
+		panel_transactionDetail.add(txtpnSubtotal);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(0, 38, 292, 12);
+		panel_transactionDetail.add(separator);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(0, 86, 292, 12);
+		panel_transactionDetail.add(separator_1);
+		
+		textField_transactionID = new JTextField();
+		textField_transactionID.setBounds(105, 6, 130, 26);
+		panel_transactionDetail.add(textField_transactionID);
+		textField_transactionID.setColumns(10);
+		
+		textField_createDate = new JTextField();
+		textField_createDate.setBounds(87, 52, 199, 26);
+		panel_transactionDetail.add(textField_createDate);
+		textField_createDate.setColumns(10);
+		
+		JTextPane txtpnSubtotal_1 = new JTextPane();
+		txtpnSubtotal_1.setText("Subtotal:");
+		txtpnSubtotal_1.setBounds(6, 110, 61, 18);
+		panel_transactionDetail.add(txtpnSubtotal_1);
+		
+		JTextPane txtpnTax = new JTextPane();
+		txtpnTax.setText("Tax:");
+		txtpnTax.setBounds(6, 162, 32, 18);
+		panel_transactionDetail.add(txtpnTax);
+		
+		JTextPane txtpnTotal = new JTextPane();
+		txtpnTotal.setText("Total:");
+		txtpnTotal.setBounds(6, 220, 41, 18);
+		panel_transactionDetail.add(txtpnTotal);
+		
+		textField_transaction_subtotal = new JTextField();
+		textField_transaction_subtotal.setBounds(70, 105, 130, 26);
+		panel_transactionDetail.add(textField_transaction_subtotal);
+		textField_transaction_subtotal.setColumns(10);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setBounds(0, 138, 292, 12);
+		panel_transactionDetail.add(separator_2);
+		
+		textField_transaction_tax = new JTextField();
+		textField_transaction_tax.setBounds(40, 158, 130, 26);
+		panel_transactionDetail.add(textField_transaction_tax);
+		textField_transaction_tax.setColumns(10);
+		
+		JSeparator separator_3 = new JSeparator();
+		separator_3.setBounds(0, 196, 292, 12);
+		panel_transactionDetail.add(separator_3);
+		
+		textField_transaction_total = new JTextField();
+		textField_transaction_total.setBounds(50, 215, 130, 26);
+		panel_transactionDetail.add(textField_transaction_total);
+		textField_transaction_total.setColumns(10);
+		
+		JSeparator separator_4 = new JSeparator();
+		separator_4.setBounds(0, 253, 292, 12);
+		panel_transactionDetail.add(separator_4);
+		
+		JTextPane txtpnTransactionType = new JTextPane();
+		txtpnTransactionType.setText("Transaction Type:");
+		txtpnTransactionType.setBounds(6, 277, 112, 18);
+		panel_transactionDetail.add(txtpnTransactionType);
+		
+		textField_transactionType = new JTextField();
+		textField_transactionType.setBounds(120, 272, 130, 26);
+		panel_transactionDetail.add(textField_transactionType);
+		textField_transactionType.setColumns(10);
+		
+		JSeparator separator_5 = new JSeparator();
+		separator_5.setBounds(0, 310, 292, 12);
+		panel_transactionDetail.add(separator_5);
+		
+		JTextPane txtpnMethod = new JTextPane();
+		txtpnMethod.setText("Method:");
+		txtpnMethod.setBounds(6, 334, 51, 18);
+		panel_transactionDetail.add(txtpnMethod);
+		
+		textField_method = new JTextField();
+		textField_method.setBounds(60, 329, 130, 26);
+		panel_transactionDetail.add(textField_method);
+		textField_method.setColumns(10);
+		
+		JSeparator separator_6 = new JSeparator();
+		separator_6.setBounds(0, 367, 292, 12);
+		panel_transactionDetail.add(separator_6);
+		
+		JTextPane txtpnPromotionId = new JTextPane();
+		txtpnPromotionId.setText("Promotion ID:");
+		txtpnPromotionId.setBounds(6, 391, 87, 18);
+		panel_transactionDetail.add(txtpnPromotionId);
+		
+		textField_promotionID = new JTextField();
+		textField_promotionID.setBounds(95, 386, 130, 26);
+		panel_transactionDetail.add(textField_promotionID);
+		textField_promotionID.setColumns(10);
+		
+		JSeparator separator_7 = new JSeparator();
+		separator_7.setBounds(0, 424, 292, 12);
+		panel_transactionDetail.add(separator_7);
+		
+		JTextPane txtpnEmployeeId = new JTextPane();
+		txtpnEmployeeId.setText("Employee ID:");
+		txtpnEmployeeId.setBounds(6, 448, 85, 18);
+		panel_transactionDetail.add(txtpnEmployeeId);
+		
+		textField_employeeID = new JTextField();
+		textField_employeeID.setBounds(95, 443, 130, 26);
+		panel_transactionDetail.add(textField_employeeID);
+		textField_employeeID.setColumns(10);
+		
+		
 	}
 }
