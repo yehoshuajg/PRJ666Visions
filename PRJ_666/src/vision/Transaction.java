@@ -2,7 +2,9 @@ package vision;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Transaction {
@@ -133,5 +135,42 @@ public class Transaction {
 		else {
 			return false;
 		}
+	}
+	public int writeTransactionCash(String dateString, double subTotal, double tax, double total, String transactionType, String transactionMethod, int promotionID, int employeeID){
+		Connect connect = new Connect();
+		Connection con;
+		Statement state = null;
+		int generatedKey = 0;
+		try {
+			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			state = con.createStatement();
+			String sql;
+			//PromotionID causing foreign key relationship error
+			/*sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
+					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+promotionID+"','"+employeeID+"')";
+			*/
+			
+			sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
+					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+employeeID+"')";
+			
+			//state.executeUpdate(sql);
+			
+			PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			ps.execute();
+			 
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+			    generatedKey = rs.getInt(1);
+			}
+			//System.out.println("Inserted record's ID: " + generatedKey);
+			
+			//Clean-up environment
+			state.close();
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return generatedKey;
 	}
 }

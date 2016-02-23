@@ -6,10 +6,8 @@ public class Product {
 	private String description;
 	private int categoryID;
 	private int subCategoryID;
-	//private double unitCost;
 	private double salePrice;
 	private int quantity;
-	//private int supplierID;
 	private String notes;
 	
 	Product(){
@@ -66,18 +64,12 @@ public class Product {
 	void setSubCategoryID(int subCategoryID){
 		this.subCategoryID = subCategoryID;
 	}
-	/*void setUnitCost(int unitCost){
-		this.unitCost = unitCost;
-	}*/
-	void setSalePrice(int salePrice){
+	void setSalePrice(double salePrice){
 		this.salePrice = salePrice;
 	}
 	void setQuantity(int quantity){
 		this.quantity = quantity;
 	}
-	/*void setSupplierID(int supplierID){
-		this.supplierID = supplierID;
-	}*/
 	void setNotes(String notes){
 		this.notes = notes;
 	}
@@ -88,9 +80,7 @@ public class Product {
 	String getDescription(){ return this.description; }
 	int getCategoryID(){ return this.categoryID; }
 	int getSubCategoryID(){ return this.subCategoryID; }
-	//double getUnitCost(){ return this.unitCost; }
 	double getSalePrice(){ return this.salePrice; }
 	int getQuantity(){ return this.quantity; }
-	//int getSupplierID(){ return this.supplierID; }
 	String getNotes(){ return this.notes; }
 }

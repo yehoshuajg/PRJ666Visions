@@ -33,6 +33,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -102,6 +105,9 @@ public class Home extends JFrame implements KeyListener{
 	private int c = 0;
 	private String stringTempPrice = null;
 	private double tempTotal = 0;
+	private String transactionType = null;
+	private String transactionMethod = null;
+	private int promotionID = 0;
 	
 	//Discount
 	private Vector<Discount> discount;
@@ -946,12 +952,13 @@ public class Home extends JFrame implements KeyListener{
 											
 											tempTotal = tQ * tP;
 											tempTotal = Math.round(tempTotal * 100.0) / 100.0;
-											
+											System.out.println(tempTotal);
 											model.setValueAt(tempTotal, row, productQuantityAndPrice_column);
 										
 											if(tableListenerCount == 1){
 												calculateSubtotal();
 												calculateInventoryQuantity();
+												calculateSalePrice(row,model.getValueAt(row, id_column));
 											}
 											else if(tableListenerCount == 0){
 												stringTempPrice = model.getValueAt(row, productQuantityAndPrice_column).toString();
@@ -1355,6 +1362,17 @@ public class Home extends JFrame implements KeyListener{
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
 	}
 	
+	public void calculateSalePrice(int row, Object objID){
+		int id = (int) objID;
+		for(int i = 0; i < productBySearch.size(); i++){
+			if(id == productBySearch.get(i).getID()){
+				double t = (double) model.getValueAt(row, productQuantityAndPrice_column);
+				productBySearch.get(i).setSalePrice(t);
+				break;
+			}
+		}
+	}
+	
 	public void calculateCashCheckout(){
 		String cashTenderInput = checkout_amount_tender_input.getText();
 		
@@ -1386,9 +1404,24 @@ public class Home extends JFrame implements KeyListener{
 				sb2.append("Cash Tender: $" + cashTender + "\n");
 				sb2.append("Change: $" + change + "\n");
 				sb2.append("Printing receipt.");
+				transactionType = "Sale";
+				transactionMethod = "Cash";
 				String message2 = sb2.toString();
 				int cashTransaction = JOptionPane.showOptionDialog(null,message2,"Checkout using Cash",
 				JOptionPane.PLAIN_MESSAGE,JOptionPane.PLAIN_MESSAGE,null,optionsTransactionCash,optionsTransactionCash[0]);
+				
+				Transaction transaction = new Transaction();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				Date date = new Date();
+				String dateString = dateFormat.format(date);
+				//change employeeid
+				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, 1);
+				
+				TransactionRecord transactionRecord = new TransactionRecord();
+				for(int i = 0; i < productBySearch.size(); i++){
+					//change employeeid
+					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productBySearch.get(i).getQuantity(),productBySearch.get(i).getSalePrice(),1);
+				}
 				d4.dispose();
 			}
 			//frame_cashCheckout.dispose();
@@ -1424,6 +1457,12 @@ public class Home extends JFrame implements KeyListener{
 					
 			if(subTotal < previous){
 				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
+				if(oneTimeDiscount.getID() > 0){
+					promotionID = oneTimeDiscount.getID();
+				}
+				else{
+					promotionID = 0;
+				}
 				oneTimeDiscountCheck = true;
 				d3.dispose();
 				textField_productID_input.requestFocusInWindow();

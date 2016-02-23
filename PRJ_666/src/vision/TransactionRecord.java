@@ -2,7 +2,9 @@ package vision;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 
@@ -148,5 +150,67 @@ public class TransactionRecord {
 	}
 	public void setUnitCost(double unitCost) {
 		this.unitCost = unitCost;
+	}
+	public void insertTransactionRecord(int transactionID, int productID, int productQuantity, double productSalePrice, int employeeID){
+		Connect connect = new Connect();
+		Connection con;
+		Statement state = null;
+		int generatedKey = 0;
+		try {
+			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			state = con.createStatement();
+			String sql;
+			//same product from multiple supplier?
+			double productUnitCost = getProductUnitCost(productID);
+			
+			//PromotionID causing foreign key relationship error
+			sql = "INSERT INTO `TransactionRecord`(TransactionID,ProductID,QuantitySold,UnitPrice,EmployeeID,UnitCost) "
+					+ "VALUE ('"+transactionID+"','"+productID+"','"+productQuantity+"',"+productSalePrice+",'"+employeeID+"','"+productUnitCost+"')";
+			
+			
+			state.executeUpdate(sql);
+			
+			//Clean-up environment
+			state.close();
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public double getProductUnitCost(int id){
+		int count = 0;
+		double unitCost = 0;
+		try {
+			Connect connect = new Connect();
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			Statement state = null;
+			
+			state = con.createStatement();
+			String sql;
+			sql = "SELECT * FROM product_supplier where ProductID = '" + id + "'";
+			ResultSet rs = state.executeQuery(sql);
+			
+			//Extract data from result set
+			while(rs.next()){
+				//Retrieve by column name
+				unitCost = rs.getDouble("UnitCost");
+				count++;
+			}
+			//Clean-up environment
+			rs.close();
+			state.close();
+			con.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(count == 1){
+			return unitCost;
+		}
+		else {
+			return 0;
+		}
 	}
 }

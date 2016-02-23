@@ -113,11 +113,13 @@ public class Discount {
 				if(discount.get(i).getDiscountValue() > 0){
 					total -= discount.get(i).getDiscountValue();
 					type = "$"+discount.get(i).getDiscountValue();
+					this.id = i + 1;
 				}
 				else if(discount.get(i).getDiscountPercent() > 0){
 					double temp = (discount.get(i).getDiscountPercent() / 100) * total;
 					total -= temp;
 					type = discount.get(i).getDiscountPercent()+"%";
+					this.id = i + 1;
 				}
 				else{
 					JOptionPane.showMessageDialog(null,"Invalid option.");
@@ -137,11 +139,13 @@ public class Discount {
 				if(discount.get(i).getDiscountValue()  == temp){
 					type = "$"+temp;
 					check = true;
+					this.id = i + 1;
 					return total -= temp;
 				}
 				else{
 					check = false;
 				}
+				
 			}
 			if(check == false){
 				JOptionPane.showMessageDialog(null,"Amount entered does not exist in promotion.");
@@ -155,6 +159,7 @@ public class Discount {
 				if(discount.get(i).getDiscountValue() == temp){
 					type = "$"+temp;
 					check2 = true;
+					this.id = i + 1;
 					return total -= temp;
 				}
 				else{
@@ -174,6 +179,7 @@ public class Discount {
 					type = temp+"%";
 					check = true;
 					temp = (temp / 100) * total;
+					this.id = i + 1;
 					return total -= temp;
 				}
 				else{
