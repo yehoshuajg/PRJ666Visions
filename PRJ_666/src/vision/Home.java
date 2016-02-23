@@ -53,7 +53,6 @@ public class Home extends JFrame implements KeyListener{
 	
 	//http://www.dreamincode.net/forums/topic/22739-message-dialogs-in-java/
 	
-	
 	//Find Product by ID
 	private Cashier cashierProductByID = null;
 	private Vector<Product> productBySearch = new Vector<Product>();
@@ -585,7 +584,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_quantity_input.setColumns(10);
 		
 		JTabbedPane tabbedPane_3 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_3.setBounds(854, 11, 198, 259);
+		tabbedPane_3.setBounds(854, 11, 198, 328);
 		cashier_submenu.add(tabbedPane_3);
 		
 		JPanel cashier_commands = new JPanel();
@@ -593,7 +592,7 @@ public class Home extends JFrame implements KeyListener{
 		cashier_commands.setLayout(null);
 		
 		JSeparator separator_4 = new JSeparator();
-		separator_4.setBounds(0, 45, 264, 20);
+		separator_4.setBounds(0, 45, 177, 20);
 		cashier_commands.add(separator_4);
 		
 		btnCancelItem = new JButton("Cancel item");
@@ -710,7 +709,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_discount.setColumns(10);
 		
 		JSeparator separator_3 = new JSeparator();
-		separator_3.setBounds(0, 152, 264, 20);
+		separator_3.setBounds(0, 152, 177, 20);
 		cashier_commands.add(separator_3);
 		
 		JButton btnFindByName = new JButton("Find by Name");
@@ -760,6 +759,29 @@ public class Home extends JFrame implements KeyListener{
 		});
 		btnFindByName.setBounds(10, 170, 117, 29);
 		cashier_commands.add(btnFindByName);
+		
+		JSeparator separator_7 = new JSeparator();
+		separator_7.setBounds(0, 205, 177, 20);
+		cashier_commands.add(separator_7);
+		
+		JButton btnNewTransaction = new JButton("New Transaction");
+		btnNewTransaction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				/*setVisible(false);
+				dispose();
+				try {
+					Home home = new Home();
+					home.setVisible(true);
+					
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/
+				
+			}
+		});
+		btnNewTransaction.setBounds(7, 230, 161, 29);
+		cashier_commands.add(btnNewTransaction);
 		
 		JTabbedPane tabbedPane_5 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_5.setBounds(854, 399, 198, 150);
@@ -952,7 +974,7 @@ public class Home extends JFrame implements KeyListener{
 											
 											tempTotal = tQ * tP;
 											tempTotal = Math.round(tempTotal * 100.0) / 100.0;
-											System.out.println(tempTotal);
+											
 											model.setValueAt(tempTotal, row, productQuantityAndPrice_column);
 										
 											if(tableListenerCount == 1){
@@ -1098,13 +1120,11 @@ public class Home extends JFrame implements KeyListener{
 								TransactionRecord tr = new TransactionRecord();
 								for(int i = 0; i < tr.getTransactionCount(tempTransactionID); i++){
 									tr.getTransactionRecord(tempTransactionID, i);
-								model_refund.addRow(new Object[]{
-								tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
+									model_refund.addRow(new Object[]{
+									tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),
+									tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
+									tracker++;
 								}
-								
-								
-								
-								tracker++;
 							}
 							else{
 								JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
@@ -1420,7 +1440,19 @@ public class Home extends JFrame implements KeyListener{
 				TransactionRecord transactionRecord = new TransactionRecord();
 				for(int i = 0; i < productBySearch.size(); i++){
 					//change employeeid
-					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productBySearch.get(i).getQuantity(),productBySearch.get(i).getSalePrice(),1);
+					String qs = null;
+					for(int j = 0; j < table.getRowCount(); j++){
+						int tID = (int) model.getValueAt(j, id_column);
+						if(productBySearch.get(i).getID() == tID){
+							//System.out.println("Name: " + table.getValueAt(j, productName_column));
+							//System.out.println("Quantity: " + table.getValueAt(j, productQuantity_column));
+							qs = String.valueOf(table.getValueAt(j, productQuantity_column));
+							break;
+						}
+					}
+					int q = Integer.parseInt(qs);
+					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),q,productBySearch.get(i).getSalePrice(),1);
+					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
 				}
 				d4.dispose();
 			}

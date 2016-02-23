@@ -165,7 +165,7 @@ public class TransactionRecord {
 			
 			//PromotionID causing foreign key relationship error
 			sql = "INSERT INTO `TransactionRecord`(TransactionID,ProductID,QuantitySold,UnitPrice,EmployeeID,UnitCost) "
-					+ "VALUE ('"+transactionID+"','"+productID+"','"+productQuantity+"',"+productSalePrice+",'"+employeeID+"','"+productUnitCost+"')";
+			+ "VALUE ('"+transactionID+"','"+productID+"','"+productQuantity+"',"+productSalePrice+",'"+employeeID+"','"+productUnitCost+"')";
 			
 			
 			state.executeUpdate(sql);
@@ -178,6 +178,8 @@ public class TransactionRecord {
 			e.printStackTrace();
 		}
 	}
+	
+	//Gets unit cost of a product
 	public double getProductUnitCost(int id){
 		int count = 0;
 		double unitCost = 0;
@@ -208,6 +210,68 @@ public class TransactionRecord {
 		}
 		if(count == 1){
 			return unitCost;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public void updateProduct(int productID, int newQuantity){
+		int previousQuantity = getPreviousQuantity(productID);
+		int newQuantity2 = previousQuantity - newQuantity;
+		
+		Connect connect = new Connect();
+		Connection con;
+		Statement state = null;
+		try {
+			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			state = con.createStatement();
+			String sql;
+			
+			//PromotionID causing foreign key relationship error
+			sql = "UPDATE `Product` SET Quantity = '" + newQuantity2 + "'" + "where ID = '" + productID + "'";
+	
+			state.executeUpdate(sql);
+			
+			//Clean-up environment
+			state.close();
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public int getPreviousQuantity(int id){
+		int count = 0;
+		int quantity = 0;
+		try {
+			Connect connect = new Connect();
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			Statement state = null;
+			
+			state = con.createStatement();
+			String sql;
+			sql = "SELECT * FROM Product where ID = '" + id + "'";
+			ResultSet rs = state.executeQuery(sql);
+			
+			//Extract data from result set
+			while(rs.next()){
+				//Retrieve by column name
+				quantity = rs.getInt("Quantity");
+				count++;
+			}
+			//Clean-up environment
+			rs.close();
+			state.close();
+			con.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(count == 1){
+			return quantity;
 		}
 		else {
 			return 0;
