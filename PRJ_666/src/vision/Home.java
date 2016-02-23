@@ -62,8 +62,10 @@ public class Home extends JFrame implements KeyListener{
 	
 	private int idLength = 8;
 	
+	JTabbedPane tabbedPane;
 	private JPanel contentPane;
 	private Employees employee;
+	private int employeePositionID = 0;
 	private JTextField welcome;
 	private JTextField productID;
 	private JTextField productName;
@@ -231,7 +233,7 @@ public class Home extends JFrame implements KeyListener{
 */		
 		//connect = new Connect();
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 11, 1350, 690); //main size
 		contentPane.add(tabbedPane);
 		
@@ -1353,33 +1355,52 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setActionCommand("1");
 		keypad_2.setActionCommand("2");
 		*/
-		Reports report_sec = new Reports(); 
-		JPanel panel_reports = report_sec.getWindow();
-		tabbedPane.addTab("Reports",panel_reports);
-		panel_reports.setLayout(null);
 		
-		JPanel panel_staff = new JPanel();
-		tabbedPane.addTab("Staff", null, panel_staff, null);
 		
-		JPanel panel_supplier = new JPanel();
-		tabbedPane.addTab("Supplier", null, panel_supplier, null);
 		
-		//JPanel panel_inventory = new JPanel();
-		//tabbedPane.addTab("Inventory", null, panel_inventory, null);
-		Inventory inv = new Inventory();
-		tabbedPane.addTab("Inventory",inv);
-		inv.refreshInventoryTable();
 		
-		JPanel panel_payments = new JPanel();
-		tabbedPane.addTab("Payments", null, panel_payments, null);
 		
-		JPanel panel_getHelp = new JPanel();
-		tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+		
+		
+		
+		
 	
 	}
 	public void setEmployee(Employees e){
 		employee = e;
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
+		
+		Positions position = new Positions();
+		if(position.checkPosition(employee.getPositionID()) == true){
+			//Report
+			Reports report_sec = new Reports(); 
+			JPanel panel_reports = report_sec.getWindow();
+			tabbedPane.addTab("Reports",panel_reports);
+			panel_reports.setLayout(null);
+			
+			//Staff
+			JPanel panel_staff = new JPanel();
+			tabbedPane.addTab("Staff", null, panel_staff, null);
+			
+			//Supplier
+			JPanel panel_supplier = new JPanel();
+			tabbedPane.addTab("Supplier", null, panel_supplier, null);
+			
+			//Inventory
+			//JPanel panel_inventory = new JPanel();
+			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
+			Inventory inv = new Inventory();
+			tabbedPane.addTab("Inventory",inv);
+			inv.refreshInventoryTable();
+			
+			//Payments
+			JPanel panel_payments = new JPanel();
+			tabbedPane.addTab("Payments", null, panel_payments, null);
+			
+			//Get Help
+			JPanel panel_getHelp = new JPanel();
+			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+		}
 	}
 	
 	public void calculateSalePrice(int row, Object objID){
@@ -1444,8 +1465,6 @@ public class Home extends JFrame implements KeyListener{
 					for(int j = 0; j < table.getRowCount(); j++){
 						int tID = (int) model.getValueAt(j, id_column);
 						if(productBySearch.get(i).getID() == tID){
-							//System.out.println("Name: " + table.getValueAt(j, productName_column));
-							//System.out.println("Quantity: " + table.getValueAt(j, productQuantity_column));
 							qs = String.valueOf(table.getValueAt(j, productQuantity_column));
 							break;
 						}
