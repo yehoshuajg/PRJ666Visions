@@ -8,7 +8,7 @@ public class Connect {
 	
 	//JDBC driver name and database URL
 	private static String driver = "com.mysql.jdbc.Driver";
-	private static String url = "jdbc:mysql://localhost:3306/StoreDB?useSSL=false"; //DB name
+	private static String url = "jdbc:mysql://localhost:9107/StoreDB?useSSL=false"; //DB name
 	
 	//Created user in mySQL and gave it root permissions
 	//Database credentials
