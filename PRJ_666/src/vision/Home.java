@@ -33,9 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -53,6 +50,7 @@ public class Home extends JFrame implements KeyListener{
 	
 	//http://www.dreamincode.net/forums/topic/22739-message-dialogs-in-java/
 	
+	
 	//Find Product by ID
 	private Cashier cashierProductByID = null;
 	private Vector<Product> productBySearch = new Vector<Product>();
@@ -62,10 +60,8 @@ public class Home extends JFrame implements KeyListener{
 	
 	private int idLength = 8;
 	
-	JTabbedPane tabbedPane;
 	private JPanel contentPane;
 	private Employees employee;
-	private int employeePositionID = 0;
 	private JTextField welcome;
 	private JTextField productID;
 	private JTextField productName;
@@ -106,9 +102,6 @@ public class Home extends JFrame implements KeyListener{
 	private int c = 0;
 	private String stringTempPrice = null;
 	private double tempTotal = 0;
-	private String transactionType = null;
-	private String transactionMethod = null;
-	private int promotionID = 0;
 	
 	//Discount
 	private Vector<Discount> discount;
@@ -233,7 +226,7 @@ public class Home extends JFrame implements KeyListener{
 */		
 		//connect = new Connect();
 		
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(10, 11, 1350, 690); //main size
 		contentPane.add(tabbedPane);
 		
@@ -586,7 +579,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_quantity_input.setColumns(10);
 		
 		JTabbedPane tabbedPane_3 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_3.setBounds(854, 11, 198, 328);
+		tabbedPane_3.setBounds(854, 11, 198, 259);
 		cashier_submenu.add(tabbedPane_3);
 		
 		JPanel cashier_commands = new JPanel();
@@ -594,7 +587,7 @@ public class Home extends JFrame implements KeyListener{
 		cashier_commands.setLayout(null);
 		
 		JSeparator separator_4 = new JSeparator();
-		separator_4.setBounds(0, 45, 177, 20);
+		separator_4.setBounds(0, 45, 264, 20);
 		cashier_commands.add(separator_4);
 		
 		btnCancelItem = new JButton("Cancel item");
@@ -711,7 +704,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_discount.setColumns(10);
 		
 		JSeparator separator_3 = new JSeparator();
-		separator_3.setBounds(0, 152, 177, 20);
+		separator_3.setBounds(0, 152, 264, 20);
 		cashier_commands.add(separator_3);
 		
 		JButton btnFindByName = new JButton("Find by Name");
@@ -761,29 +754,6 @@ public class Home extends JFrame implements KeyListener{
 		});
 		btnFindByName.setBounds(10, 170, 117, 29);
 		cashier_commands.add(btnFindByName);
-		
-		JSeparator separator_7 = new JSeparator();
-		separator_7.setBounds(0, 205, 177, 20);
-		cashier_commands.add(separator_7);
-		
-		JButton btnNewTransaction = new JButton("New Transaction");
-		btnNewTransaction.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/*setVisible(false);
-				dispose();
-				try {
-					Home home = new Home();
-					home.setVisible(true);
-					
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}*/
-				
-			}
-		});
-		btnNewTransaction.setBounds(7, 230, 161, 29);
-		cashier_commands.add(btnNewTransaction);
 		
 		JTabbedPane tabbedPane_5 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_5.setBounds(854, 399, 198, 150);
@@ -982,7 +952,6 @@ public class Home extends JFrame implements KeyListener{
 											if(tableListenerCount == 1){
 												calculateSubtotal();
 												calculateInventoryQuantity();
-												calculateSalePrice(row,model.getValueAt(row, id_column));
 											}
 											else if(tableListenerCount == 0){
 												stringTempPrice = model.getValueAt(row, productQuantityAndPrice_column).toString();
@@ -1122,11 +1091,13 @@ public class Home extends JFrame implements KeyListener{
 								TransactionRecord tr = new TransactionRecord();
 								for(int i = 0; i < tr.getTransactionCount(tempTransactionID); i++){
 									tr.getTransactionRecord(tempTransactionID, i);
-									model_refund.addRow(new Object[]{
-									tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),
-									tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
-									tracker++;
+								model_refund.addRow(new Object[]{
+								tracker,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),tr.getReturned(),tr.getDateReturned(),tr.getEmployeeID()});
 								}
+								
+								
+								
+								tracker++;
 							}
 							else{
 								JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
@@ -1355,63 +1326,32 @@ public class Home extends JFrame implements KeyListener{
 		keypad_1.setActionCommand("1");
 		keypad_2.setActionCommand("2");
 		*/
+		Reports report_sec = new Reports(); 
+		JPanel panel_reports = report_sec.getWindow();
+		tabbedPane.addTab("Reports",panel_reports);
 		
+		JPanel panel_staff = new JPanel();
+		tabbedPane.addTab("Staff", null, panel_staff, null);
 		
+		JPanel panel_supplier = new JPanel();
+		tabbedPane.addTab("Supplier", null, panel_supplier, null);
 		
+		//JPanel panel_inventory = new JPanel();
+		//tabbedPane.addTab("Inventory", null, panel_inventory, null);
+		Inventory inv = new Inventory();
+		tabbedPane.addTab("Inventory",inv);
+		inv.refreshInventoryTable();
 		
+		JPanel panel_payments = new JPanel();
+		tabbedPane.addTab("Payments", null, panel_payments, null);
 		
-		
-		
-		
-		
+		JPanel panel_getHelp = new JPanel();
+		tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 	
 	}
 	public void setEmployee(Employees e){
 		employee = e;
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
-		
-		Positions position = new Positions();
-		if(position.checkPosition(employee.getPositionID()) == true){
-			//Report
-			Reports report_sec = new Reports(); 
-			JPanel panel_reports = report_sec.getWindow();
-			tabbedPane.addTab("Reports",panel_reports);
-			panel_reports.setLayout(null);
-			
-			//Staff
-			JPanel panel_staff = new JPanel();
-			tabbedPane.addTab("Staff", null, panel_staff, null);
-			
-			//Supplier
-			JPanel panel_supplier = new JPanel();
-			tabbedPane.addTab("Supplier", null, panel_supplier, null);
-			
-			//Inventory
-			//JPanel panel_inventory = new JPanel();
-			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
-			Inventory inv = new Inventory();
-			tabbedPane.addTab("Inventory",inv);
-			inv.refreshInventoryTable();
-			
-			//Payments
-			JPanel panel_payments = new JPanel();
-			tabbedPane.addTab("Payments", null, panel_payments, null);
-			
-			//Get Help
-			JPanel panel_getHelp = new JPanel();
-			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
-		}
-	}
-	
-	public void calculateSalePrice(int row, Object objID){
-		int id = (int) objID;
-		for(int i = 0; i < productBySearch.size(); i++){
-			if(id == productBySearch.get(i).getID()){
-				double t = (double) model.getValueAt(row, productQuantityAndPrice_column);
-				productBySearch.get(i).setSalePrice(t);
-				break;
-			}
-		}
 	}
 	
 	public void calculateCashCheckout(){
@@ -1445,34 +1385,9 @@ public class Home extends JFrame implements KeyListener{
 				sb2.append("Cash Tender: $" + cashTender + "\n");
 				sb2.append("Change: $" + change + "\n");
 				sb2.append("Printing receipt.");
-				transactionType = "Sale";
-				transactionMethod = "Cash";
 				String message2 = sb2.toString();
 				int cashTransaction = JOptionPane.showOptionDialog(null,message2,"Checkout using Cash",
 				JOptionPane.PLAIN_MESSAGE,JOptionPane.PLAIN_MESSAGE,null,optionsTransactionCash,optionsTransactionCash[0]);
-				
-				Transaction transaction = new Transaction();
-				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-				Date date = new Date();
-				String dateString = dateFormat.format(date);
-				//change employeeid
-				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, 1);
-				
-				TransactionRecord transactionRecord = new TransactionRecord();
-				for(int i = 0; i < productBySearch.size(); i++){
-					//change employeeid
-					String qs = null;
-					for(int j = 0; j < table.getRowCount(); j++){
-						int tID = (int) model.getValueAt(j, id_column);
-						if(productBySearch.get(i).getID() == tID){
-							qs = String.valueOf(table.getValueAt(j, productQuantity_column));
-							break;
-						}
-					}
-					int q = Integer.parseInt(qs);
-					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),q,productBySearch.get(i).getSalePrice(),1);
-					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
-				}
 				d4.dispose();
 			}
 			//frame_cashCheckout.dispose();
@@ -1508,12 +1423,6 @@ public class Home extends JFrame implements KeyListener{
 					
 			if(subTotal < previous){
 				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
-				if(oneTimeDiscount.getID() > 0){
-					promotionID = oneTimeDiscount.getID();
-				}
-				else{
-					promotionID = 0;
-				}
 				oneTimeDiscountCheck = true;
 				d3.dispose();
 				textField_productID_input.requestFocusInWindow();
