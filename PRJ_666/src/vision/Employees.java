@@ -145,7 +145,7 @@ public class Employees extends JFrame{
 	public String getHireDate(){ return this.hireDate; }
 	public String getTerminationDate(){ return this.terminationDate; }
 	
-	public boolean fetchLogin(String userID) throws Exception{
+	public boolean fetchLogin(String userID, String pass) throws Exception{
 		//Execute a query
 		con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 		Statement state = null;
@@ -197,7 +197,7 @@ public class Employees extends JFrame{
 		}
 	}
 	public boolean login(String name, String pass) throws Exception{
-		if(fetchLogin(name) == true){
+		if(fetchLogin(name,pass) == true){
 			return true;
 		}
 		else{
