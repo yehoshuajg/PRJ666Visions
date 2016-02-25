@@ -1369,7 +1369,7 @@ public class Home extends JFrame implements KeyListener{
 	public void setEmployee(Employees e){
 		employee = e;
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
-		
+	
 		Positions position = new Positions();
 		if(position.checkPosition(employee.getPositionID()) == true){
 			//Report
@@ -1378,8 +1378,9 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Reports",panel_reports);
 			
 			//Staff
-			JPanel panel_staff = new JPanel();
-			tabbedPane.addTab("Staff", null, panel_staff, null);
+			Employees staff = new Employees();
+			JPanel panel_staff = staff.getWindow();
+			tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
 			JPanel panel_supplier = new JPanel();

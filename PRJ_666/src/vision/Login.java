@@ -95,7 +95,7 @@ public class Login extends JFrame {
 							JOptionPane.showMessageDialog(null,"Welcome, " + employee.getFirstName() + " " + employee.getLastName());
 							dispose();
 							Home home = new Home();
-							home.setEmployee(employee);
+							home.setEmployee(employee);					
 							home.setVisible(true);
 						}
 						else{
