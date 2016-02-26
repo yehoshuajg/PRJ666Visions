@@ -152,7 +152,8 @@ public class Employees extends JFrame{
 		
 		state = con.createStatement();
 	    String sql;
-	    sql = "SELECT * FROM Employee where UserName = '" + userID + "'";
+	    sql = "SELECT * FROM Employee where UserName = '" + userID + "' AND Password = '" + pass + "' AND "
+	    		+ "TerminationDate IS NULL";
 	    ResultSet rs = state.executeQuery(sql);
 	    int count = 0;
 	    //Extract data from result set
@@ -171,7 +172,7 @@ public class Employees extends JFrame{
 	    	this.positionID = rs.getInt("PositionID");
 	    	this.jobType = rs.getString("JobType");
 		  	this.username = rs.getString("UserName");
-		  	
+		  	//no need to grab pass
 		  	this.hireDate = rs.getString("HireDate");
 		  	this.terminationDate = rs.getString("TerminationDate");
 		  	count++;
