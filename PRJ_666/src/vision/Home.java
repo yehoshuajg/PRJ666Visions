@@ -34,6 +34,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -43,6 +44,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -534,7 +536,7 @@ public class Home extends JFrame implements KeyListener{
 															table.scrollRectToVisible(table.getCellRect(table.getRowCount()-1, 0, true));
 														}
 														
-														textField_productID_input.setText("");
+														//textField_productID_input.setText("");
 														textField_name_input.setText(tempProductSearch.getName());
 														textField_price_input.setText("$" + String.valueOf(tempProductSearch.getSalePrice()));		
 														textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
@@ -901,34 +903,29 @@ public class Home extends JFrame implements KeyListener{
 									
 									productByLike = new Vector<Product>();
 									cashierProductByID.findProductUsingLike(productNameInput.trim(),productByLike);
+									
 									if(productByLike.size() > 0){
-										txtpnsearch_2.setText("");
 										for(int i = 0; i < productByLike.size(); i++){
-											//If something is in the sale table
+											//If sale table is not empty
 											if(productBySearch.size() > 0){
-												boolean check = false;
 												for(int j = 0; j < productBySearch.size(); j++){
-													if(productByLike.get(i).getID() == productBySearch.get(j).getID()){
-														check = false;
+													if(String.valueOf(productByLike.get(i).getID()).equals(String.valueOf(productBySearch.get(j).getID()))){
+														model_search.addRow(new Object[]{i+1,productBySearch.get(j).getName(),productBySearch.get(j).getDescription(),productBySearch.get(j).getQuantity(),productBySearch.get(j).getSalePrice(),productBySearch.get(j).getNotes()});
+														break;
 													}
-													//Break avoids duplicates and if no if(check == true), product already in 
-													//sale table wont show up
 													else{
 														model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
-														check = true;
 														break;
 													}
 												}
-												if(check == false){
-													model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productBySearch.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
-												}
 											}
-											//If the sale table is empty
+											//if sale table is empty
 											else{
 												model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
 											}
 										}
 									}
+									//No product found
 									else{
 										txtpnsearch_2.setText("Product '" + productNameInput + "' was not found.");
 									}
@@ -936,6 +933,7 @@ public class Home extends JFrame implements KeyListener{
 							}
 						});
 						
+						//Cancel button closes the window
 						product_cancel_button.addActionListener(new ActionListener() {
 							
 							@Override
@@ -945,6 +943,7 @@ public class Home extends JFrame implements KeyListener{
 							}
 						});
 						
+						//Checking for double click
 						table_search.addMouseListener(new MouseAdapter() {
 							public void mouseClicked(MouseEvent e) {
 								if (e.getClickCount() == 2) {
@@ -956,9 +955,21 @@ public class Home extends JFrame implements KeyListener{
 											String n = (String) model_search.getValueAt(row, 1);
 											for(int i = 0; i < productByLike.size(); i++){
 												if(n.equals(productByLike.get(i).getName())){ //maybe change to using ID
-													textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
-													d5.dispose();
-													break;
+													int items = 0;
+													try{
+														boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
+														if(b == true){
+															items++;
+														}
+													}catch(Exception e2){}
+													if(items == 0){
+														textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
+														d5.dispose();
+														break;
+													}
+													else{
+														txtpnsearch_2.setText("Please use the add button at the bottom use add multiple items at a time.");
+													}
 												}
 											}
 										}
@@ -976,6 +987,7 @@ public class Home extends JFrame implements KeyListener{
 								}
 							}
 						});
+						
 						//Add button listener
 						Runnable runAdd = new Runnable() {
 							@Override
@@ -984,17 +996,18 @@ public class Home extends JFrame implements KeyListener{
 									
 									@Override
 									public void actionPerformed(ActionEvent e) {
+										Vector<Integer> searchID = new Vector<Integer>();
 										if(model_search.getRowCount() > 0){
-											for (int i = model_search.getRowCount()-1; i >= 0; --i) {
-											//for (int i = 0; i < model_search.getRowCount(); i++) {
+											//for (int i = model_search.getRowCount()-1; i >= 0; --i) {
+											for (int i = 0; i < model_search.getRowCount(); i++) {
 												try{
 													boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
 													if (b == true){
 														for(int j = 0; j < productByLike.size(); j++){
 															if(String.valueOf(model_search.getValueAt(i, 1)).equals(productByLike.get(j).getName())){
-																textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
-																//d5.dispose();
-																//break;
+																searchID.add(productByLike.get(i).getID());
+																d5.dispose();
+																break;
 															}
 															else{
 																//System.out.println("Else");
@@ -1006,6 +1019,16 @@ public class Home extends JFrame implements KeyListener{
 												}
 											}
 										}
+										new Timer(200, new ActionListener() {
+								            int it = 0;
+								            @Override
+								            public void actionPerformed(ActionEvent e2) {
+								            	textField_productID_input.setText(String.valueOf(searchID.get(it)));
+								                if (++it == searchID.size()){
+								                    ((Timer)e2.getSource()).stop();
+								                }
+								            }
+								        }).start();
 									}
 								});
 							}
@@ -1023,13 +1046,9 @@ public class Home extends JFrame implements KeyListener{
 						d5.getRootPane().setDefaultButton(product_search_button);
 						d5.setVisible(true);
 					}
-							/*else{
-								JOptionPane.showMessageDialog(null,"Please enter a valid product name.");
-								check = false;
-							}
 					else{
 						JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
-					}*/
+					}
 				}catch(Exception e1){}
 			}
 		});
