@@ -32,6 +32,8 @@ import javax.swing.JDialog;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,6 +47,7 @@ import javax.swing.UIManager;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Toolkit;
 
 import javax.swing.JTextPane;
@@ -504,7 +507,7 @@ public class Home extends JFrame implements KeyListener{
 														TableColumn tc = table.getColumnModel().getColumn(productRemove_column);
 														tc.setCellEditor(table.getDefaultEditor(Boolean.class));
 														tc.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-														
+
 														boolean eCheck = false;
 														for(int i = 0; i < productBySearch.size(); i++){
 															if(productBySearch.size() > 0){
@@ -513,6 +516,8 @@ public class Home extends JFrame implements KeyListener{
 																	String tQ = model.getValueAt(i, productQuantity_column).toString();
 																	int tempQ = Integer.parseInt(tQ);
 																	previousValue.insertElementAt(tempQ, i);
+																	//Moves table down as scroll bar appears and more items get added
+																	//table.scrollRectToVisible(table.getCellRect(i, 0, true));
 																	eCheck = true;
 																	break;
 																}
@@ -524,6 +529,9 @@ public class Home extends JFrame implements KeyListener{
 														if(eCheck == false){
 															productBySearch.add(tempProductSearch);
 															previousValue.add(quantity);
+															
+															//Moves table down as scroll bar appears and more items get added
+															table.scrollRectToVisible(table.getCellRect(table.getRowCount()-1, 0, true));
 														}
 														
 														textField_productID_input.setText("");
@@ -726,166 +734,295 @@ public class Home extends JFrame implements KeyListener{
 				try{
 					boolean check = false;
 					if(!table.isEditing()){
-									JPanel findByName_panel = new JPanel();
-									findByName_panel.setLayout(null);
+						JPanel findByName_panel = new JPanel();
+						findByName_panel.setLayout(null);
 									
-									//Product Name
-									JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-									tabbedPane.setBounds(250, 10, 400, 100);
-									findByName_panel.add(tabbedPane);
+						//Product Name
+						JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+						tabbedPane.setBounds(250, 10, 400, 200);
+						findByName_panel.add(tabbedPane);
 									
-									JPanel panel_searchDetail = new JPanel();
-									tabbedPane.addTab("Find Product using Name, Description, Notes:", null, panel_searchDetail, null);
-									panel_searchDetail.setLayout(null);
+						JPanel panel_searchDetail = new JPanel();
+						tabbedPane.addTab("Find Product using Name, Description, Notes:", null, panel_searchDetail, null);
+						panel_searchDetail.setLayout(null);
 									
-									JTextPane txtpnsearch_1 = new JTextPane();
-									txtpnsearch_1.setText("Search:");
-									txtpnsearch_1.setBackground(Color.decode(defaultColor));
-									txtpnsearch_1.setBounds(10, 10, 50, 18);
-									panel_searchDetail.add(txtpnsearch_1);
+						//Text
+						JTextPane txtpnsearch_1 = new JTextPane();
+						txtpnsearch_1.setText("Search:");
+						txtpnsearch_1.setBackground(Color.decode(defaultColor));
+						txtpnsearch_1.setBounds(10, 13, 50, 18);
+						panel_searchDetail.add(txtpnsearch_1);
 									
-									JTextField textField_search_input = new JTextField();
-									textField_search_input.setBounds(60, 6, 150, 26);
-									panel_searchDetail.add(textField_search_input);
-									textField_search_input.setColumns(10);
+						//Messages
+						JTextPane txtpnsearch_2 = new JTextPane();
+						txtpnsearch_2.setBackground(Color.decode(defaultColor));
+						txtpnsearch_2.setBounds(10, 80, 380, 120);
+						panel_searchDetail.add(txtpnsearch_2);
 									
-									JButton product_search_button = new JButton("Search");
-									product_search_button.setBounds(210, 6, 117, 29);
-									panel_searchDetail.add(product_search_button);
+						//Textfield input
+						JTextField textField_search_input = new JTextField();
+						textField_search_input.setBounds(60, 6, 310, 30);
+						panel_searchDetail.add(textField_search_input);
+						textField_search_input.setColumns(10);
 									
-									//Places cursor in ID field as soon as page loads, like focus in html
-									textField_search_input.addAncestorListener(new AncestorListener() {
-										@Override
-										public void ancestorRemoved(AncestorEvent event) {
-											// TODO Auto-generated method stub
-										}
-										@Override
-										public void ancestorMoved(AncestorEvent event) {
-											// TODO Auto-generated method stub	
-										}
-										@Override
-										public void ancestorAdded(AncestorEvent event) {
-											// TODO Auto-generated method stub
-											SwingUtilities.invokeLater(new Runnable() {
-									            @Override
-									            public void run() {
-									            	textField_search_input.requestFocusInWindow();
-									            }
-											});
-										}
-									});
+						//Search button
+						JButton product_search_button = new JButton("Search");
+						product_search_button.setBounds(3, 45, 190, 29);
+						panel_searchDetail.add(product_search_button);
 									
-									//Table
-									JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
-									tabbedPane_refund_table.setBounds(30, 204, 822, 375);
-									findByName_panel.add(tabbedPane_refund_table);
+						//Cancel button
+						JButton product_cancel_button = new JButton("Cancel");
+						product_cancel_button.setBounds(190, 45, 185, 29);
+						panel_searchDetail.add(product_cancel_button);
+						
+						//Add button
+						JButton product_add_button = new JButton("Add");
+						product_add_button.setBounds(38, 575, 807, 40);
+						findByName_panel.add(product_add_button);
 									
-									JPanel panel_table_refund = new JPanel(new BorderLayout());
-									tabbedPane_refund_table.addTab("List of suggestions: ", null, panel_table_refund, null);
-									
-									Vector<String> search_row_data = new Vector<String>();
-									Vector<String> search_column_name = new Vector<String>();
-									search_column_name.addElement("#");
-									search_column_name.addElement("Name");
-									search_column_name.addElement("Description");
-									search_column_name.addElement("Quantity");
-									search_column_name.addElement("Sale Price");
-									search_column_name.addElement("Notes");
-									search_column_name.addElement("Add");
-									
-									JTable table_search = new JTable(search_row_data, search_column_name){
-										public boolean isCellEditable(int row, int column) {
-											//Return true if the column (number) is editable, else false
-									        if(column == 3 || column == 6){ 
-									        	return true;
-									        }
-									        else{
-									        	return false;
-									        }
-									    }
-									};
-									panel_table_refund.add(table_search.getTableHeader(), BorderLayout.NORTH);
-									panel_table_refund.add(table_search, BorderLayout.CENTER);
-									
-									//Row Height
-									table_search.setRowHeight(30);
-								  	
-								    //Column Width
-								  	TableColumnModel columnModel_search = table_search.getColumnModel();
-								  	columnModel_search.getColumn(0).setPreferredWidth(10); //ID
-								  	columnModel_search.getColumn(1).setPreferredWidth(100); //Product ID
-								  	columnModel_search.getColumn(2).setPreferredWidth(100); //Name
-								  	columnModel_search.getColumn(3).setPreferredWidth(10); //Quantity 
-								  	columnModel_search.getColumn(4).setPreferredWidth(30); //Price
-								  	columnModel_search.getColumn(5).setPreferredWidth(70); //Price * Quantity
-								  	columnModel_search.getColumn(6).setPreferredWidth(10); //Remove
-
-								    //Columns won't be able to moved around
-								  	table_search.getTableHeader().setReorderingAllowed(false);
-								  	
-								    //Center table data 
-								  	DefaultTableCellRenderer centerRenderer_search = new DefaultTableCellRenderer();
-								  	centerRenderer_search.setHorizontalAlignment( SwingConstants.CENTER );
-								  	table_search.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //ID
-								  	table_search.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Product ID
-								  	table_search.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Name
-								  	table_search.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Quantity
-								  	table_search.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Price
-								  	table_search.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_search ); //Quantity * Price
-								  	table_search.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_search ); //Remove
-								  	
-								    //Center table column names
-								  	centerRenderer_search = (DefaultTableCellRenderer) table_search.getTableHeader().getDefaultRenderer();
-								  	centerRenderer_search.setHorizontalAlignment(JLabel.CENTER);
-								  	
-									JScrollPane jsp2 = new JScrollPane(table_search);
-									jsp2.setBounds(2, 2, 810, 344);
-									jsp2.setVisible(true);
-									panel_table_refund.add(jsp2);
-								   
-									DefaultTableModel model_refund = (DefaultTableModel) table_search.getModel();
-									//Button listener
-									product_search_button.addActionListener(new ActionListener() {
-										
-										@Override
-										public void actionPerformed(ActionEvent e) {
-											// TODO Auto-generated method stub
-											String productNameInput = textField_search_input.getText();
-											productNameInput.trim();
-											if(validateEmpty(productNameInput) == false){
-												JOptionPane.showMessageDialog(null,"Product name cannot be empty. Please enter a product name.");		
-											}
-											else if(productNameInput.trim().matches("^[-0-9A-Za-z.,'() ]*$")){
-												try {
-													cashierProductByID = new Cashier();
-												} catch (Exception e1) {
-													// TODO Auto-generated catch block
-													e1.printStackTrace();
-												}
-												
-												//productByName = new Product();
-												//productByName = cashierProductByID.findProductName(productNameInput);
-												productByLike = new Vector<Product>();
-												cashierProductByID.findProductUsingLike(productNameInput.trim(),productByLike);
-												for(int i = 0; i < productByLike.size(); i++){
-													model_refund.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
-												}
-												//System.out.println(productByLike.size());
-
-											}
-										}
-									});
-
-									Component component = (Component) e.getSource();
-							        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
-									d5 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
-									d5.getContentPane().add(findByName_panel);
-									d5.setSize(900, 650);
-									d5.setLocationRelativeTo(null);
-									d5.setVisible(true);
-									//d5.getRootPane().setDefaultButton(checkoutCash_btnEnter);
-									
+						//Places cursor in ID field as soon as page loads, like focus in html
+						textField_search_input.addAncestorListener(new AncestorListener() {
+							@Override
+							public void ancestorRemoved(AncestorEvent event) {
+								// TODO Auto-generated method stub
 							}
+							@Override
+							public void ancestorMoved(AncestorEvent event) {
+								// TODO Auto-generated method stub	
+							}
+							@Override
+							public void ancestorAdded(AncestorEvent event) {
+								// TODO Auto-generated method stub
+							SwingUtilities.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										textField_search_input.requestFocusInWindow();
+									}
+								});
+							}
+						});
+									
+						//Table
+						JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
+						tabbedPane_refund_table.setBounds(30, 204, 822, 375);
+						findByName_panel.add(tabbedPane_refund_table);
+									
+						JPanel panel_table_refund = new JPanel(new BorderLayout());
+						tabbedPane_refund_table.addTab("List of suggestions: ", null, panel_table_refund, null);
+									
+						Vector<String> search_row_data = new Vector<String>();
+						Vector<String> search_column_name = new Vector<String>();
+						search_column_name.addElement("#");
+						search_column_name.addElement("Name");
+						search_column_name.addElement("Description");
+						search_column_name.addElement("Quantity");
+						search_column_name.addElement("Sale Price");
+						search_column_name.addElement("Notes");
+						search_column_name.addElement("Add");
+						
+						JTable table_search = new JTable(search_row_data, search_column_name){
+							public boolean isCellEditable(int row, int column) {
+								//Return true if the column (number) is editable, else false
+								//if(column == 3 || column == 6){ 
+								if(column == 6){
+									return true;
+								}
+								else{
+									return false;
+								}
+							}
+						};
+						panel_table_refund.add(table_search.getTableHeader(), BorderLayout.NORTH);
+						panel_table_refund.add(table_search, BorderLayout.CENTER);
+						
+						//Row Height
+						table_search.setRowHeight(30);
+						
+						//Column Width
+						TableColumnModel columnModel_search = table_search.getColumnModel();
+						columnModel_search.getColumn(0).setPreferredWidth(1); //#
+						columnModel_search.getColumn(1).setPreferredWidth(110); //Name
+						columnModel_search.getColumn(2).setPreferredWidth(100); //Description
+						columnModel_search.getColumn(3).setPreferredWidth(1); //Quantity 
+						columnModel_search.getColumn(4).setPreferredWidth(30); //Sale Price
+						columnModel_search.getColumn(5).setPreferredWidth(75); //Notes
+						columnModel_search.getColumn(6).setPreferredWidth(10); //Add/Remove
+						
+						//Columns won't be able to moved around
+						table_search.getTableHeader().setReorderingAllowed(false);
+						
+						//Center table data 
+						DefaultTableCellRenderer centerRenderer_search = new DefaultTableCellRenderer();
+						centerRenderer_search.setHorizontalAlignment( SwingConstants.CENTER );
+						table_search.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //ID
+						table_search.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Product ID
+						table_search.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Name
+						table_search.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Quantity
+						table_search.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Price
+						table_search.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_search ); //Quantity * Price
+						table_search.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_search ); //Remove
+						
+						//Center table column names
+						centerRenderer_search = (DefaultTableCellRenderer) table_search.getTableHeader().getDefaultRenderer();
+						centerRenderer_search.setHorizontalAlignment(JLabel.CENTER);
+						
+						JScrollPane jsp2 = new JScrollPane(table_search);
+						jsp2.setBounds(2, 2, 810, 344);
+						jsp2.setVisible(true);
+						panel_table_refund.add(jsp2);
+						
+						//Setting Checkbox
+						TableColumn tc = table_search.getColumnModel().getColumn(productRemove_column);
+						tc.setCellEditor(table_search.getDefaultEditor(Boolean.class));
+						tc.setCellRenderer(table_search.getDefaultRenderer(Boolean.class));
+						
+						DefaultTableModel model_search = (DefaultTableModel) table_search.getModel();
+						//Button listener
+						product_search_button.addActionListener(new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+								String productNameInput = textField_search_input.getText();
+								productNameInput.trim();
+								if(validateEmpty(productNameInput) == false){
+									JOptionPane.showMessageDialog(null,"Search cannot be empty. Please enter a product name, description or notes.");		
+								}
+								else if(productNameInput.trim().matches("^[-0-9A-Za-z.,'() ]*$")){
+									try {
+										cashierProductByID = new Cashier();
+									} catch (Exception e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+									for (int i = model_search.getRowCount()-1; i >= 0; --i) {
+										model_search.removeRow(i);
+									}
+									
+									productByLike = new Vector<Product>();
+									cashierProductByID.findProductUsingLike(productNameInput.trim(),productByLike);
+									if(productByLike.size() > 0){
+										txtpnsearch_2.setText("");
+										for(int i = 0; i < productByLike.size(); i++){
+											//If something is in the sale table
+											if(productBySearch.size() > 0){
+												boolean check = false;
+												for(int j = 0; j < productBySearch.size(); j++){
+													if(productByLike.get(i).getID() == productBySearch.get(j).getID()){
+														check = false;
+													}
+													//Break avoids duplicates and if no if(check == true), product already in 
+													//sale table wont show up
+													else{
+														model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+														check = true;
+														break;
+													}
+												}
+												if(check == false){
+													model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productBySearch.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+												}
+											}
+											//If the sale table is empty
+											else{
+												model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+											}
+										}
+									}
+									else{
+										txtpnsearch_2.setText("Product '" + productNameInput + "' was not found.");
+									}
+								}
+							}
+						});
+						
+						product_cancel_button.addActionListener(new ActionListener() {
+							
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+								d5.dispose();
+							}
+						});
+						
+						table_search.addMouseListener(new MouseAdapter() {
+							public void mouseClicked(MouseEvent e) {
+								if (e.getClickCount() == 2) {
+									JTable target = (JTable)e.getSource();
+									int row = target.getSelectedRow();
+									int column = target.getSelectedColumn();
+									if(column == 0 || column == 1 || column == 2 || column == 4 || column == 5){
+										if(row > -1){
+											String n = (String) model_search.getValueAt(row, 1);
+											for(int i = 0; i < productByLike.size(); i++){
+												if(n.equals(productByLike.get(i).getName())){ //maybe change to using ID
+													textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
+													d5.dispose();
+													break;
+												}
+											}
+										}
+									}
+									//Quantity
+									else if(column == 3){
+										table_search.setRowSelectionInterval(row, row);
+										table_search.setColumnSelectionInterval(0, 0);
+										textField_search_input.requestFocusInWindow();
+									}
+									//Checkbox
+									else if(column == 6){
+										
+									}
+								}
+							}
+						});
+						//Add button listener
+						Runnable runAdd = new Runnable() {
+							@Override
+							public void run() {
+								product_add_button.addActionListener(new ActionListener() {
+									
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										if(model_search.getRowCount() > 0){
+											for (int i = model_search.getRowCount()-1; i >= 0; --i) {
+											//for (int i = 0; i < model_search.getRowCount(); i++) {
+												try{
+													boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
+													if (b == true){
+														for(int j = 0; j < productByLike.size(); j++){
+															if(String.valueOf(model_search.getValueAt(i, 1)).equals(productByLike.get(j).getName())){
+																textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
+																//d5.dispose();
+																//break;
+															}
+															else{
+																//System.out.println("Else");
+															}
+														}
+													}
+												}catch(Exception e2){
+													
+												}
+											}
+										}
+									}
+								});
+							}
+						};
+						SwingUtilities.invokeLater(runAdd);
+						
+						
+						
+						Component component = (Component) e.getSource();
+						JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+						d5 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+						d5.getContentPane().add(findByName_panel);
+						d5.setSize(900, 650);
+						d5.setLocationRelativeTo(null);
+						d5.getRootPane().setDefaultButton(product_search_button);
+						d5.setVisible(true);
+					}
 							/*else{
 								JOptionPane.showMessageDialog(null,"Please enter a valid product name.");
 								check = false;
@@ -1954,8 +2091,8 @@ public class Home extends JFrame implements KeyListener{
 		d3.getContentPane().add(panel_discount);
 		d3.setBounds(0, 0, 475, 400);
 		d3.setLocationRelativeTo(null);
-		d3.setVisible(true);
 		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
+		d3.setVisible(true);
 	}
 	
 	public void loadCheckoutFrame(ActionEvent e){
@@ -2192,8 +2329,9 @@ public class Home extends JFrame implements KeyListener{
 		d4.getContentPane().add(panel_checkout);
 		d4.setSize(475, 400);
 		d4.setLocationRelativeTo(null);
-		d4.setVisible(true);
 		d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+		d4.setVisible(true);
+		
 	}
 	public void calculateSubtotal(){
 		double sub = 0;
