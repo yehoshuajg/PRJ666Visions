@@ -536,7 +536,7 @@ public class Home extends JFrame implements KeyListener{
 															table.scrollRectToVisible(table.getCellRect(table.getRowCount()-1, 0, true));
 														}
 														
-														//textField_productID_input.setText("");
+														textField_productID_input.setText("");
 														textField_name_input.setText(tempProductSearch.getName());
 														textField_price_input.setText("$" + String.valueOf(tempProductSearch.getSalePrice()));		
 														textField_quantity_input.setText(String.valueOf(tempProductSearch.getQuantity()));
@@ -758,7 +758,7 @@ public class Home extends JFrame implements KeyListener{
 						//Messages
 						JTextPane txtpnsearch_2 = new JTextPane();
 						txtpnsearch_2.setBackground(Color.decode(defaultColor));
-						txtpnsearch_2.setBounds(10, 80, 380, 120);
+						txtpnsearch_2.setBounds(10, 80, 370, 120);
 						panel_searchDetail.add(txtpnsearch_2);
 									
 						//Textfield input
@@ -905,6 +905,7 @@ public class Home extends JFrame implements KeyListener{
 									cashierProductByID.findProductUsingLike(productNameInput.trim(),productByLike);
 									
 									if(productByLike.size() > 0){
+										txtpnsearch_2.setText("");
 										for(int i = 0; i < productByLike.size(); i++){
 											//If sale table is not empty
 											if(productBySearch.size() > 0){
@@ -998,7 +999,7 @@ public class Home extends JFrame implements KeyListener{
 									public void actionPerformed(ActionEvent e) {
 										Vector<Integer> searchID = new Vector<Integer>();
 										if(model_search.getRowCount() > 0){
-											//for (int i = model_search.getRowCount()-1; i >= 0; --i) {
+											txtpnsearch_2.setText("");
 											for (int i = 0; i < model_search.getRowCount(); i++) {
 												try{
 													boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
@@ -1019,16 +1020,30 @@ public class Home extends JFrame implements KeyListener{
 												}
 											}
 										}
-										new Timer(200, new ActionListener() {
-								            int it = 0;
-								            @Override
-								            public void actionPerformed(ActionEvent e2) {
-								            	textField_productID_input.setText(String.valueOf(searchID.get(it)));
-								                if (++it == searchID.size()){
-								                    ((Timer)e2.getSource()).stop();
-								                }
-								            }
-								        }).start();
+										else{
+											txtpnsearch_2.setText("Table is empty. Please enter keywords into search bar.");
+										}
+										if(model_search.getRowCount() > 0){
+											if(searchID.size() > 0){
+												txtpnsearch_2.setText("");
+												new Timer(1, new ActionListener() {
+										            int it = 0;
+										            @Override
+										            public void actionPerformed(ActionEvent e2) {
+										            	textField_productID_input.setText(String.valueOf(searchID.get(it)));
+										                if (++it == searchID.size()){
+										                    ((Timer)e2.getSource()).stop();
+										                }
+										            }
+										        }).start();
+											}
+											else{
+												txtpnsearch_2.setText("Please select/check a product before adding it to the table.");
+											}
+										}
+										
+										
+										
 									}
 								});
 							}
