@@ -96,15 +96,13 @@ public class Transaction {
 	}
 	public boolean getTransactionDetails(int id){
 		int count = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM Transaction where ID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Transaction where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -122,7 +120,6 @@ public class Transaction {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
@@ -138,24 +135,30 @@ public class Transaction {
 	}
 	public int writeTransactionCash(String dateString, double subTotal, double tax, double total, String transactionType, String transactionMethod, int promotionID, int employeeID){
 		Connect connect = new Connect();
-		Connection con;
-		Statement state = null;
+		Connection con = null;
 		int generatedKey = 0;
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			state = con.createStatement();
 			String sql;
 			//PromotionID causing foreign key relationship error
 			/*sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
 					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+promotionID+"','"+employeeID+"')";
 			*/
+			//New
+			/*sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
+					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+employeeID+"')";
+			*/
 			
 			sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
-					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+employeeID+"')";
-			
-			//state.executeUpdate(sql);
-			
+					+ "VALUE (?,?,?,?,?,?,?)";
 			PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, dateString);
+			ps.setDouble(2, subTotal);
+			ps.setDouble(3, tax);
+			ps.setDouble(4, total);
+			ps.setString(5, transactionType);
+			ps.setString(6, transactionMethod);
+			ps.setInt(7, employeeID);
 			ps.execute();
 			 
 			//assigns generatedKey as transaction #, which will be used to write into transactionRecord
@@ -166,7 +169,7 @@ public class Transaction {
 			//System.out.println("Inserted record's ID: " + generatedKey);
 			
 			//Clean-up environment
-			state.close();
+			rs.close();
 			con.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

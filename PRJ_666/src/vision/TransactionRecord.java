@@ -88,15 +88,13 @@ public class TransactionRecord {
 	}
 	public int getTransactionCount(int id){
 		int count = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM transactionrecord where TransactionID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM transactionrecord where TransactionID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -104,7 +102,6 @@ public class TransactionRecord {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
@@ -115,15 +112,13 @@ public class TransactionRecord {
 	}
 	public void getTransactionRecord(int id, int row){
 		int count = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM transactionrecord where TransactionID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM transactionrecord where TransactionID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -145,7 +140,6 @@ public class TransactionRecord {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
@@ -155,24 +149,26 @@ public class TransactionRecord {
 	}
 	public void insertTransactionRecord(int transactionID, int productID, int productQuantity, double productSalePrice, int employeeID){
 		Connect connect = new Connect();
-		Connection con;
-		Statement state = null;
+		Connection con = null;
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			state = con.createStatement();
-			String sql;
 			//same product from multiple supplier?
 			double productUnitCost = getProductUnitCost(productID);
 			
 			//PromotionID causing foreign key relationship error
-			sql = "INSERT INTO `TransactionRecord`(TransactionID,ProductID,QuantitySold,UnitPrice,EmployeeID,UnitCost) "
-			+ "VALUE ('"+transactionID+"','"+productID+"','"+productQuantity+"',"+productSalePrice+",'"+employeeID+"','"+productUnitCost+"')";
+			String sql = "INSERT INTO `TransactionRecord`(TransactionID,ProductID,QuantitySold,UnitPrice,EmployeeID,UnitCost) "
+			+ "VALUE (?,?,?,?,?,?)";
 			
-			
-			state.executeUpdate(sql);
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, transactionID);
+			ps.setInt(2, productID);
+			ps.setInt(3, productQuantity);
+			ps.setDouble(4, productSalePrice);
+			ps.setInt(5, employeeID);
+			ps.setDouble(6, productUnitCost);
+			ps.executeUpdate();
 			
 			//Clean-up environment
-			state.close();
 			con.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -184,15 +180,13 @@ public class TransactionRecord {
 	public double getProductUnitCost(int id){
 		int count = 0;
 		double unitCost = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM product_supplier where ProductID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM product_supplier where ProductID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -202,7 +196,6 @@ public class TransactionRecord {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
@@ -222,20 +215,17 @@ public class TransactionRecord {
 		int newQuantity2 = previousQuantity - newQuantity;
 		
 		Connect connect = new Connect();
-		Connection con;
-		Statement state = null;
 		try {
-			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			state = con.createStatement();
-			String sql;
-			
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			//PromotionID causing foreign key relationship error
-			sql = "UPDATE `Product` SET Quantity = '" + newQuantity2 + "'" + "where ID = '" + productID + "'";
-	
-			state.executeUpdate(sql);
+			//String sql = "UPDATE `Product` SET Quantity = '" + newQuantity2 + "'" + "where ID = '" + productID + "'";
+			String sql = "UPDATE `Product` SET Quantity = ? where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, newQuantity2);
+			ps.setInt(2, productID);
+		    ps.executeUpdate();
 			
 			//Clean-up environment
-			state.close();
 			con.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -246,15 +236,13 @@ public class TransactionRecord {
 	public int getPreviousQuantity(int id){
 		int count = 0;
 		int quantity = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM Product where ID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Product where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -264,7 +252,6 @@ public class TransactionRecord {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {

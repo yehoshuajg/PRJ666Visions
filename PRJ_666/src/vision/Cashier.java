@@ -2,6 +2,7 @@ package vision;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,15 +17,13 @@ public class Cashier {
 		//Execute a query
 		Connect connect = new Connect();
 		Connection c = null;
-		Statement state = null;
 		Product productByID = null;
-		int count = 0;
 		try{
 			c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			state = c.createStatement();
-			
-			String sql = "SELECT * FROM Product where ID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Product where ID = ?";
+			PreparedStatement ps = c.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -39,11 +38,9 @@ public class Cashier {
 				String tempNotes = rs.getString("Notes");
 				
 				productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempSalePrice,tempQuantity,tempNotes);
-				count++;
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			c.close();
 		}catch(Exception e){
 			
@@ -55,15 +52,13 @@ public class Cashier {
 		//Execute a query
 		Connect connect = new Connect();
 		Connection c = null;
-		Statement state = null;
 		Product productByID = null;
-		int count = 0;
 		try{
 			c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			state = c.createStatement();
-			
-			String sql = "SELECT * FROM Product where Name = '" + name + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Product where Name = ?";
+			PreparedStatement ps = c.prepareStatement(sql);
+			ps.setString(1, name);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -78,11 +73,9 @@ public class Cashier {
 				String tempNotes = rs.getString("Notes");
 				
 				productByID = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempSalePrice,tempQuantity,tempNotes);
-				count++;
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			c.close();
 		}catch(Exception e){
 			
@@ -95,8 +88,6 @@ public class Cashier {
 		Connect connect = new Connect();
 		Connection con = null;
 		Statement state = null;
-		ResultSet rs = null;
-		
 		try{
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			state = con.createStatement();
@@ -106,45 +97,44 @@ public class Cashier {
 		
 		//Name
 		columnName = "Name"; 
-		productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
+		productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 		
 		//Description
 		columnName = "Description";
-		productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
-		//findProductUsingTemplate(state, rs, input, columnName, productByLike);
+		productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 		
 		//Notes
 		columnName = "Notes";
-		productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
-		//findProductUsingTemplate(state, rs, input, columnName, productByLike);
+		productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 		
 		String tempInput = input;
 		String[] splited = tempInput.split("\\s+");
 		for(int i = 0; i < splited.length; i++){
 			columnName = "Name";
-			productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
+			productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 			
 			columnName = "Description";
-			productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
+			productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 			
 			columnName = "Notes";
-			productByLike = findProductUsingTemplate(state, rs, input, columnName, productByLike);
+			productByLike = findProductUsingTemplate(con, input, columnName, productByLike);
 		}
 		//Clean-up environment
 		try{
-			rs.close();
-			state.close();
 			con.close();
 		}catch(Exception e){}
 			
 	}
-	public Vector<Product> findProductUsingTemplate(Statement state, ResultSet rs, String input, String columnName, Vector<Product> productByLike){
+	public Vector<Product> findProductUsingTemplate(Connection c, String input, String columnName, Vector<Product> productByLike){
 		Product p = null;
-		String sql = null;
 		boolean check = false;
+		ResultSet rs = null;
 		try {
-			sql = "SELECT * FROM Product WHERE " +  columnName + " LIKE '%" + input + "%'";
-			rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Product WHERE ? LIKE ?";
+			PreparedStatement ps = c.prepareStatement(sql);
+			ps.setString(1, columnName);
+			ps.setString(2, "%"+input+"%");
+			rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -174,9 +164,9 @@ public class Cashier {
 					productByLike.add(p);
 				}
 			}
+			rs.close();
 		}catch(Exception e){
 		}
-		//System.out.println(sql);
 		return productByLike;
 	}
 }

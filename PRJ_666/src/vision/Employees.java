@@ -7,53 +7,23 @@ import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Scanner;
-import java.awt.Font;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JTabbedPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.sql.*;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.WindowConstants;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
-import net.proteanit.sql.DbUtils;
-import org.jdatepicker.impl.*;
 
 public class Employees extends JFrame{
-	private Connect connect;
-	private Connection con;
-
 	//Employee
 	private int id;
 	private String firstName;
@@ -100,13 +70,9 @@ public class Employees extends JFrame{
 	
 	public Employees() {
 		super();
-        
-        try {
-            connect = new Connect();
-            c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage()); 
-        }
+		//Removed connec connection, create an instance of connect class and use the getters to grab the url, user, name
+		//Close connection when done using it. Add try/catch rather than throw exception in function prototype.
+		//Look at fetchLogin() to get an idea.
 	}
 	
 	//Setters
@@ -145,43 +111,54 @@ public class Employees extends JFrame{
 	public String getHireDate(){ return this.hireDate; }
 	public String getTerminationDate(){ return this.terminationDate; }
 	
-	public boolean fetchLogin(String userID, String pass) throws Exception{
+	public boolean fetchLogin(String userID, String pass){
 		//Execute a query
-		con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-		Statement state = null;
+		Connect connect = new Connect();
+		Connection con = null;
+		int count = 0;
 		
-		state = con.createStatement();
-	    String sql;
-	    sql = "SELECT * FROM Employee where UserName = '" + userID + "' AND Password = '" + pass + "' AND "
-	    		+ "TerminationDate IS NULL";
-	    ResultSet rs = state.executeQuery(sql);
-	    int count = 0;
-	    //Extract data from result set
-	    while(rs.next()){
-			//Retrieve by column name
-	    	this.id = rs.getInt("ID");
-	    	this.firstName = rs.getString("FirstName");
-	    	this.lastName = rs.getString("LastName");
-	    	this.street = rs.getString("Street");
-	    	this.city = rs.getString("City");
-	    	this.stateProvince = rs.getString("State_Province");
-	    	this.postalCode = rs.getString("PostalCode");
-	    	this.homePhone = rs.getString("HomePhone");
-	    	this.cellPhone = rs.getString("CellPhone");
-	    	this.email = rs.getString("Email");
-	    	this.positionID = rs.getInt("PositionID");
-	    	this.jobType = rs.getString("JobType");
-		  	this.username = rs.getString("UserName");
-		  	//no need to grab pass
-		  	this.hireDate = rs.getString("HireDate");
-		  	this.terminationDate = rs.getString("TerminationDate");
-		  	count++;
-	    }
-	    //Clean-up environment
-	    rs.close();
-	    state.close();
-	    con.close();
-	    if(count == 1){
+		try{
+			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			/*
+			Avoid SQL Injection: Use prepared statements (JDBC Library)
+			1.) Put "?" instead of variable/value.
+			2.) Pass it to prepare statement
+			3.) Set values to "?" by using setString(parameter#,value) 
+			4.) Execute the query using prepared statement, not String sql.
+			*/
+			String sql = "SELECT * FROM Employee where UserName = ? AND Password = ? AND TerminationDate IS NULL";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setString(1, userID);
+			ps.setString(2, pass);
+		    ResultSet rs = ps.executeQuery();
+		    
+		    //Extract data from result set
+		    while(rs.next()){
+				//Retrieve by column name
+		    	this.id = rs.getInt("ID");
+		    	this.firstName = rs.getString("FirstName");
+		    	this.lastName = rs.getString("LastName");
+		    	this.street = rs.getString("Street");
+		    	this.city = rs.getString("City");
+		    	this.stateProvince = rs.getString("State_Province");
+		    	this.postalCode = rs.getString("PostalCode");
+		    	this.homePhone = rs.getString("HomePhone");
+		    	this.cellPhone = rs.getString("CellPhone");
+		    	this.email = rs.getString("Email");
+		    	this.positionID = rs.getInt("PositionID");
+		    	this.jobType = rs.getString("JobType");
+			  	this.username = rs.getString("UserName");
+			  	//no need to grab pass
+			  	this.hireDate = rs.getString("HireDate");
+			  	this.terminationDate = rs.getString("TerminationDate");
+			  	count++;
+		    }
+		    //Clean-up environment
+		    rs.close();
+		    con.close();
+		}catch(Exception e){}
+		
+		if(count == 1){
 	    	return true;
 	    }
 	    else{

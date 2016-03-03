@@ -2,6 +2,7 @@ package vision;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
@@ -29,15 +30,12 @@ public class Discount {
 	}
 	public int getPromotionCount(){
 		int count = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM Promotion";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Promotion";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -45,7 +43,6 @@ public class Discount {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
@@ -55,16 +52,13 @@ public class Discount {
 		return count;
 	}
 	public void getPromotion(int id){
-		int count = 0;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM Promotion where ID = '" + id + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Promotion where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -78,11 +72,9 @@ public class Discount {
 				else if(this.discountPercent > 0){
 					this.type = "%";
 				}
-				count++;
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {

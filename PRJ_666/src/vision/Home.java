@@ -957,6 +957,9 @@ public class Home extends JFrame implements KeyListener{
 						//Checking for double click
 						table_search.addMouseListener(new MouseAdapter() {
 							public void mouseClicked(MouseEvent e) {
+								if (e.getClickCount() == 1) {
+									System.out.println("1");
+								}
 								if (e.getClickCount() == 2) {
 									JTable target = (JTable)e.getSource();
 									int row = target.getSelectedRow();

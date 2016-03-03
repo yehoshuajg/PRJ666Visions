@@ -2,6 +2,7 @@ package vision;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -41,15 +42,13 @@ public class Positions {
 	public boolean checkPosition(int positionID){
 		int count = 0;
 		boolean check = false;
+		Connect connect = new Connect();
 		try {
-			Connect connect = new Connect();
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			Statement state = null;
-			
-			state = con.createStatement();
-			String sql;
-			sql = "SELECT * FROM Positions where ID = '" + positionID + "'";
-			ResultSet rs = state.executeQuery(sql);
+			String sql = "SELECT * FROM Positions where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, positionID);
+			ResultSet rs = ps.executeQuery();
 			
 			//Extract data from result set
 			while(rs.next()){
@@ -61,7 +60,6 @@ public class Positions {
 			}
 			//Clean-up environment
 			rs.close();
-			state.close();
 			con.close();
 			
 		} catch (Exception e) {
