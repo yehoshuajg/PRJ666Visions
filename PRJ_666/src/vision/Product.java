@@ -16,35 +16,18 @@ public class Product {
 		description = null;
 		categoryID = 0;
 		subCategoryID = 0;
-		//unitCost = 0;
 		salePrice = 0;
 		quantity = 0;
-		//supplierID = 0;
 		notes = null;
 	}
-	/*
-	Product(int id, String name, String description, int categoryID, int subCategoryID, double unitCost, double salePrice, int quantity, int supplierID, String notes){
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.categoryID = categoryID;
-		this.subCategoryID = subCategoryID;
-		this.unitCost = unitCost;
-		this.salePrice = salePrice;
-		this.quantity = quantity;
-		this.supplierID = supplierID;
-		this.notes = notes;
-	}*/
 	Product(int id, String name, String description, int categoryID, int subCategoryID, double salePrice, int quantity, String notes){
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.categoryID = categoryID;
 		this.subCategoryID = subCategoryID;
-		//this.unitCost = unitCost;
 		this.salePrice = salePrice;
 		this.quantity = quantity;
-		//this.supplierID = supplierID;
 		this.notes = notes;
 	}
 	

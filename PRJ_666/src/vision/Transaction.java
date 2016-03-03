@@ -158,6 +158,7 @@ public class Transaction {
 			PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.execute();
 			 
+			//assigns generatedKey as transaction #, which will be used to write into transactionRecord
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next()) {
 			    generatedKey = rs.getInt(1);

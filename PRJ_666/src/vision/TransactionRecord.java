@@ -38,6 +38,54 @@ public class TransactionRecord {
 		this.employeeID = employeeID;
 		this.unitCost = unitCost;
 	}
+	public int getTransactionID() {
+		return transactionID;
+	}
+	public void setTransactionID(int transactionID) {
+		this.transactionID = transactionID;
+	}
+	public int getProductID() {
+		return productID;
+	}
+	public void setProductID(int productID) {
+		this.productID = productID;
+	}
+	public int getQuantitySold() {
+		return quantitySold;
+	}
+	public void setQuantitySold(int quantitySold) {
+		this.quantitySold = quantitySold;
+	}
+	public double getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(double unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	public int getReturned() {
+		return returned;
+	}
+	public void setReturned(int returned) {
+		this.returned = returned;
+	}
+	public String getDateReturned() {
+		return dateReturned;
+	}
+	public void setDateReturned(String dateReturned) {
+		this.dateReturned = dateReturned;
+	}
+	public int getEmployeeID() {
+		return employeeID;
+	}
+	public void setEmployeeID(int employeeID) {
+		this.employeeID = employeeID;
+	}
+	public double getUnitCost() {
+		return unitCost;
+	}
+	public void setUnitCost(double unitCost) {
+		this.unitCost = unitCost;
+	}
 	public int getTransactionCount(int id){
 		int count = 0;
 		try {
@@ -89,6 +137,8 @@ public class TransactionRecord {
 				this.employeeID = rs.getInt("EmployeeID");
 				this.unitCost = rs.getDouble("UnitCost");
 				count++;
+				//row is coming from for loop, so it stops when it finds the record (row#) it was looking for in that transactionRecord
+				//and returns it
 				if(count == row){
 					break;
 				}
@@ -103,59 +153,10 @@ public class TransactionRecord {
 			e.printStackTrace();
 		}
 	}
-	public int getTransactionID() {
-		return transactionID;
-	}
-	public void setTransactionID(int transactionID) {
-		this.transactionID = transactionID;
-	}
-	public int getProductID() {
-		return productID;
-	}
-	public void setProductID(int productID) {
-		this.productID = productID;
-	}
-	public int getQuantitySold() {
-		return quantitySold;
-	}
-	public void setQuantitySold(int quantitySold) {
-		this.quantitySold = quantitySold;
-	}
-	public double getUnitPrice() {
-		return unitPrice;
-	}
-	public void setUnitPrice(double unitPrice) {
-		this.unitPrice = unitPrice;
-	}
-	public int getReturned() {
-		return returned;
-	}
-	public void setReturned(int returned) {
-		this.returned = returned;
-	}
-	public String getDateReturned() {
-		return dateReturned;
-	}
-	public void setDateReturned(String dateReturned) {
-		this.dateReturned = dateReturned;
-	}
-	public int getEmployeeID() {
-		return employeeID;
-	}
-	public void setEmployeeID(int employeeID) {
-		this.employeeID = employeeID;
-	}
-	public double getUnitCost() {
-		return unitCost;
-	}
-	public void setUnitCost(double unitCost) {
-		this.unitCost = unitCost;
-	}
 	public void insertTransactionRecord(int transactionID, int productID, int productQuantity, double productSalePrice, int employeeID){
 		Connect connect = new Connect();
 		Connection con;
 		Statement state = null;
-		int generatedKey = 0;
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			state = con.createStatement();
