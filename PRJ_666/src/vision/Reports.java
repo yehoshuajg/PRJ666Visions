@@ -6,8 +6,10 @@
 package vision;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Vector;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField.AbstractFormatter;
@@ -38,6 +41,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableRowSorter;
 import net.proteanit.sql.DbUtils;
 import org.jdatepicker.impl.*;
 
@@ -46,6 +51,7 @@ import org.jdatepicker.impl.*;
  * @author Gaurav
  */
 public class Reports extends JFrame {
+    //Setting up GUI
     private JPanel Reports;
     private JButton Filter_Inventory;
     private JButton Filter_Invoices;
@@ -76,9 +82,25 @@ public class Reports extends JFrame {
     private JLabel transaction_label;
     private JButton transaction_search;
     
+    //Connection to database
     private Connection c = null;
-    private String query = null;
+    
+    //Query to run in every table
+    private String revenue_query = null;
+    private String inventory_query = null;
+    private String orders_query = null;
+    private String transactions_query = null;
+    private String invoices_query = null;
+    private String performance_query = null;
+    
+    //Sorting table data
     private String order = null;
+    private Vector<String> Revenue_headings = new Vector<>();
+    private Vector<String> Inventory_headings = new Vector<>();
+    private Vector<String> Orders_headings = new Vector<>();
+    private Vector<String> Transactions_headings = new Vector<>();
+    private Vector<String> Invoices_headings = new Vector<>();
+    private Vector<String> Performance_headings = new Vector<>();
     
     public Reports(){
         super();
@@ -91,13 +113,13 @@ public class Reports extends JFrame {
         }
     }
     
-    protected void updateReport(JTable jTable1){
+    protected void updateReport(JTable jTable1, String query){
         Statement stmt = null;
         ResultSet rs = null;
         
         try {
             stmt = c.createStatement();
-            rs = stmt.executeQuery(query + order);
+            rs = stmt.executeQuery(query);
             
             jTable1.getTableHeader().setFont(new java.awt.Font("Tahoma", Font.BOLD, 12));
             
@@ -198,15 +220,15 @@ public class Reports extends JFrame {
         Report_tabs.setTabPlacement(JTabbedPane.LEFT);
         
         Filter_Revenue.setText("Filter");
-	Filter_Revenue.addActionListener((java.awt.event.ActionEvent evt) -> {
+	Filter_Revenue.addActionListener((ActionEvent evt) -> {
             JFrame f = new JFrame();
             f.getContentPane().add(getFilterRevenue(f));
-            f.setSize(400, 350);
+            f.setSize(300, 350);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
 
-	query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month',"
+	revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month',"
             + " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
             + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
             + " sum(ROUND(Total, 2)) as 'Total', "
@@ -217,10 +239,27 @@ public class Reports extends JFrame {
             + " where TransactionType = 'Sale' "
             + " group by Year, Month ";
         
-	order = " ";
-
-	updateReport(Revenue_table);
-		
+	Revenue_headings.clear();
+        Revenue_headings.add("`Year`");
+        Revenue_headings.add("`Month`");
+        Revenue_headings.add("`Order Cost`");
+        Revenue_headings.add("`Order Paid`");
+        Revenue_headings.add("`SubTotal`");
+        Revenue_headings.add("`Tax`");
+        Revenue_headings.add("`Total`");
+        Revenue_headings.add("`Revenue`");
+        
+	updateReport(Revenue_table, revenue_query);
+	
+        Revenue_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Revenue_table.columnAtPoint(e.getPoint());
+                order = " order by " + Revenue_headings.get(col);
+                updateReport(Revenue_table, revenue_query + order);
+            }
+        });
+        
         ScrollPane_Revenue.setViewportView(Revenue_table);
 
         javax.swing.GroupLayout RevenueLayout = new javax.swing.GroupLayout(Revenue);
@@ -252,23 +291,38 @@ public class Reports extends JFrame {
 	Filter_Inventory.addActionListener((java.awt.event.ActionEvent evt) -> {
             JFrame f = new JFrame();
             f.getContentPane().add(getFilterInventory(f));
-            f.setSize(400, 350);
+            f.setSize(430, 300);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
 
-	query = "select p.Name as 'Product', p.Description as 'Product Description', c1.Name as 'Category',"
+	inventory_query = "select p.Name as 'Product', p.Description as 'Product Description', c1.Name as 'Category',"
             + " c2.Name as 'SubCategory', ROUND(AVG(ps.UnitCost), 2) as 'Unit Cost', ROUND(p.SalePrice, 2) "
             + " as 'Sale Price', p.Quantity as 'Quantity' from Product p "
             + " left outer join StoreDB.Category as c1 on p.CategoryID = c1.ID "
             + " left outer join StoreDB.Category as c2 on p.SubCategoryID = c2.ID"
             + " join Product_Supplier as ps on p.ID = ps.ProductID group by ps.ProductID ";
         
-        order = " ";
-	
+        Inventory_headings.clear();
+        Inventory_headings.add("`Product`");
+        Inventory_headings.add("`Product Description`");
+        Inventory_headings.add("`Category`");
+        Inventory_headings.add("`SubCategory`");
+        Inventory_headings.add("`Unit Cost`");
+        Inventory_headings.add("`Sale Price`");
+        Inventory_headings.add("`Quantity`");
         
-        updateReport(Inventory_table);
-		
+        updateReport(Inventory_table, inventory_query);
+        
+        Inventory_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Inventory_table.columnAtPoint(e.getPoint());
+                order = " order by " + Inventory_headings.get(col);
+                updateReport(Inventory_table, inventory_query + order);
+            }
+        });
+        
         ScrollPane_Inventory.setViewportView(Inventory_table);
 
         javax.swing.GroupLayout InventoryLayout = new javax.swing.GroupLayout(Inventory);
@@ -300,20 +354,34 @@ public class Reports extends JFrame {
 	Filter_Orders.addActionListener((java.awt.event.ActionEvent evt) -> {
             JFrame f = new JFrame();
             f.getContentPane().add(getFilterOrder(f));
-            f.setSize(400, 350);
+            f.setSize(350, 320);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
 
-        query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received'," 
+        orders_query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received'," 
             + " o.Cost as 'Cost', IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '" 
             + " from `Order` o, Supplier s" 
             + " where o.SupplierID = s.ID ";
         
-        order = " ";
+        Orders_headings.clear();
+        Orders_headings.add("`Supplier`");
+        Orders_headings.add("`Date Created`");
+        Orders_headings.add("`Date Received`");
+        Orders_headings.add("`Cost`");
+        Orders_headings.add("`Amount Paid`");
         
-	updateReport(Orders_table);
-		
+	updateReport(Orders_table, orders_query);
+
+        Orders_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Orders_table.columnAtPoint(e.getPoint());
+                order = " order by " + Orders_headings.get(col);
+                updateReport(Orders_table, orders_query + order);
+            }
+        });
+                
         ScrollPane_Orders.setViewportView(Orders_table);
 
         javax.swing.GroupLayout OrdersLayout = new javax.swing.GroupLayout(Orders);
@@ -345,25 +413,47 @@ public class Reports extends JFrame {
 	Filter_Transaction.addActionListener((java.awt.event.ActionEvent evt) -> {
             JFrame f = new JFrame();
             f.getContentPane().add(getFilterTransaction(f));
-            f.setSize(400, 350);
+            f.setSize(350, 365);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
 
-	query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
+	transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
             + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
             + " SubTotal, Tax, Total from `Transaction` t, Employee e" 
             + " where t.EmployeeID = e.ID";
-		
-	updateReport(Transactions_table);
-		
+	
+        Transactions_headings.clear();
+        Transactions_headings.add("`ID`");
+        Transactions_headings.add("`Date Created`");
+        Transactions_headings.add("`Transaction Type`");
+        Transactions_headings.add("`Payment Type`");
+        Transactions_headings.add("`Employee`");
+        Transactions_headings.add("`SubTotal`");
+        Transactions_headings.add("`Tax`");
+        Transactions_headings.add("`Total`");
+        
+	updateReport(Transactions_table, transactions_query);
+	
+        Transactions_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Transactions_table.columnAtPoint(e.getPoint());
+                order = " order by " + Transactions_headings.get(col);
+                updateReport(Transactions_table, transactions_query + order);
+            }
+        });
+        
         ScrollPane_Transactions.setViewportView(Transactions_table);
 
         transaction_label.setText("Transaction ID:");
         transaction_label.setPreferredSize(new java.awt.Dimension(74, 23));
         
         transaction_search.setText("Search");
-
+        transaction_search.addActionListener((java.awt.event.ActionEvent evt) -> {
+            
+        });
+        
         javax.swing.GroupLayout TransactionsLayout = new javax.swing.GroupLayout(Transactions);
         Transactions.setLayout(TransactionsLayout);
         TransactionsLayout.setHorizontalGroup(
@@ -403,18 +493,34 @@ public class Reports extends JFrame {
 	Filter_Invoices.addActionListener((java.awt.event.ActionEvent evt) -> {
             JFrame f = new JFrame();
             f.getContentPane().add(getFilterInvoice(f));
-            f.setSize(400, 350);
+            f.setSize(350, 330);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
 
-	query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
+	invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
             + "'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding', 'View/Process Details' as ''" 
             + " FROM StoreDB.Invoice i, Supplier s" 
             + " where i.SupplierID = s.ID ";
-		
-	updateReport(Invoices_table);
-		
+	
+        Invoices_headings.clear();
+        Invoices_headings.add("`ID`");
+        Invoices_headings.add("`Name`");
+        Invoices_headings.add("`Date Received`");
+        Invoices_headings.add("`Amount Due`");
+        Invoices_headings.add("`OutStanding`");
+        
+	updateReport(Invoices_table, invoices_query);
+        
+        Invoices_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Invoices_table.columnAtPoint(e.getPoint());
+                order = " order by " + Invoices_headings.get(col);
+                updateReport(Invoices_table, invoices_query + order);
+            }
+        });
+        
 	ScrollPane_Invoices.setViewportView(Invoices_table);
 
         javax.swing.GroupLayout InvoicesLayout = new javax.swing.GroupLayout(Invoices);
@@ -445,23 +551,36 @@ public class Reports extends JFrame {
         Filter_Performance.setText("Filter");
 	Filter_Performance.addActionListener((java.awt.event.ActionEvent evt) -> {
             JFrame f = new JFrame();
-            //f.getContentPane().add(getFilterPerformance(f));
-            f.setSize(400, 350);
+            f.getContentPane().add(getFilterPerformance(f));
+            f.setSize(430, 390);
             f.setVisible(true);
             f.setLocationRelativeTo(null);
         });
+        
+        performance_query = "Select c.Name as 'Name', sum(tr.QuantitySold) as 'Quantity Sold',"
+            + " ROUND(sum(tr.UnitPrice * tr.QuantitySold), 2) as 'Total',"
+            + " ROUND(sum((tr.UnitPrice * tr.QuantitySold) - (tr.UnitCost * tr.QuantitySold)), 2) as 'Profit'"    
+            + " from Category c, TransactionRecord tr, Product p "
+            + " where tr.ProductID = p.ID and (p.CategoryID = c.ID or p.SubCategoryID = c.ID) " /*and c.ParentID IS NULL */
+            + " group by c.Name";
 
-        Performance_table.setModel(new DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        Performance_headings.clear();
+        Performance_headings.add("`Name`");
+        Performance_headings.add("`Quantity Sold`");
+        Performance_headings.add("`Total`");
+        Performance_headings.add("`Profit`");
+        
+	updateReport(Performance_table, performance_query);
+       
+        Performance_table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = Performance_table.columnAtPoint(e.getPoint());
+                order = " order by " + Performance_headings.get(col);
+                updateReport(Performance_table, performance_query + order);
             }
-        ));
+        });
+        
         ScrollPane_Performance.setViewportView(Performance_table);
 
         javax.swing.GroupLayout PerformanceLayout = new javax.swing.GroupLayout(Performance);
@@ -513,7 +632,7 @@ public class Reports extends JFrame {
 
         pack();
     }
-
+    //returns JPanel for Filtering Revenue report
     private JPanel getFilterRevenue(JFrame fr){
         ButtonGroup group = new ButtonGroup();
         JPanel jPanel1 = new JPanel();
@@ -549,56 +668,55 @@ public class Reports extends JFrame {
         submit.setText("Submit");
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             if(yearly.isSelected()){
-                query = "select Year(CreateDate) as 'Year', ";
+                revenue_query = "select Year(CreateDate) as 'Year', ";
                 order = "group by Year";
-                /*
-                table_headings.clear();
-                table_headings.add("`Year`");
-                */
+                
+                Revenue_headings.clear();
+                Revenue_headings.add("`Year`");
+                
             }else {
-                query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month', ";
+                revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month', ";
                 order = "group by Year, Month";
-                /*
-                table_headings.clear();
-                table_headings.add("`Year`");
-                table_headings.add("`Month`");
-                */
+                
+                Revenue_headings.clear();
+                Revenue_headings.add("`Year`");
+                Revenue_headings.add("`Month`");
             }
             
             if(!remove_order.isSelected()){
-                query += " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
-                        + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
-                        + " sum(ROUND(Total, 2)) as 'Total', "
-                        + " (ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2))"
-                        + " as Revenue from Transaction Left join Invoice i"
-                        + " ON Year(i.ReceivedDate) = Year(CreateDate)"
-                        + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
-                        + " where TransactionType = 'Sale' ";
-                /*
-                table_headings.add("`Order Cost`");
-                table_headings.add("`Order Paid`");
-                table_headings.add("`SubTotal`");
-                table_headings.add("`Tax`");
-                table_headings.add("`Total`");
-                table_headings.add("`Revenue`");
-                */
+                revenue_query += " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
+                    + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
+                    + " sum(ROUND(Total, 2)) as 'Total', "
+                    + " (ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2))"
+                    + " as Revenue from Transaction Left join Invoice i"
+                    + " ON Year(i.ReceivedDate) = Year(CreateDate)"
+                    + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
+                    + " where TransactionType = 'Sale' ";
+                
+                Revenue_headings.add("`Order Cost`");
+                Revenue_headings.add("`Order Paid`");
+                Revenue_headings.add("`SubTotal`");
+                Revenue_headings.add("`Tax`");
+                Revenue_headings.add("`Total`");
+                Revenue_headings.add("`Revenue`");
+                
             } else {
-                query += " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
-                        + " sum(ROUND(Total, 2)) as 'Total', "
-                        + " sum(ROUND(Total, 2)) as Revenue"
-                        + " from Transaction Left join Invoice i"
-                        + " ON Year(i.ReceivedDate) = Year(CreateDate)"
-                        + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
-                        + " where TransactionType = 'Sale' ";
-                /*
-                table_headings.add("`SubTotal`");
-                table_headings.add("`Tax`");
-                table_headings.add("`Total`");
-                table_headings.add("`Revenue`");
-                */
+                revenue_query += " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
+                    + " sum(ROUND(Total, 2)) as 'Total', "
+                    + " sum(ROUND(Total, 2)) as Revenue"
+                    + " from Transaction Left join Invoice i"
+                    + " ON Year(i.ReceivedDate) = Year(CreateDate)"
+                    + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
+                    + " where TransactionType = 'Sale' ";
+                
+                Revenue_headings.add("`SubTotal`");
+                Revenue_headings.add("`Tax`");
+                Revenue_headings.add("`Total`");
+                Revenue_headings.add("`Revenue`");
+                
             }
             
-            query = query + order;
+            revenue_query += order;
             order = " ";
             
             String revenueless = revenue_less.getText();
@@ -613,10 +731,10 @@ public class Reports extends JFrame {
                     less = more;
                     more = temp;
                 }
-                query += " HAVING Revenue BETWEEN " + less + " AND " + more;
+                revenue_query += " HAVING Revenue BETWEEN " + less + " AND " + more;
                 
             }
-            updateReport(Revenue_table);
+            updateReport(Revenue_table, revenue_query);
             
             fr.dispose();
         });
@@ -652,7 +770,7 @@ public class Reports extends JFrame {
                                 .addComponent(revenue_more, GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
                                 .addComponent(revenue_less))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(124, 124, 124)
+                        .addGap(94, 94, 94)
                         .addComponent(submit, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(176, Short.MAX_VALUE))
         );
@@ -698,6 +816,7 @@ public class Reports extends JFrame {
         return jPanel1;
     }
     
+    //returns JPanel for Filtering Inventory report
     private JPanel getFilterInventory(JFrame fr){
         JPanel jPanel_inventory = new JPanel();
         JLabel Title = new JLabel();
@@ -723,32 +842,33 @@ public class Reports extends JFrame {
             String subcat = (String)subcategory.getSelectedItem();
             String sup = (String)supplier.getSelectedItem();
             
-            query =  "select p.Name as 'Product', p.Description as 'Product Description', (select Name from Category "
+            inventory_query =  "select p.Name as 'Product', p.Description as 'Product Description', (select Name from Category "
                     + " where ID = p.CategoryID) as 'Category', (select Name from Category where ID = p.SubCategoryID)"
                     + " as 'SubCategory', ROUND(AVG(ps.UnitCost), 2) as 'Unit Cost', ROUND(p.SalePrice, 2) as 'Sale Price',"
                     + " p.Quantity as 'Quantity' from Product p, StoreDB.Category as c1, StoreDB.Category as c2, Supplier s,"
                     + " Product_Supplier as ps ";
+        
             if(cat.equals("All")){
-                query += " where p.CategoryID = c1.ID ";
+                inventory_query += " where p.CategoryID = c1.ID ";
             } else {
-                query += " where p.CategoryID = (Select ID from Category where Name='" + cat + "') ";
+                inventory_query += " where p.CategoryID = (Select ID from Category where Name='" + cat + "') ";
             }
             
             if(subcat.equals("All")){
-                query += " AND p.SubCategoryID = c2.ID ";
+                inventory_query += " AND p.SubCategoryID = c2.ID ";
             } else {
-                query += " AND p.SubCategoryID = (Select ID FROM Category where Name='" + subcat + "') ";
+                inventory_query += " AND p.SubCategoryID = (Select ID FROM Category where Name='" + subcat + "') ";
             }
             
             if(sup.equals("All")){
-                query += " AND  p.ID = ps.ProductID AND ps.SupplierID = s.ID  group by ps.ProductID";
+                inventory_query += " AND  p.ID = ps.ProductID AND ps.SupplierID = s.ID  group by ps.ProductID";
             } else {
-                query += " AND  p.ID = ps.ProductID AND ps.SupplierID = (Select ID FROM Supplier "
+                inventory_query += " AND  p.ID = ps.ProductID AND ps.SupplierID = (Select ID FROM Supplier "
                         + "where Name='" + sup + "') group by ps.ProductID";
             }
             
             order = " ";
-            updateReport(Inventory_table);
+            updateReport(Inventory_table, inventory_query);
             
             fr.dispose();
         });
@@ -930,6 +1050,7 @@ public class Reports extends JFrame {
                     .addComponent(jLabel4)
                     .addComponent(supplier, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addGap(15, 15, 15)
                 .addComponent(submit)
                 .addGap(51, 51, 51))
         );
@@ -950,6 +1071,7 @@ public class Reports extends JFrame {
         return jPanel_inventory;
     }
     
+    //returns JPanel for Filtering Order report
     private JPanel getFilterOrder(JFrame fr){
         JPanel panel_order = new JPanel();
         JLabel Title = new JLabel();
@@ -1024,30 +1146,31 @@ public class Reports extends JFrame {
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             String sup = (String)supplier.getSelectedItem();
             
-            query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received',"
+            orders_query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received',"
                     + " o.Cost as 'Cost', ";
             
+            Orders_headings.clear();
+            Orders_headings.add("`Supplier`");
+            Orders_headings.add("`Date Created`");
+            Orders_headings.add("`Date Received`");
+            Orders_headings.add("`Cost`");
             
             if(outstanding.isSelected()) {
-                query += " ROUND(o.Cost - IFNULL(o.AmountPaid, 0), 2) as 'Outstanding', 'View Details' as ' '"
+                orders_query += " ROUND(o.Cost - IFNULL(o.AmountPaid, 0), 2) as 'Outstanding', 'View Details' as ' '"
                         + " from `Order` o, Supplier s"
                         + " where o.SupplierID = s.ID";
-                /*
-                table_headings.clear();
-                table_headings.add("`Supplier`");
-                table_headings.add("`Date Created`");
-                table_headings.add("`Date Received`");
-                table_headings.add("`Cost`");
-                table_headings.add("`Outstanding`");
-                */
+                
+                Orders_headings.add("`Outstanding`");
             } else {
-                query += " IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '"
+                orders_query += " IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '"
                         + " from `Order` o, Supplier s"
                         + " where o.SupplierID = s.ID";
+                
+                Orders_headings.add("`Amount Paid`");
             }
             
             if(!sup.equals("All")){
-                query += " AND s.Name = '" + sup + "'";
+                orders_query += " AND s.Name = '" + sup + "'";
             }
             
             if(!(date_from.getJFormattedTextField().getText().equals(dateFrom) &&
@@ -1056,11 +1179,11 @@ public class Reports extends JFrame {
                 String From = date_from.getJFormattedTextField().getText();
                 String To = date_to.getJFormattedTextField().getText();
                 
-                query += " AND DATE(o.ReceivedDate) BETWEEN '" + From + "' and '" + To + "'";
+                orders_query += " AND DATE(o.ReceivedDate) BETWEEN '" + From + "' and '" + To + "'";
             }
             
             order = " ";
-            updateReport(Orders_table);
+            updateReport(Orders_table, orders_query);
             
             fr.dispose();
         });
@@ -1089,10 +1212,11 @@ public class Reports extends JFrame {
                                     .addComponent(date_to, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                     .addComponent(date_from, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                             .addComponent(jLabel2)
-                            .addGroup(panel_orderLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(submit, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(outstanding)))))
-                .addContainerGap(162, Short.MAX_VALUE))
+                            .addComponent(outstanding)
+                            .addGroup(panel_orderLayout.createSequentialGroup()
+                                .addGap(80, 80, 80)
+                            .addComponent(submit, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         panel_orderLayout.setVerticalGroup(
             panel_orderLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -1136,6 +1260,7 @@ public class Reports extends JFrame {
         return panel_order;
     }
     
+    //returns JPanel for Filtering Invoice report
     private JPanel getFilterInvoice(JFrame fr){
         JPanel panel_invoice = new JPanel();
         JLabel Title = new JLabel();
@@ -1204,22 +1329,22 @@ public class Reports extends JFrame {
         
         jLabel4.setText("To:");
 
-        outstanding.setText("Display invoices with outstanding balance");
+        outstanding.setText("Display unpaid invoices");
 
         submit.setText("Submit");
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             String sup = (String)supplier.getSelectedItem();
-            query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
+            invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
                     + "'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding', 'View Details' as ''"
                     + " FROM StoreDB.Invoice i, Supplier s"
                     + " where i.SupplierID = s.ID";
             
             if(outstanding.isSelected()) {
-                query += " AND ROUND(i.AmountDue - i.AmountPaid, 2) > 0";
+                invoices_query += " AND ROUND(i.AmountDue - i.AmountPaid, 2) > 0";
             }
             
             if(!sup.equals("All")){
-                query += " AND s.Name = '" + sup + "'";
+                invoices_query += " AND s.Name = '" + sup + "'";
             }
             
             if(!(date_from.getJFormattedTextField().getText().equals(dateFrom) &&
@@ -1228,11 +1353,11 @@ public class Reports extends JFrame {
                 String From = date_from.getJFormattedTextField().getText();
                 String To = date_to.getJFormattedTextField().getText();
                 
-                query += " AND DATE(i.ReceivedDate) BETWEEN '" + From + "' and '" + To + "'";
+                invoices_query += " AND DATE(i.ReceivedDate) BETWEEN '" + From + "' and '" + To + "'";
             }
             
             order = " ";
-            updateReport(Invoices_table);
+            updateReport(Invoices_table, invoices_query);
             
             fr.dispose();
         });
@@ -1261,9 +1386,10 @@ public class Reports extends JFrame {
                                     .addComponent(date_to, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                     .addComponent(date_from, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                             .addComponent(jLabel2)
-                            .addGroup(panel_invoiceLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                .addComponent(submit, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(outstanding)))))
+                            .addComponent(outstanding)
+                            .addGroup(panel_invoiceLayout.createSequentialGroup()
+                                .addGap(83, 83, 83)
+                                .addComponent(submit, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(162, Short.MAX_VALUE))
         );
         panel_invoiceLayout.setVerticalGroup(
@@ -1308,6 +1434,7 @@ public class Reports extends JFrame {
         return panel_invoice;
     }
     
+    //returns JPanel for Filtering Transaction report
     private JPanel getFilterTransaction(JFrame fr){
         JPanel panel_transaction = new JPanel();
         JLabel Title = new JLabel();
@@ -1348,7 +1475,7 @@ public class Reports extends JFrame {
 
         submit.setText("Submit");
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
-            query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
+            transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
                     + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
                     + " SubTotal, Tax, Total from `Transaction` t, Employee e" 
                     + " where t.EmployeeID = e.ID";
@@ -1361,7 +1488,7 @@ public class Reports extends JFrame {
                 String From = date_from.getJFormattedTextField().getText();
                 String To = date_to.getJFormattedTextField().getText();
                 
-                query += " AND DATE(t.CreateDate) BETWEEN '" + From + "' and '" + To + "'";
+                transactions_query += " AND DATE(t.CreateDate) BETWEEN '" + From + "' and '" + To + "'";
             }
             
             String revenueless = revenue_less.getText();
@@ -1376,16 +1503,16 @@ public class Reports extends JFrame {
                     less = more;
                     more = temp;
                 }
-                query += " AND Total BETWEEN " + less + " AND " + more;
+                transactions_query += " AND Total BETWEEN " + less + " AND " + more;
             }
             
             String method = (String)payment.getSelectedItem();
             
             if(!method.equals("All")){
-                query += " AND t.Method = '" + method + "'";
+                transactions_query += " AND t.Method = '" + method + "'";
             }
             
-            updateReport(Transactions_table);
+            updateReport(Transactions_table, transactions_query);
             
             fr.dispose();
         });
@@ -1467,7 +1594,7 @@ public class Reports extends JFrame {
                 .addGroup(panel_transactionLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(payment, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGap(20, 20, 20)
                 .addComponent(submit)
                 .addGap(19, 19, 19))
         );
@@ -1488,6 +1615,322 @@ public class Reports extends JFrame {
         return panel_transaction;
     }
     
+    //returns JPanel for Filtering Performance report
+    private JPanel getFilterPerformance(JFrame fr){
+        JPanel jPanel_Performance = new JPanel();
+        JLabel Title = new JLabel();
+        JLabel  jLabel1 = new JLabel();
+        JLabel jLabel2 = new JLabel();
+        JComboBox<String> category = new JComboBox<>();
+        JLabel jLabel3 = new JLabel();
+        JLabel jLabel4  = new JLabel();
+        JTextField productID = new JTextField();
+        JLabel jLabel5 = new JLabel();
+        JComboBox<String> productName = new JComboBox<>();
+        JLabel jLabel6 = new JLabel();
+        JLabel jLabel7 = new JLabel();
+        JLabel jLabel8 = new JLabel();
+        JComboBox<String> year = new JComboBox<>();
+        JButton submit = new JButton();
+        JLabel jLabel9 = new JLabel();
+        JSeparator jSeparator1 = new JSeparator();
+        JSeparator jSeparator2 = new JSeparator();
+        
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        Title.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        Title.setText("Filter");
+
+        jLabel1.setText("View Sales by Category on Monthly basis:");
+
+        jLabel2.setText("Category in:");
+        
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = c.createStatement();
+            rs = stmt.executeQuery("select Name from Category order by Name");
+            
+            if(rs != null){
+                category.addItem("All");
+                while(rs.next()){                    
+                    category.addItem(rs.getString(1));
+                }
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "There seems to be error with your SQL server!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if(stmt != null) stmt.close();
+                if(rs != null) rs.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        
+        jLabel3.setText("View Product on Monthly basis:");
+
+        jLabel4.setText("Product ID:");
+
+        jLabel5.setText("OR");
+
+        try {
+            stmt = c.createStatement();
+            rs = stmt.executeQuery("select Name from Product order by Name");
+            
+            if(rs != null){
+                productName.addItem("All");
+                while(rs.next()){                    
+                    productName.addItem(rs.getString(1));
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "There seems to be error with your SQL server!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if(stmt != null) stmt.close();
+                if(rs != null) rs.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+        jLabel6.setText("Product Name: ");
+
+        jLabel7.setText("View Report by Specific Year:");
+
+        jLabel8.setText("Year: ");
+
+        try {
+            stmt = c.createStatement();
+            rs = stmt.executeQuery("select DISTINCT(Year(CreateDate)) from Transaction order by Year(CreateDate)");
+            
+            if(rs != null){
+                year.addItem("All");
+                while(rs.next()){                    
+                    year.addItem(rs.getString(1));
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "There seems to be error with your SQL server!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if(stmt != null) stmt.close();
+                if(rs != null) rs.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+        submit.setText("Submit");
+        submit.addActionListener((java.awt.event.ActionEvent evt) -> {
+            String cat = (String)category.getSelectedItem();
+            String yr = (String)year.getSelectedItem();
+            String prodName = (String)productName.getSelectedItem();
+            String prodID = productID.getText();
+            
+            if((!cat.equals("All")) && (!prodID.equals("") || !prodName.equals("All"))){
+                JOptionPane.showMessageDialog(null, "Cannot have Category and Product selected at same time.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                if(prodID.equals("") && prodName.equals("All")){
+                    if(!yr.equals("All")){
+                        if(cat.equals("All")){
+                            performance_query = "Select c.Name as 'Name', sum(tr.QuantitySold) as 'Quantity Sold',"
+                                + " ROUND(sum(tr.UnitPrice * tr.QuantitySold), 2) as 'Total',"
+                                + " ROUND(sum((tr.UnitPrice * tr.QuantitySold) - (tr.UnitCost * tr.QuantitySold)), 2) as 'Profit'"    
+                                + " from Category c, TransactionRecord tr, Product p, Transaction t "
+                                + " where tr.ProductID = p.ID and (p.CategoryID = c.ID or p.SubCategoryID = c.ID) " /*and c.ParentID IS NULL */
+                                + " and t.ID = tr.TransactionID and Year(t.CreateDate) = '" + yr + "' group by c.Name";
+                            
+                            Performance_headings.clear();
+                            Performance_headings.add("`Name`");
+                            Performance_headings.add("`Quantity Sold`");
+                            Performance_headings.add("`Total`");
+                            Performance_headings.add("`Profit`");
+
+                        } else {
+                            performance_query = "select MonthName(t.CreateDate) as 'Month', sum(tr.QuantitySold) as 'Quantity Sold',"
+                                + " ROUND(sum(tr.UnitPrice * tr.QuantitySold), 2) as 'Total',"
+                                + " ROUND(sum((tr.UnitPrice * tr.QuantitySold) - (tr.UnitCost * tr.QuantitySold)), 2) as 'Profit'"
+                                + " from Category c, TransactionRecord tr, Product p, Transaction t"
+                                + " where tr.ProductID = p.ID and (p.CategoryID = (select ID from Category where Name='" + cat + "') "
+                                + "or p.SubCategoryID = (select ID from Category where Name='" + cat + "'))"/*and c.ParentID IS NULL*/
+                                + " and t.ID = tr.TransactionID"
+                                + " and Year(t.CreateDate) = '" + yr + "' group by MonthName(t.CreateDate)";
+                            
+                            Performance_headings.clear();
+                            Performance_headings.add("`Month`");
+                            Performance_headings.add("`Quantity Sold`");
+                            Performance_headings.add("`Total`");
+                            Performance_headings.add("`Profit`");
+                        }
+                    } else {
+                        if(cat.equals("All")){
+                            performance_query = "Select c.Name, sum(tr.QuantitySold) as 'Quantity Sold', ROUND(sum(tr.UnitPrice * tr.QuantitySold), 2) as 'Total',"
+                                + " ROUND(sum((tr.UnitPrice * tr.QuantitySold) - (tr.UnitCost * tr.QuantitySold)), 2) as 'Profit'"    
+                                + " from Category c, TransactionRecord tr, Product p, Transaction t "
+                                + " where tr.ProductID = p.ID and (p.CategoryID = c.ID or p.SubCategoryID = c.ID) " /*and c.ParentID IS NULL */
+                                + " and t.ID = tr.TransactionID group by c.Name";
+                            
+                            Performance_headings.clear();
+                            Performance_headings.add("`Name`");
+                            Performance_headings.add("`Quantity Sold`");
+                            Performance_headings.add("`Total`");
+                            Performance_headings.add("`Profit`");
+
+                        } else {
+                            performance_query = "select MonthName(t.CreateDate) as 'Month', sum(tr.QuantitySold) as 'Quantity Sold',"
+                                + " ROUND(sum(tr.UnitPrice * tr.QuantitySold), 2) as 'Total',"
+                                + " ROUND(sum((tr.UnitPrice * tr.QuantitySold) - (tr.UnitCost * tr.QuantitySold)), 2) as 'Profit'"
+                                + " from Category c, TransactionRecord tr, Product p, Transaction t"
+                                + " where tr.ProductID = p.ID and (p.CategoryID = c.ID or p.SubCategoryID = c.ID)"/*and c.ParentID IS NULL*/
+                                + " and c.Name = '" + cat + "' and t.ID = tr.TransactionID"
+                                + " group by MonthName(t.CreateDate)"; 
+                            
+                            Performance_headings.clear();
+                            Performance_headings.add("`Month`");
+                            Performance_headings.add("`Quantity Sold`");
+                            Performance_headings.add("`Total`");
+                            Performance_headings.add("`Profit`");
+                        }
+                    }
+                } else {
+                    performance_query = "select MonthName(t.CreateDate) as 'Month', sum(tr.QuantitySold) as 'Quantity Sold',"
+                            + " ROUND(tr.UnitPrice * sum(tr.QuantitySold), 2) as 'Sale Amount', " 
+                            + " ROUND((tr.UnitPrice * sum(tr.QuantitySold)) - (tr.UnitCost * sum(tr.QuantitySold)), 2)"
+                            + " as 'Profit' from TransactionRecord tr, Product p, Transaction t "
+                            + " where tr.ProductID = p.ID and t.ID = tr.TransactionID";
+                    if(prodID.equals("")){
+                        performance_query += " and tr.ProductID = (select ID from Product where Name = '" + prodName + "')";
+                    } else {
+                        performance_query += " and tr.ProductID = '" + prodID + "' ";
+                    }
+                    
+                    if(!yr.equals("All")){
+                        performance_query += " and YEAR(t.CreateDate) = '" + yr + "'";
+                    }
+                    
+                    performance_query += " group by YEAR(t.CreateDate), MonthName(t.CreateDate)";
+                }
+                updateReport(Performance_table, performance_query);
+                fr.dispose();
+            } 
+        });
+
+        jLabel9.setText("OR");
+
+        javax.swing.GroupLayout jPanel_PerformanceLayout = new javax.swing.GroupLayout(jPanel_Performance);
+        jPanel_Performance.setLayout(jPanel_PerformanceLayout);
+        jPanel_PerformanceLayout.setHorizontalGroup(
+            jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(Title)
+                                .addComponent(jLabel1)))
+                        .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel3))
+                        .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel7))
+                        .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                            .addGap(34, 34, 34)
+                            .addComponent(jLabel8)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                            .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                        .addGap(145, 145, 145)
+                        .addComponent(submit, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                        .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(jLabel4))
+                            .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel6)))
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(productName, 0, 228, Short.MAX_VALUE)
+                            .addComponent(productID)))
+                    .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(jLabel2)
+                        .addGap(48, 48, 48)
+                        .addComponent(category, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(29, Short.MAX_VALUE))
+            .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator2))
+        );
+        jPanel_PerformanceLayout.setVerticalGroup(
+            jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel_PerformanceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Title)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(category, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(productID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(productName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel7)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel_PerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(year, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(submit)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel_Performance, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel_Performance, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        
+        return jPanel_Performance;
+    }
+    
+    //returns JPanel for Report section
     public JPanel getWindow(){
         if(Reports == null)
         {
@@ -1497,6 +1940,7 @@ public class Reports extends JFrame {
         return Reports;
     }
     
+    //Class for formatting Date.
     class DateLabelFormatter extends AbstractFormatter {
         private final String datePattern = "yyyy-MM-dd";
         private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
@@ -1515,6 +1959,5 @@ public class Reports extends JFrame {
 
             return "";
         }
-
     }
 }
