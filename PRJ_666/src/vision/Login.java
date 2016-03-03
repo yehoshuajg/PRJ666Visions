@@ -92,7 +92,6 @@ public class Login extends JFrame {
 					}
 					else{
 						if(employee.login(textField.getText(),passwordField.getText()) == true){
-							JOptionPane.showMessageDialog(null,"Welcome, " + employee.getFirstName() + " " + employee.getLastName());
 							dispose();
 							Home home = new Home();
 							home.setEmployee(employee);					
