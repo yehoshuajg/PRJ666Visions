@@ -131,12 +131,12 @@ public class TransactionRecord {
 				this.dateReturned = rs.getString("DateReturned");
 				this.employeeID = rs.getInt("EmployeeID");
 				this.unitCost = rs.getDouble("UnitCost");
-				count++;
 				//row is coming from for loop, so it stops when it finds the record (row#) it was looking for in that transactionRecord
 				//and returns it
 				if(count == row){
 					break;
 				}
+				count++;
 			}
 			//Clean-up environment
 			rs.close();

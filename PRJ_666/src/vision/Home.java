@@ -66,6 +66,7 @@ public class Home extends JFrame implements KeyListener{
 	private Vector<Product> productByRefund = new Vector<Product>();
 	private Vector<Product> productByLike;
 	private Vector<Integer> previousValue = new Vector<Integer>();
+	private Vector<Integer> previousRefundValue = new Vector<Integer>();
 	private Product tempProductSearch = new Product();
 	private Product productByName; // = new Product();
 	
@@ -153,13 +154,6 @@ public class Home extends JFrame implements KeyListener{
 	private JTabbedPane tabbedPane_7;
 	private JPanel keypad_panel;
 	private JTextField checkout_amount_tender_input;
-	
-	//Inventory
-	//private int previousQuantity = 0;
-	private int previousRow = 0;
-	
-	//Runnable
-	Runnable run1; //make it local later
 	
 	//JFrame/Dialog
 	private JDialog d3;
@@ -958,13 +952,13 @@ public class Home extends JFrame implements KeyListener{
 						table_search.addMouseListener(new MouseAdapter() {
 							public void mouseClicked(MouseEvent e) {
 								if (e.getClickCount() == 1) {
-									System.out.println("1");
+									//System.out.println("1");
 								}
 								if (e.getClickCount() == 2) {
-									JTable target = (JTable)e.getSource();
-									int row = target.getSelectedRow();
-									int column = target.getSelectedColumn();
-									if(column == 0 || column == 1 || column == 2 || column == 4 || column == 5){
+									//JTable target = (JTable)e.getSource();
+									int row = table_search.getSelectedRow();
+									int column = table_search.getSelectedColumn();
+									if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5){
 										if(row > -1){
 											String n = (String) model_search.getValueAt(row, 1);
 											for(int i = 0; i < productByLike.size(); i++){
@@ -1267,29 +1261,38 @@ public class Home extends JFrame implements KeyListener{
 			        int row = table.getSelectionModel().getLeadSelectionIndex();
 			        if(row > -1 && col > -1){
 			        	if(col == productQuantity_column){
-							run1 = new Runnable() {
+							Runnable run1 = new Runnable() {
 								@Override
 								public void run() {
 									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
 									char c = tempQuantity.charAt(0);
 									char c2 = tempQuantity.charAt(tempQuantity.length()-1);
+									
+									//Previous Quantity
+									int previousQuantity = 0;
+									String nID = model.getValueAt(row, id_column).toString();
+									for(int i = 0; i < productBySearch.size(); i++){
+										if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
+											previousQuantity = previousValue.get(i);
+										}
+									}
 									if(validateEmpty(tempQuantity) == false){
 										JOptionPane.showMessageDialog(null,"Quantity field cannot be left empty. "
 												+ "Please enter a quantity above 0 for row #" + (row+1) + ".");
-										model.setValueAt(1, row, col);
+										model.setValueAt(previousQuantity, row, col);
 										table.setRowSelectionInterval(row, row);
 										table.setColumnSelectionInterval(0, 0);
 									}
 									else if(checkForNumbers(tempQuantity) == false){
 										JOptionPane.showMessageDialog(null,"Quantity entered for row #" + (row+1) + 
 												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-										model.setValueAt(1, row, col);
+										model.setValueAt(previousQuantity, row, col);
 										table.setRowSelectionInterval(row, row);
 										table.setColumnSelectionInterval(0, 0);
 									}
 									else if(c == '0' && c2 >= '0'){
 										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
-										model.setValueAt(1, row, col);
+										model.setValueAt(previousQuantity, row, col);
 										table.setRowSelectionInterval(row, row);
 										table.setColumnSelectionInterval(0, 0);
 									}
@@ -1506,6 +1509,7 @@ public class Home extends JFrame implements KeyListener{
 									//Removed tr.getEmployeeID() (reminder)
 									Cashier refundCashier = new Cashier();
 									productByRefund.add(refundCashier.findProductID(tr.getProductID()));
+									previousRefundValue.add(tr.getReturned());
 								}
 							}
 							else{
@@ -2515,7 +2519,7 @@ public class Home extends JFrame implements KeyListener{
 		refund_column_name.addElement("Unit Price");
 		refund_column_name.addElement("Returned");
 		refund_column_name.addElement("Date Returned");
-		refund_column_name.addElement("Employee ID");
+		//refund_column_name.addElement("Employee ID");
 		
 		table_refund = new JTable(refund_row_data, refund_column_name){
 			public boolean isCellEditable(int row, int column) {
@@ -2538,10 +2542,10 @@ public class Home extends JFrame implements KeyListener{
 	  	TableColumnModel columnModel_refund = table_refund.getColumnModel();
 	  	columnModel_refund.getColumn(0).setPreferredWidth(10); //#
 	 	columnModel_refund.getColumn(1).setPreferredWidth(30); //Product ID
-	  	columnModel_refund.getColumn(2).setPreferredWidth(200); //Quantity Sold
+	  	columnModel_refund.getColumn(2).setPreferredWidth(30); //Quantity Sold
         columnModel_refund.getColumn(3).setPreferredWidth(30); //Unit Price 
-	  	columnModel_refund.getColumn(4).setPreferredWidth(50); //Returned
-	  	columnModel_refund.getColumn(5).setPreferredWidth(30); //Date Returned
+	  	columnModel_refund.getColumn(4).setPreferredWidth(30); //Returned
+	  	columnModel_refund.getColumn(5).setPreferredWidth(100); //Date Returned
 	  	//columnModel_refund.getColumn(6).setPreferredWidth(10); //Employee ID
 
 	    //Columns won't be able to moved around
@@ -2574,15 +2578,104 @@ public class Home extends JFrame implements KeyListener{
 				//Changes which product is selected in product details
 				int row = table_refund.getSelectionModel().getLeadSelectionIndex();
 	        	if(productByRefund.size() > 0){
-	        		for(int i = 0; i < productByRefund.size(); i++){
-	        			if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(productByRefund.get(i).getID()))){
-	        				textField_refund_name.setText(productByRefund.get(i).getName());
-	        				textField_refund_description_input.setText(productByRefund.get(i).getDescription());
-	        				textField_refund_quantity_remaining_input.setText(String.valueOf(productByRefund.get(i).getQuantity()));
-	        				break;
-	        			}
+	        		if (e.getClickCount() == 1) {
+		        		for(int i = 0; i < productByRefund.size(); i++){
+		        			if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(productByRefund.get(i).getID()))){
+		        				textField_refund_name.setText(productByRefund.get(i).getName());
+		        				textField_refund_description_input.setText(productByRefund.get(i).getDescription());
+		        				textField_refund_quantity_remaining_input.setText(String.valueOf(productByRefund.get(i).getQuantity()));
+		        				break;
+		        			}
+		        		}
 	        		}
 	        	}
+			}
+		});
+		
+		table_refund.getModel().addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent e) {
+				if(model_refund.getRowCount() > 0){
+					//Sales Total
+					int col2 = table_refund.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+			        int row2 = table_refund.getSelectionModel().getLeadSelectionIndex();
+			        if(row2 > -1 && col2 > -1){
+			        	if(col2 == 4){
+							Runnable run2 = new Runnable() {
+								@Override
+								public void run() {
+									String tempQuantity = model_refund.getValueAt(row2, 4).toString();
+									if(!tempQuantity.isEmpty()){
+										char c = tempQuantity.charAt(0);
+										char c2 = tempQuantity.charAt(tempQuantity.length()-1);
+									}
+									//Previous Quantity
+									int previousQuantity2 = 0;
+									if(model_refund.getRowCount() > 0){
+										String nID = model_refund.getValueAt(row2, id_column).toString();
+										for(int i = 0; i < productByRefund.size(); i++){
+											if(nID.equals(String.valueOf(productByRefund.get(i).getID()))){
+												previousQuantity2 = previousRefundValue.get(i);
+											}
+										}
+									}
+									if(validateEmpty(tempQuantity) == false){
+										JOptionPane.showMessageDialog(null,"Remaining field cannot be left empty. "
+												+ "Please enter a remaining quantity above 0 for row #" + (row2+1) + ".");
+										model_refund.setValueAt(previousQuantity2, row2, col2);
+										table_refund.setRowSelectionInterval(row2, row2);
+										table_refund.setColumnSelectionInterval(0, 0);
+									}
+									else if(checkForNumbers(tempQuantity) == false){
+										JOptionPane.showMessageDialog(null,"Remaining quantity entered for row #" + (row2+1) + 
+												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+										model_refund.setValueAt(previousQuantity2, row2, col2);
+										table_refund.setRowSelectionInterval(row2, row2);
+										table_refund.setColumnSelectionInterval(0, 0);
+									}
+									/*else if(c == '0' && c2 >= '0'){
+										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
+										model_refund.setValueAt(previousQuantity2, row2, col2);
+										table_refund.setRowSelectionInterval(row2, row2);
+										table_refund.setColumnSelectionInterval(0, 0);
+									}*/
+									else{
+										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, 4).toString());
+										int sold = Integer.parseInt(model_refund.getValueAt(row2, 2).toString());
+										if(newReturn > sold){
+											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be above the number of quantity bought.");
+											model_refund.setValueAt(previousQuantity2, row2, col2);
+											table_refund.setRowSelectionInterval(row2, row2);
+											table_refund.setColumnSelectionInterval(0, 0);
+										}
+										else{
+											if(model_refund.getRowCount() > 0){
+												if(productByRefund.size() > 0){
+													for(int i = 0; i < productByRefund.size(); i++){
+														String tableValue = model_refund.getValueAt(row2, id_column).toString();
+														String vectorValue = String.valueOf(productByRefund.get(i).getID());
+														if(tableValue.equals(vectorValue)){
+															String value = model_refund.getValueAt(row2, col2).toString();
+															int convertedValue = Integer.valueOf(value);
+															previousRefundValue.remove(i);
+															previousRefundValue.insertElementAt(convertedValue, i);
+															break;
+														}
+													}
+												}
+											}	
+											
+											//After entering value, movies selection to next column (does not leave user in same colum)
+											table_refund.setRowSelectionInterval(row2, row2);
+											table_refund.setColumnSelectionInterval(0, 0);
+											textField_transaction_input.requestFocusInWindow();
+										}
+									}
+								}
+							};
+							SwingUtilities.invokeLater(run2);
+			        	}
+			        }
+				}
 			}
 		});
 	}
