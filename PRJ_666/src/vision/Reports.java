@@ -5,6 +5,8 @@
  */
 package vision;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -42,6 +44,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import net.proteanit.sql.DbUtils;
 import org.jdatepicker.impl.*;
@@ -102,6 +106,10 @@ public class Reports extends JFrame {
     private Vector<String> Invoices_headings = new Vector<>();
     private Vector<String> Performance_headings = new Vector<>();
     
+    //Color code data
+    private int active;
+    private int revenue_color_col;
+    
     public Reports(){
         super();
         
@@ -109,7 +117,8 @@ public class Reports extends JFrame {
             Connect connect = new Connect();
             c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage()); 
+            JOptionPane.showMessageDialog(null, "Cannot establish connection with MySQL.",
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -127,6 +136,35 @@ public class Reports extends JFrame {
                 if(rs.next()) {
                     rs.beforeFirst();
                     jTable1.setModel(DbUtils.resultSetToTableModel(rs));
+                    /*
+                    switch (active){
+                        case 0: 
+                            jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
+                                @Override
+                                public Component getTableCellRendererComponent(JTable table,
+                                        Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+
+                                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+                                    double status = (double)table.getModel().getValueAt(row, revenue_color_col);
+                                    if (status < 2500) {
+                                        setBackground(new Color(232, 137, 143)); //Light red color
+                                    } else if(status < 5000){
+                                        setBackground(new Color(250, 210, 90)); //Light yellow/orange color
+                                    } else {
+                                        setBackground(new Color(121, 237, 135)); //Light green color
+                                    }
+                                    return this;
+                                }   
+                            });
+                            break;
+                    /*    case 1: break;
+                        case 2: break;
+                        case 3: break;
+                        case 4: break;
+                        default: break;
+                    }
+                    */
                 } else {
                     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
                     model.setRowCount(0);
@@ -215,6 +253,11 @@ public class Reports extends JFrame {
         
         Report_tabs.setFont(new java.awt.Font("Arial", Font.BOLD, 12));
         
+        Report_tabs.addChangeListener((ChangeEvent changeEvent) -> {
+            active = Report_tabs.getSelectedIndex();
+            //System.out.println("Tab changed to: " + Report_tabs.getTitleAt(active) + ", index is: " + active);
+        });
+                
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         Report_tabs.setTabPlacement(JTabbedPane.LEFT);
@@ -238,6 +281,8 @@ public class Reports extends JFrame {
             + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
             + " where TransactionType = 'Sale' "
             + " group by Year, Month ";
+        
+        revenue_color_col = 7;
         
 	Revenue_headings.clear();
         Revenue_headings.add("`Year`");
@@ -372,7 +417,31 @@ public class Reports extends JFrame {
         Orders_headings.add("`Amount Paid`");
         
 	updateReport(Orders_table, orders_query);
+        
+        Orders_table.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if (e.getClickCount() == 2)
+                {
+                    int row = Orders_table.getSelectedRow();
+                    String createDate = Orders_table.getModel().getValueAt(row, 1).toString();
 
+                    Order t = new Order();
+                    JFrame f = new JFrame();
+                    JPanel p = t.getOrderInfo(createDate, f);
+                    if(p != null){                
+                        f.getContentPane().add(p);
+                        f.setSize(920, 500);
+                        f.setVisible(true);
+                        f.setLocationRelativeTo(null);    
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Searched order does not exits.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         Orders_table.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -420,7 +489,7 @@ public class Reports extends JFrame {
 
 	transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
             + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
-            + " SubTotal, Tax, Total from `Transaction` t, Employee e" 
+            + " SubTotal, Tax, Total, 'View Details' as '' from `Transaction` t, Employee e" 
             + " where t.EmployeeID = e.ID";
 	
         Transactions_headings.clear();
@@ -434,7 +503,30 @@ public class Reports extends JFrame {
         Transactions_headings.add("`Total`");
         
 	updateReport(Transactions_table, transactions_query);
-	
+	Transactions_table.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if (e.getClickCount() == 2)
+                {
+                    int row = Transactions_table.getSelectedRow();
+                    int id = (int) Transactions_table.getModel().getValueAt(row, 0);
+                    
+                    Transaction t = new Transaction();
+                    JPanel p = t.getTransactionInfo(id);
+                    if(p != null){
+                        JFrame f = new JFrame();                
+                        f.getContentPane().add(p);
+                        f.setSize(900, 500);
+                        f.setVisible(true);
+                        f.setLocationRelativeTo(null);    
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Searched transaction does not exits.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         Transactions_table.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -451,7 +543,24 @@ public class Reports extends JFrame {
         
         transaction_search.setText("Search");
         transaction_search.addActionListener((java.awt.event.ActionEvent evt) -> {
-            
+            int id = Integer.parseInt(input_transactionID.getText());
+            if(id != 0){
+                Transaction t = new Transaction();
+                JPanel p = t.getTransactionInfo(id);
+                if(p != null){
+                    JFrame f = new JFrame();                
+                    f.getContentPane().add(p);
+                    f.setSize(900, 500);
+                    f.setVisible(true);
+                    f.setLocationRelativeTo(null);    
+                } else {
+                    JOptionPane.showMessageDialog(null, "Searched transaction does not exits.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Transaction ID is not recognize!, ID must be number digits",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
         
         javax.swing.GroupLayout TransactionsLayout = new javax.swing.GroupLayout(Transactions);
@@ -671,6 +780,7 @@ public class Reports extends JFrame {
                 revenue_query = "select Year(CreateDate) as 'Year', ";
                 order = "group by Year";
                 
+                revenue_color_col = 0;
                 Revenue_headings.clear();
                 Revenue_headings.add("`Year`");
                 
@@ -678,6 +788,7 @@ public class Reports extends JFrame {
                 revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month', ";
                 order = "group by Year, Month";
                 
+                revenue_color_col = 1;
                 Revenue_headings.clear();
                 Revenue_headings.add("`Year`");
                 Revenue_headings.add("`Month`");
@@ -693,6 +804,7 @@ public class Reports extends JFrame {
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
                     + " where TransactionType = 'Sale' ";
                 
+                revenue_color_col += 6;
                 Revenue_headings.add("`Order Cost`");
                 Revenue_headings.add("`Order Paid`");
                 Revenue_headings.add("`SubTotal`");
@@ -709,6 +821,7 @@ public class Reports extends JFrame {
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
                     + " where TransactionType = 'Sale' ";
                 
+                revenue_color_col += 4;
                 Revenue_headings.add("`SubTotal`");
                 Revenue_headings.add("`Tax`");
                 Revenue_headings.add("`Total`");
@@ -1477,7 +1590,7 @@ public class Reports extends JFrame {
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
                     + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
-                    + " SubTotal, Tax, Total from `Transaction` t, Employee e" 
+                    + " SubTotal, Tax, Total, 'View Details' as '' from `Transaction` t, Employee e" 
                     + " where t.EmployeeID = e.ID";
             
             order = " ";
