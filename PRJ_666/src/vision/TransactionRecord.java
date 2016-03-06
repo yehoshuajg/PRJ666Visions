@@ -110,9 +110,10 @@ public class TransactionRecord {
 		}
 		return count;
 	}
-	public void getTransactionRecord(int id, int row){
+	public TransactionRecord getTransactionRecord(int id, int row){
 		int count = 0;
 		Connect connect = new Connect();
+		TransactionRecord tr = new TransactionRecord();
 		try {
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			String sql = "SELECT * FROM transactionrecord where TransactionID = ?";
@@ -123,14 +124,14 @@ public class TransactionRecord {
 			//Extract data from result set
 			while(rs.next()){
 				//Retrieve by column name
-				this.transactionID = rs.getInt("TransactionID");
-				this.productID = rs.getInt("ProductID");
-				this.quantitySold = rs.getInt("QuantitySold");
-				this.unitPrice = rs.getDouble("UnitPrice");
-				this.returned = rs.getInt("Returned");
-				this.dateReturned = rs.getString("DateReturned");
-				this.employeeID = rs.getInt("EmployeeID");
-				this.unitCost = rs.getDouble("UnitCost");
+				tr.transactionID = rs.getInt("TransactionID");
+				tr.productID = rs.getInt("ProductID");
+				tr.quantitySold = rs.getInt("QuantitySold");
+				tr.unitPrice = rs.getDouble("UnitPrice");
+				tr.returned = rs.getInt("Returned");
+				tr.dateReturned = rs.getString("DateReturned");
+				tr.employeeID = rs.getInt("EmployeeID");
+				tr.unitCost = rs.getDouble("UnitCost");
 				//row is coming from for loop, so it stops when it finds the record (row#) it was looking for in that transactionRecord
 				//and returns it
 				if(count == row){
@@ -146,6 +147,7 @@ public class TransactionRecord {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return tr;
 	}
 	public void insertTransactionRecord(int transactionID, int productID, int productQuantity, double productSalePrice, int employeeID){
 		Connect connect = new Connect();
@@ -231,7 +233,6 @@ public class TransactionRecord {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	public int getPreviousQuantity(int id){
 		int count = 0;
@@ -263,6 +264,25 @@ public class TransactionRecord {
 		}
 		else {
 			return 0;
+		}
+	}
+	public void writeProductRefund(TransactionRecord tr){
+		Connect connect = new Connect();
+		try {
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			String sql = "UPDATE `TransactionRecord` SET Returned = ?, DateReturned = ? where TransactionID = ? AND ProductID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, tr.getReturned());
+			ps.setString(2, tr.getDateReturned());
+			ps.setInt(3, tr.getTransactionID());
+			ps.setInt(4, tr.getProductID());
+		    ps.executeUpdate();
+			
+			//Clean-up environment
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

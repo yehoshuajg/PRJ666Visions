@@ -38,6 +38,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
@@ -165,6 +166,11 @@ public class Home extends JFrame implements KeyListener{
 	private JPanel panel_refund;
 	
 	//Refund Table
+	private Transaction t;
+	private Vector<TransactionRecord> tr = new Vector<TransactionRecord>();
+	private Vector<TransactionRecord> trecord = new Vector<TransactionRecord>();
+	private Vector<TransactionRecord> returning = new Vector<TransactionRecord>();
+	private int transactionRecordLength = 0;
 	private Vector<String> refund_column_name = new Vector<String>();
 	private Vector<String> refund_row_data = new Vector<String>();
 	private JTable table_refund;
@@ -174,15 +180,20 @@ public class Home extends JFrame implements KeyListener{
 	private JTextPane textField_refund_quantity_remaining_input;
 	
 	//Refund details:
-	private JTextField textField_transactionID;
-	private JTextField textField_createDate;
-	private JTextField textField_transaction_subtotal;
-	private JTextField textField_transaction_tax;
-	private JTextField textField_transaction_total;
-	private JTextField textField_transactionType;
-	private JTextField textField_method;
-	private JTextField textField_promotionID;
-	private JTextField textField_employeeID;
+	private JTextPane textField_transactionID;
+	private JTextPane textField_createDate;
+	private JTextPane textField_transaction_subtotal;
+	private JTextPane textField_transaction_tax;
+	private JTextPane textField_transaction_total;
+	private JTextPane textField_transactionType;
+	private JTextPane textField_method;
+	private JTextPane textField_promotionID;
+	private JTextPane textField_employeeID;
+	
+	//Date
+	String dateDelimiter = "/";
+	
+	
 	
 	/**
 	 * Launch the application.
@@ -1487,29 +1498,32 @@ public class Home extends JFrame implements KeyListener{
 						}
 						else{
 							int tempTransactionID = Integer.parseInt(tempInput);
-							Transaction t = new Transaction();
+							t = new Transaction();
 							if(t.getTransactionDetails(tempTransactionID) == true){
 								textField_transactionID.setText(String.valueOf(t.getId()));
-								textField_createDate.setText(t.getCreateDate());
-								textField_transaction_subtotal.setText(String.valueOf(t.getSubTotal()));
-								textField_transaction_tax.setText(String.valueOf(t.getTax()));
-								textField_transaction_total.setText(String.valueOf(t.getTotal()));
+								textField_createDate.setText(parseDate(t.getCreateDate()));
+								textField_transaction_subtotal.setText("$" + String.valueOf(t.getSubTotal()));
+								textField_transaction_tax.setText("$" + String.valueOf(t.getTax()));
+								textField_transaction_total.setText("$" + String.valueOf(t.getTotal()));
 								textField_transactionType.setText(t.getTransactionType());
 								textField_method.setText(t.getMethod());
 								textField_promotionID.setText(String.valueOf(t.getPromotionID()));
 								textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
 								
 								productByRefund.clear();
-								TransactionRecord tr = new TransactionRecord();
-								for(int i = 0; i < tr.getTransactionCount(tempTransactionID); i++){
-									tr.getTransactionRecord(tempTransactionID, i);
+								tr.clear();
+								TransactionRecord temp = new TransactionRecord();
+								transactionRecordLength = temp.getTransactionCount(tempTransactionID);
+								for(int i = 0; i < transactionRecordLength; i++){
+									tr.add(temp.getTransactionRecord(tempTransactionID, i));
 									model_refund.addRow(new Object[]{
-									i+1,tr.getProductID(),tr.getQuantitySold(),tr.getUnitPrice(),
-									tr.getReturned(),tr.getDateReturned()});
+									i+1,tr.get(i).getProductID(),tr.get(i).getQuantitySold(),tr.get(i).getUnitPrice(),
+									tr.get(i).getReturned(),tr.get(i).getDateReturned()});
+									
 									//Removed tr.getEmployeeID() (reminder)
 									Cashier refundCashier = new Cashier();
-									productByRefund.add(refundCashier.findProductID(tr.getProductID()));
-									previousRefundValue.add(tr.getReturned());
+									productByRefund.add(refundCashier.findProductID(tr.get(i).getProductID()));
+									previousRefundValue.add(tr.get(i).getReturned());
 								}
 							}
 							else{
@@ -2639,15 +2653,22 @@ public class Home extends JFrame implements KeyListener{
 										table_refund.setColumnSelectionInterval(0, 0);
 									}*/
 									else{
-										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, 4).toString());
-										int sold = Integer.parseInt(model_refund.getValueAt(row2, 2).toString());
+										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, 4).toString().trim());
+										int sold = Integer.parseInt(model_refund.getValueAt(row2, 2).toString().trim());
 										if(newReturn > sold){
 											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be above the number of quantity bought.");
 											model_refund.setValueAt(previousQuantity2, row2, col2);
 											table_refund.setRowSelectionInterval(row2, row2);
 											table_refund.setColumnSelectionInterval(0, 0);
 										}
+										else if(underReturn(newReturn, tr.get(row2)) == true){
+											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be below the previous returned quantity.");
+											model_refund.setValueAt(previousQuantity2, row2, col2);
+											table_refund.setRowSelectionInterval(row2, row2);
+											table_refund.setColumnSelectionInterval(0, 0);
+										}
 										else{
+											//Sets previous value for the selected row
 											if(model_refund.getRowCount() > 0){
 												if(productByRefund.size() > 0){
 													for(int i = 0; i < productByRefund.size(); i++){
@@ -2664,13 +2685,99 @@ public class Home extends JFrame implements KeyListener{
 												}
 											}	
 											
-											//After entering value, movies selection to next column (does not leave user in same colum)
-											table_refund.setRowSelectionInterval(row2, row2);
-											table_refund.setColumnSelectionInterval(0, 0);
-											textField_transaction_input.requestFocusInWindow();
+											if(tr.size() > 0){
+												String table_productID = model_refund.getValueAt(row2, id_column).toString().trim();
+												for(int i = 0; i < tr.size(); i++){
+													if(table_productID.equals(String.valueOf(tr.get(i).getProductID()))){
+														if(newReturn == tr.get(i).getReturned()){
+															if(returning.size() > 0){
+																for(int j = 0; j < returning.size(); j++){
+																	if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
+																		//System.out.println("Before:" + returning.size());
+																		returning.remove(j);
+																		//System.out.println("After:" + returning.size());
+																	}
+																	else{
+																		//System.out.println("else");
+																	}
+																}
+															}
+															else{
+																returning.clear();
+															}
+															
+														}
+														else{
+															if(returning.size() > 0){
+																boolean check = true;
+																for(int j = 0; j < returning.size(); j++){
+																	if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
+																		TransactionRecord r = new TransactionRecord();
+																		r.setTransactionID(tr.get(i).getTransactionID());
+																		r.setProductID(tr.get(i).getProductID());
+																		r.setQuantitySold(tr.get(i).getQuantitySold());
+																		r.setUnitPrice(tr.get(i).getUnitPrice());
+																		r.setReturned(newReturn);
+																		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																		Date date = new Date();
+																		String dateString = dateFormat.format(date);
+																		r.setDateReturned(dateString);
+																		//Change to current user later
+																		r.setEmployeeID(1);
+																		r.setUnitCost(tr.get(i).getUnitCost());
+																		returning.remove(j);
+																		returning.insertElementAt(r, j);	
+																		check = true;
+																		break;
+																	}
+																	else{
+																		check = false;
+																	}
+																}
+																if(check == false){
+																	TransactionRecord r = new TransactionRecord();
+																	r.setTransactionID(tr.get(i).getTransactionID());
+																	r.setProductID(tr.get(i).getProductID());
+																	r.setQuantitySold(tr.get(i).getQuantitySold());
+																	r.setUnitPrice(tr.get(i).getUnitPrice());
+																	r.setReturned(newReturn);
+																	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																	Date date = new Date();
+																	String dateString = dateFormat.format(date);
+																	r.setDateReturned(dateString);
+																	//Change to current user later
+																	r.setEmployeeID(1);
+																	r.setUnitCost(tr.get(i).getUnitCost());
+																	returning.add(r);	
+																}
+															}
+															else{
+																TransactionRecord r = new TransactionRecord();
+																r.setTransactionID(tr.get(i).getTransactionID());
+																r.setProductID(tr.get(i).getProductID());
+																r.setQuantitySold(tr.get(i).getQuantitySold());
+																r.setUnitPrice(tr.get(i).getUnitPrice());
+																r.setReturned(newReturn);
+																DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																Date date = new Date();
+																String dateString = dateFormat.format(date);
+																r.setDateReturned(dateString);
+																//Change to current user later
+																r.setEmployeeID(1);
+																r.setUnitCost(tr.get(i).getUnitCost());
+																returning.add(r);
+															}
+														}
+													}
+												}
+											}
+										}
+										//After entering value, movies selection to next column (does not leave user in same colum)
+										table_refund.setRowSelectionInterval(row2, row2);
+										table_refund.setColumnSelectionInterval(0, 0);
+										textField_transaction_input.requestFocusInWindow();
 										}
 									}
-								}
 							};
 							SwingUtilities.invokeLater(run2);
 			        	}
@@ -2709,15 +2816,17 @@ public class Home extends JFrame implements KeyListener{
 		separator_1.setBounds(0, 86, 292, 12);
 		panel_transactionDetail.add(separator_1);
 		
-		textField_transactionID = new JTextField();
-		textField_transactionID.setBounds(105, 6, 130, 26);
+		textField_transactionID = new JTextPane();
+		textField_transactionID.setBounds(105, 10, 130, 26);
+		textField_transactionID.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_transactionID);
-		textField_transactionID.setColumns(10);
+		textField_transactionID.setEditable(false);
 		
-		textField_createDate = new JTextField();
-		textField_createDate.setBounds(87, 52, 199, 26);
+		textField_createDate = new JTextPane();
+		textField_createDate.setBounds(87, 58, 199, 26);
 		panel_transactionDetail.add(textField_createDate);
-		textField_createDate.setColumns(10);
+		textField_createDate.setBackground(Color.decode(defaultColor));
+		textField_createDate.setEditable(false);
 		
 		JTextPane txtpnSubtotal = new JTextPane();
 		txtpnSubtotal.setText("Subtotal:");
@@ -2737,28 +2846,31 @@ public class Home extends JFrame implements KeyListener{
 		txtpnTotal.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnTotal);
 		
-		textField_transaction_subtotal = new JTextField();
-		textField_transaction_subtotal.setBounds(70, 105, 130, 26);
+		textField_transaction_subtotal = new JTextPane();
+		textField_transaction_subtotal.setBounds(68, 110, 218, 20);
+		textField_transaction_subtotal.setEditable(false);
+		textField_transaction_subtotal.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_transaction_subtotal);
-		textField_transaction_subtotal.setColumns(10);
 		
 		JSeparator separator_2 = new JSeparator();
 		separator_2.setBounds(0, 138, 292, 12);
 		panel_transactionDetail.add(separator_2);
 		
-		textField_transaction_tax = new JTextField();
-		textField_transaction_tax.setBounds(40, 158, 130, 26);
+		textField_transaction_tax = new JTextPane();
+		textField_transaction_tax.setBounds(38, 162, 248, 20);
+		textField_transaction_tax.setEditable(false);
+		textField_transaction_tax.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_transaction_tax);
-		textField_transaction_tax.setColumns(10);
 		
 		JSeparator separator_3 = new JSeparator();
 		separator_3.setBounds(0, 196, 292, 12);
 		panel_transactionDetail.add(separator_3);
 		
-		textField_transaction_total = new JTextField();
-		textField_transaction_total.setBounds(50, 215, 130, 26);
+		textField_transaction_total = new JTextPane();
+		textField_transaction_total.setBounds(48, 220, 238, 20);
+		textField_transaction_total.setEditable(false);
+		textField_transaction_total.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_transaction_total);
-		textField_transaction_total.setColumns(10);
 		
 		JSeparator separator_4 = new JSeparator();
 		separator_4.setBounds(0, 253, 292, 12);
@@ -2770,10 +2882,11 @@ public class Home extends JFrame implements KeyListener{
 		txtpnTransactionType.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnTransactionType);
 		
-		textField_transactionType = new JTextField();
-		textField_transactionType.setBounds(120, 272, 130, 26);
+		textField_transactionType = new JTextPane();
+		textField_transactionType.setBounds(125, 278, 161, 20);
+		textField_transactionType.setEditable(false);
+		textField_transactionType.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_transactionType);
-		textField_transactionType.setColumns(10);
 		
 		JSeparator separator_5 = new JSeparator();
 		separator_5.setBounds(0, 310, 292, 12);
@@ -2785,10 +2898,11 @@ public class Home extends JFrame implements KeyListener{
 		txtpnMethod.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnMethod);
 		
-		textField_method = new JTextField();
-		textField_method.setBounds(60, 329, 130, 26);
+		textField_method = new JTextPane();
+		textField_method.setBounds(65, 334, 221, 20);
+		textField_method.setEditable(false);
+		textField_method.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_method);
-		textField_method.setColumns(10);
 		
 		JSeparator separator_6 = new JSeparator();
 		separator_6.setBounds(0, 367, 292, 12);
@@ -2800,10 +2914,11 @@ public class Home extends JFrame implements KeyListener{
 		txtpnPromotionId.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnPromotionId);
 		
-		textField_promotionID = new JTextField();
-		textField_promotionID.setBounds(95, 386, 130, 26);
+		textField_promotionID = new JTextPane();
+		textField_promotionID.setBounds(100, 391, 186, 20);
+		textField_promotionID.setEditable(false);
+		textField_promotionID.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_promotionID);
-		textField_promotionID.setColumns(10);
 		
 		JSeparator separator_7 = new JSeparator();
 		separator_7.setBounds(0, 424, 292, 12);
@@ -2815,9 +2930,95 @@ public class Home extends JFrame implements KeyListener{
 		txtpnEmployeeId.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnEmployeeId);
 		
-		textField_employeeID = new JTextField();
-		textField_employeeID.setBounds(95, 443, 130, 26);
+		textField_employeeID = new JTextPane();
+		textField_employeeID.setBounds(95, 449, 191, 20);
+		textField_employeeID.setEditable(false);
+		textField_employeeID.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(textField_employeeID);
-		textField_employeeID.setColumns(10);
+		
+		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_1.setBounds(930, 517, 293, 81);
+		panel_refund.add(tabbedPane_1);
+		
+		JPanel panel = new JPanel();
+		tabbedPane_1.addTab("Commands:", null, panel, null);
+		panel.setLayout(null);
+		
+		JButton btnRefund = new JButton("Refund");
+		btnRefund.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!table_refund.isEditing()){
+					if(tr.size() > 0){
+						if(returning.size() > 0){
+							TransactionRecord temp = new TransactionRecord();
+							for(int i = 0; i < returning.size(); i++){
+								temp.writeProductRefund(returning.get(i));
+							}
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"No changes were made to the transaction.");
+						}
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"No items found in Transaction Record.");
+					}
+				}
+				else{
+					JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+				}
+			}
+		});
+		btnRefund.setBounds(0, 0, 272, 35);
+		panel.add(btnRefund);
+	}
+	private String parseDate(String date) {
+		String finalOutput = null;
+		date = date.trim();
+		if(!date.isEmpty()){
+			String[] splited = date.split("\\s+");
+			String newDate = splited[0];
+			String year = null;
+			String month = null;
+			String day;
+			if(newDate.contains("-")){
+				//yyyy/MM/dd HH:mm:ss
+				//Year
+				int first = newDate.indexOf("-");
+				year = newDate.substring(0, first);
+				
+				//Month
+				newDate = newDate.substring(first+1, newDate.length());
+				int second = newDate.indexOf("-");
+				month = newDate.substring(0, second);
+				if(month.charAt(0) == '0'){
+					char c = month.charAt(1);
+					month = Character.toString(c);
+				}
+				if(Integer.parseInt(month) >= 1 && Integer.parseInt(month) <= 12){
+					DateFormatSymbols dfs = new DateFormatSymbols();
+					String[] allMonths = dfs.getMonths();
+					int newMonth = Integer.valueOf(month) - 1;
+					month = allMonths[newMonth];
+				}
+				//Day
+				newDate = newDate.substring(second+1, newDate.length());
+				day = newDate.substring(0, newDate.length());
+				if(day.charAt(0) == '0'){
+					char c = day.charAt(1);
+					day = Character.toString(c);
+				}
+				//New output: dd/MM/yyyy
+				finalOutput = day + dateDelimiter + month + dateDelimiter + year;
+			}
+		}
+		return finalOutput;
+	}
+	public boolean underReturn(int newReturnValue, TransactionRecord tr){
+		if(newReturnValue < tr.getReturned()){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
