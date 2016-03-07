@@ -752,7 +752,6 @@ public class Home extends JFrame implements KeyListener{
 			public void actionPerformed(ActionEvent e) {
 				//Find Product by Name
 				try{
-					boolean check = false;
 					if(!table.isEditing()){
 						JPanel findByName_panel = new JPanel();
 						findByName_panel.setLayout(null);
@@ -897,6 +896,7 @@ public class Home extends JFrame implements KeyListener{
 						tc2.setCellRenderer(table_search.getDefaultRenderer(Boolean.class));
 						
 						DefaultTableModel model_search = (DefaultTableModel) table_search.getModel();
+						
 						//Button listener
 						product_search_button.addActionListener(new ActionListener() {
 							
@@ -907,6 +907,7 @@ public class Home extends JFrame implements KeyListener{
 								productNameInput.trim();
 								if(validateEmpty(productNameInput) == false){
 									JOptionPane.showMessageDialog(null,"Search cannot be empty. Please enter a product name, description or notes.");		
+									fillTableFindByName(model_search);
 								}
 								else if(productNameInput.trim().matches("^[-0-9A-Za-z.,'() ]*$")){
 									Cashier cashierProductByName = new Cashier();
@@ -914,7 +915,6 @@ public class Home extends JFrame implements KeyListener{
 									for (int i = model_search.getRowCount()-1; i >= 0; --i) {
 										model_search.removeRow(i);
 									}
-									
 									productByLike = new Vector<Product>();
 									cashierProductByName.findProductUsingLike(productNameInput.trim(),productByLike);
 									
@@ -972,23 +972,25 @@ public class Home extends JFrame implements KeyListener{
 									if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5){
 										if(row > -1){
 											String n = (String) model_search.getValueAt(row, 1);
-											for(int i = 0; i < productByLike.size(); i++){
-												if(n.equals(productByLike.get(i).getName())){ //maybe change to using ID
-													int items = 0;
-													try{
-														boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
-														if(b == true){
-															items++;
+											if(productByLike.size() > 0){
+												for(int i = 0; i < productByLike.size(); i++){
+													if(n.equals(productByLike.get(i).getName())){ //maybe change to using ID
+														int items = 0;
+														try{
+															boolean b = (boolean) model_search.getValueAt(i, productRemove_column);
+															if(b == true){
+																items++;
+															}
+														}catch(Exception e2){}
+														if(items == 0){
+															textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
+															d5.dispose();
+															textField_productID_input.requestFocusInWindow();
+															break;
 														}
-													}catch(Exception e2){}
-													if(items == 0){
-														textField_productID_input.setText(String.valueOf(productByLike.get(i).getID()));
-														d5.dispose();
-														textField_productID_input.requestFocusInWindow();
-														break;
-													}
-													else{
-														txtpnsearch_2.setText("Please use the add button at the bottom use add multiple items at a time.");
+														else{
+															txtpnsearch_2.setText("Please use the add button at the bottom use add multiple items at a time.");
+														}
 													}
 												}
 											}
@@ -1066,6 +1068,8 @@ public class Home extends JFrame implements KeyListener{
 							}
 						};
 						SwingUtilities.invokeLater(runAdd);
+						
+						fillTableFindByName(model_search);
 						
 						Component component = (Component) e.getSource();
 						JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
@@ -3019,6 +3023,26 @@ public class Home extends JFrame implements KeyListener{
 		}
 		else{
 			return false;
+		}
+	}
+	public void fillTableFindByName(DefaultTableModel model_search){
+		//Fill table with all products
+		Cashier cashierAllProductsByName = new Cashier();
+		productByLike = new Vector<Product>();
+		
+		//Remove rows from table
+		for (int i = model_search.getRowCount()-1; i >= 0; --i) {
+			model_search.removeRow(i);
+		}
+		
+		//Getting all products
+		cashierAllProductsByName.getAllProductsByName(productByLike);
+		if(productByLike.size() > 0){
+			for(int i = 0; i < productByLike.size(); i++){
+				model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),
+				productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),
+				productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+			}
 		}
 	}
 }

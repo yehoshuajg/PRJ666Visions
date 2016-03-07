@@ -130,12 +130,21 @@ public class Cashier {
 		boolean check = false;
 		ResultSet rs = null;
 		try {
-			String sql = "SELECT * FROM Product WHERE ? LIKE ?";
+			//Cannot substitute variables as column names, sql injection problem otherwise
+			String sql = null;
+			if(columnName.equals("Name")){
+				sql = "SELECT * FROM Product WHERE Name LIKE ?";
+			}
+			else if(columnName.equals("Description")){
+				sql = "SELECT * FROM Product WHERE Description LIKE ?";
+			}
+			else if(columnName.equals("Notes")){
+				sql = "SELECT * FROM Product WHERE Notes LIKE ?";
+			}
 			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setString(1, columnName);
-			ps.setString(2, "%"+input+"%");
-			rs = ps.executeQuery();
+			ps.setString(1, "%"+input+"%");
 			
+			rs = ps.executeQuery();
 			//Extract data from result set
 			while(rs.next()){
 				p = new Product();
@@ -168,5 +177,34 @@ public class Cashier {
 		}catch(Exception e){
 		}
 		return productByLike;
+	}
+	public void getAllProductsByName(Vector<Product> p){
+		//Execute a query
+		Connect connect = new Connect();
+		try{
+			Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			String sql = "SELECT * FROM Product";
+			PreparedStatement ps = c.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			
+			//Extract data from result set
+			while(rs.next()){
+				//Retrieve by column name
+				int tempID = rs.getInt("ID");
+				String tempName = rs.getString("Name");
+				String tempDescription = rs.getString("Description");
+				int tempCategoryID = rs.getInt("CategoryID");
+				int tempSubCategoryID = rs.getInt("SubCategoryID");
+				double tempSalePrice = rs.getDouble("SalePrice");
+				int tempQuantity = rs.getInt("Quantity");
+				String tempNotes = rs.getString("Notes");
+				
+				Product allProducts = new Product(tempID,tempName,tempDescription,tempCategoryID,tempSubCategoryID,tempSalePrice,tempQuantity,tempNotes);
+				p.addElement(allProducts);
+			}
+			//Clean-up environment
+			rs.close();
+			c.close();
+		}catch(Exception e){}
 	}
 }
