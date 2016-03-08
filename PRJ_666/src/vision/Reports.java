@@ -404,12 +404,13 @@ public class Reports extends JFrame {
             f.setLocationRelativeTo(null);
         });
 
-        orders_query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received'," 
+        orders_query = "select o.ID, s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received'," 
             + " o.Cost as 'Cost', IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '" 
             + " from `Order` o, Supplier s" 
             + " where o.SupplierID = s.ID ";
         
         Orders_headings.clear();
+        Orders_headings.add("`ID`");
         Orders_headings.add("`Supplier`");
         Orders_headings.add("`Date Created`");
         Orders_headings.add("`Date Received`");
@@ -424,11 +425,11 @@ public class Reports extends JFrame {
                 if (e.getClickCount() == 2)
                 {
                     int row = Orders_table.getSelectedRow();
-                    String createDate = Orders_table.getModel().getValueAt(row, 1).toString();
+                    int id = Integer.parseInt(Orders_table.getModel().getValueAt(row, 0).toString());
 
                     Order t = new Order();
                     JFrame f = new JFrame();
-                    JPanel p = t.getOrderInfo(createDate, f);
+                    JPanel p = t.getOrderInfo(id, f);
                     if(p != null){                
                         f.getContentPane().add(p);
                         f.setSize(920, 500);
@@ -620,6 +621,30 @@ public class Reports extends JFrame {
         Invoices_headings.add("`OutStanding`");
         
 	updateReport(Invoices_table, invoices_query);
+        
+        Invoices_table.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if (e.getClickCount() == 2)
+                {
+                    int row = Invoices_table.getSelectedRow();
+                    int id = Integer.parseInt(Invoices_table.getModel().getValueAt(row, 0).toString());
+
+                    Invoice i = new Invoice();
+                    JFrame f = new JFrame();
+                    JPanel p = i.getInvoiceInfo(id, f);
+                    if(p != null){                
+                        f.getContentPane().add(p);
+                        f.setSize(950, 500);
+                        f.setVisible(true);
+                        f.setLocationRelativeTo(null);    
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Searched order does not exits.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
         
         Invoices_table.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
@@ -1259,10 +1284,11 @@ public class Reports extends JFrame {
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             String sup = (String)supplier.getSelectedItem();
             
-            orders_query = "select s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received',"
+            orders_query = "select o.ID, s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received',"
                     + " o.Cost as 'Cost', ";
             
             Orders_headings.clear();
+            Orders_headings.add("`ID`");
             Orders_headings.add("`Supplier`");
             Orders_headings.add("`Date Created`");
             Orders_headings.add("`Date Received`");

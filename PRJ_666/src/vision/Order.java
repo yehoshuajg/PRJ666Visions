@@ -27,7 +27,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
@@ -49,12 +48,12 @@ public class Order extends JPanel {
             con = new Connect();
             c = DriverManager.getConnection(con.getURL(),con.getUsername(),con.getPassword());            
         } catch (SQLException ex){
-            JOptionPane.showMessageDialog(null, "Cannot establish connection with MySQL.",
+            JOptionPane.showMessageDialog(null, "Cannot establish connection with MySQL Server.",
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
-    public JPanel getOrderInfo(String id, JFrame fr){
+    public JPanel getOrderInfo(int id, JFrame fr){
         
         JPanel panel_orderDetails = new JPanel();
         JLabel jLabel2 = new JLabel();
@@ -109,7 +108,7 @@ public class Order extends JPanel {
             String sql = "select p.Name,  o.OrderedQuantity as 'Ordered', o.ReceivedQuantity "
                     + " as 'Received', o.Cost as 'Total Cost' " 
                     + " from orderdetail o join Product p on o.ProductID = p.ID " 
-                    + " where orderID = (select ID from `Order` where CreateDate = '" + id + "')";
+                    + " where orderID = " + id + "";
             rs = state.executeQuery(sql);
             
             jTable1.getTableHeader().setFont(new java.awt.Font("Tahoma", Font.BOLD, 12));
@@ -130,7 +129,7 @@ public class Order extends JPanel {
             
             sql = "select o.ID, s.Name, CONCAT(e.FirstName, ' ', e.LastName), o.CreateDate, o.ReceivedDate,"
                 + " o.Cost, o.AmountPaid, o.InvoiceID from `Order` o join Supplier s on o.SupplierID = s.ID" 
-                + " join Employee e on o.EmployeeID = e.ID where o.CreateDate = '" + id + "'";
+                + " join Employee e on o.EmployeeID = e.ID where o.ID = " + id;
 
             rs = state.executeQuery(sql);
             if(rs != null) {
@@ -289,7 +288,6 @@ public class Order extends JPanel {
             PreparedStatement s = null;
             try {
                 for (Map.Entry<String, Integer> entry : updates.entrySet()) {
-                    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue() + ", order_id: " + order_id.getText());
                     String sql = "update OrderDetail set ReceivedQuantity = '" + entry.getValue() + "'"
                             + " where ProductID = (Select ID from Product where Name = '" + entry.getKey() + "')"
                             + " and OrderID = '" + order_id.getText() + "'";
