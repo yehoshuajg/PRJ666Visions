@@ -130,7 +130,7 @@ public class Cashier {
 		boolean check = false;
 		ResultSet rs = null;
 		try {
-			//Cannot substitute variables as column names, sql injection problem otherwise
+			//Cannot substitute column names as variables, sql injection problem otherwise
 			String sql = null;
 			if(columnName.equals("Name")){
 				sql = "SELECT * FROM Product WHERE Name LIKE ?";

@@ -178,7 +178,7 @@ create table Employee
 	PositionID		int				not null,
 	JobType			varchar(12)		not null,
 	UserName		varchar(15)		not null,
-	`Password`		varchar(20)		not null,
+	`Password`		varchar(200)		not null,
 	HireDate		DATE			not null,
 	TerminationDate	DATE,
 	
@@ -1123,3 +1123,8 @@ update `Order` SET InvoiceID = 33 where ID = 41;
 update `Order` SET InvoiceID = 15 where ID = 43;
 update `Order` SET InvoiceID = 30 where ID = 44;
 update `Order` SET InvoiceID = 23 where ID = 45;
+
+/*Altering employee (had problems doing so above)*/
+ALTER Table Employee Add Salt VARCHAR(50);
+update Employee Set Salt = '[B@3d4eac69' Where ID = 1;
+UPDATE Employee Set Password='765ee7dc269c81d36a6a19893def309f24fe1ef9eabdd9a1de6d2e54714c2bd6156488630cc69f5434d9e2a4dd6ffc944f4f57228359554fa37781729da54106' WHERE ID = 1;

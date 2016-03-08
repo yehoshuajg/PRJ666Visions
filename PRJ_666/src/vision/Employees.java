@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -41,6 +48,7 @@ public class Employees extends JFrame{
 	private String password;
 	private String hireDate;
 	private String terminationDate;
+	private String salt;
 	
 	// Windowbuilder vars
 	
@@ -89,9 +97,10 @@ public class Employees extends JFrame{
 	public void setPositionID(int positionID){ this.positionID = positionID; }
 	public void setJobType(String jobType){ this.jobType = jobType; }
 	public void setUserame(String username){ this.username = username; }
-	//No need to set password
+	public void setPassword(String password){ this.password = password; }
 	public void setHireDate(String hireDate){ this.hireDate = hireDate; }
 	public void setTerminationDate(String terminationDate){ this.terminationDate = terminationDate; }
+	public void setSalt(){ this.salt = salt; }
 	
 	//Getters
 	public int getID(){ return this.id; }
@@ -107,9 +116,10 @@ public class Employees extends JFrame{
 	public int getPositionID(){ return this.positionID; }
 	public String getJobType(){ return this.jobType; }	
 	public String getUsername(){ return this.username; }
-	//No need to get password
+	public String getPassword(){ return this.password; }
 	public String getHireDate(){ return this.hireDate; }
 	public String getTerminationDate(){ return this.terminationDate; }
+	public String salt(){ return this.salt; }
 	
 	public boolean fetchLogin(String userID, String pass){
 		//Execute a query
@@ -126,11 +136,10 @@ public class Employees extends JFrame{
 			3.) Set values to "?" by using setString(parameter#,value) 
 			4.) Execute the query using prepared statement, not String sql.
 			*/
-			String sql = "SELECT * FROM Employee where UserName = ? AND Password = ? AND TerminationDate IS NULL";
+			String sql = "SELECT * FROM Employee where UserName = ? AND TerminationDate IS NULL";
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setString(1, userID);
-			ps.setString(2, pass);
-		    ResultSet rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 		    
 		    //Extract data from result set
 		    while(rs.next()){
@@ -148,24 +157,46 @@ public class Employees extends JFrame{
 		    	this.positionID = rs.getInt("PositionID");
 		    	this.jobType = rs.getString("JobType");
 			  	this.username = rs.getString("UserName");
-			  	//no need to grab pass
+			  	this.password = rs.getString("Password");
 			  	this.hireDate = rs.getString("HireDate");
 			  	this.terminationDate = rs.getString("TerminationDate");
+			  	this.salt = rs.getString("Salt");
 			  	count++;
 		    }
 		    //Clean-up environment
 		    rs.close();
 		    con.close();
 		}catch(Exception e){}
-		
 		if(count == 1){
-	    	return true;
+			String hash = get_SHA_512_SecurePassword(pass, this.salt);
+			if(hash.equals(this.password)){
+				return true;
+		       }
+		    else{
+		    	return false;
+		    }
 	    }
-	    else{
-	    	return false;
-	    }
+		return false;
 	}
-	
+	private static String get_SHA_512_SecurePassword(String passwordToHash, String salt){
+    	String generatedPassword = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(salt.getBytes());
+            byte[] bytes = md.digest(passwordToHash.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            generatedPassword = sb.toString();
+        } 
+        catch (NoSuchAlgorithmException e) 
+        {
+            e.printStackTrace();
+        }
+        return generatedPassword;
+    }
 	public boolean validateEmpty(String temp){
 		if(temp.isEmpty()){
 			return false;
