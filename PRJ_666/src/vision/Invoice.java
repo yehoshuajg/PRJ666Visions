@@ -9,9 +9,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -199,7 +201,41 @@ public class Invoice extends JPanel {
 
         btn_update.setText("Update");
         btn_update.addActionListener((java.awt.event.ActionEvent evt) -> {
+            double amountdue = Double.parseDouble(amount_due.getText());
+            double amountpaid = Double.parseDouble(amount_paid.getText());
             
+            Statement s = null;
+            ResultSet r = null;
+            try {
+                s = c.createStatement();
+                String sql = "select sum(Cost), sum(AmountPaid) from `Order` where InvoiceID = " + id;
+                r = s.executeQuery(sql);
+                
+                if(r.next()){
+                    double ck_amountdue = r.getDouble(1);
+                    double ck_amountpaid = r.getDouble(2);
+                    
+                    if(amountpaid < ck_amountpaid) {
+                        JOptionPane.showMessageDialog(null, "You cannot deduct the amount you've already paid.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    } else if(amountdue < ck_amountdue){
+                        JOptionPane.showMessageDialog(null, "You cannot have amount due less then total cost of products.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        sql = "update `Invoice` set AmountDue = " + amountdue + ", AmountPaid = " + amountpaid
+                            + " where ID = " + id;
+                        
+                        PreparedStatement ps = c.prepareStatement(sql);
+                        int dump = ps.executeUpdate();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "No orders found that is paid by invoice id " + id + ".",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+            } catch (Exception sql){
+                JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
         
         btn_close.setText("Close");
