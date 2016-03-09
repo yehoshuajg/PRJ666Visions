@@ -205,6 +205,7 @@ public class Home extends JFrame implements KeyListener{
 	double finalRefundSubtotal = 0;
 	double finalRefundTax = 0;
 	double finalRefundTotal = 0;
+	double refundChange = 0;
 	
 	//Date
 	String dateDelimiter = "/";
@@ -3017,6 +3018,13 @@ public class Home extends JFrame implements KeyListener{
 								txtpnrefund_total.setBackground(Color.decode(defaultColor));
 								txtpnrefund_total.setBounds(10, 63, 150, 18);
 								panel_refundConfirmation.add(txtpnrefund_total);
+								
+								//Change
+								JTextPane txtpnrefund_change = new JTextPane();
+								txtpnrefund_change.setText("Change:");
+								txtpnrefund_change.setBackground(Color.decode(defaultColor));
+								txtpnrefund_change.setBounds(10, 88, 150, 18);
+								panel_refundConfirmation.add(txtpnrefund_change);
 										
 								//Cancel button
 								JButton refund_cancel_confirm = new JButton("Cancel");
@@ -3103,6 +3111,11 @@ public class Home extends JFrame implements KeyListener{
 								
 								//Getting all products
 								if(returning.size() > 0 && tr.size() > 0){
+									remainingSubtotal = 0;
+									finalRefundSubtotal = 0;
+									finalRefundTax = 0;
+									finalRefundTotal = 0;
+									refundChange = 0;
 									for(int i = 0; i < returning.size(); i++){
 										for(int j = 0; j < tr.size(); j++){
 											if(returning.get(i).getProductID() == tr.get(j).getProductID()){
@@ -3114,20 +3127,27 @@ public class Home extends JFrame implements KeyListener{
 												tr.get(j).getReturned(),returning.get(i).getReturned(),returning.get(i).getUnitPrice()});
 												
 												//Calculating new Subtotal
-												remainingSubtotal += returning.get(i).getUnitPrice() * returning.get(i).getReturned();
+												//Subtotal = Product of returning Unitprice * (new quantity - previous quantity of returned), so it doesn't go into negative
+												remainingSubtotal += returning.get(i).getUnitPrice() * (returning.get(i).getReturned() - tr.get(i).getReturned());
+												refundChange = remainingSubtotal;
 												finalRefundSubtotal = (t.getSubTotal()-remainingSubtotal);
 												finalRefundSubtotal = Math.round(finalRefundSubtotal * 100.0) / 100.0;
-												txtpnrefund_subtotal.setText("Subtotal: $" + finalRefundSubtotal);
+												txtpnrefund_subtotal.setText("New Subtotal: $" + finalRefundSubtotal);
 
+												//Change
+												refundChange = refundChange * 1.13;
+												refundChange = Math.round(refundChange * 100.0) / 100.0;
+												txtpnrefund_change.setText("Change: $" + refundChange);
+												
 												//Calculating new tax
 												finalRefundTax = finalRefundSubtotal * 0.13;
 												finalRefundTax = Math.round(finalRefundTax * 100.0) / 100.0;
-												txtpnrefund_tax.setText("Tax: $" + finalRefundTax);
+												txtpnrefund_tax.setText("New Tax: $" + finalRefundTax);
 														
 												//Calculating new Total
 												finalRefundTotal = finalRefundSubtotal + finalRefundTax;
 												finalRefundTotal = Math.round(finalRefundTotal * 100.0) / 100.0;
-												txtpnrefund_total.setText("Total: $" + finalRefundTotal);
+												txtpnrefund_total.setText("New Total: $" + finalRefundTotal);
 												break;
 											}
 										}
