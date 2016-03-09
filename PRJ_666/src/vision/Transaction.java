@@ -189,6 +189,29 @@ public class Transaction extends JFrame {
 		}
 		return generatedKey;
 	}
+	public void writeProductRefundTransaction(int transactionID, String dateString, double finalRefundSubtotal, double finalRefundTax, double finalRefundTotal, String transactionType, String transactionMethod, int employeeID){
+		Connect connect = new Connect();
+		try {
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			String sql = "UPDATE `Transaction` SET CreateDate = ?, Subtotal = ?, Tax = ?, Total = ?, TransactionType = ?, Method = ?, EmployeeID = ? where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setString(1, dateString);
+			ps.setDouble(2, finalRefundSubtotal);
+			ps.setDouble(3, finalRefundTax);
+			ps.setDouble(4, finalRefundTotal);
+			ps.setString(5, transactionType);
+			ps.setString(6, transactionMethod);
+			ps.setInt(7, employeeID);
+			ps.setInt(8, transactionID);
+		    ps.executeUpdate();
+			
+			//Clean-up environment
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public JPanel getTransactionInfo(int id) {
         JPanel panel_transactiondetails = new JPanel();
