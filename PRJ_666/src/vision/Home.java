@@ -25,7 +25,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -919,6 +920,13 @@ public class Home extends JFrame implements KeyListener{
 						tc2.setCellRenderer(table_search.getDefaultRenderer(Boolean.class));
 						
 						DefaultTableModel model_search = (DefaultTableModel) table_search.getModel();
+						
+						TableRowSorter<TableModel> sorter = new TableRowSorter<>(table_search.getModel());
+						table_search.setRowSorter(sorter);
+						
+						//Disable column
+						sorter.setSortable(0, false);
+						sorter.setSortable(4, false);
 						
 						//Button listener
 						product_search_button.addActionListener(new ActionListener() {
@@ -2678,19 +2686,22 @@ public class Home extends JFrame implements KeyListener{
 			public void mouseClicked(MouseEvent e) {
 				//Changes which product is selected in product details
 				int row = table_refund.getSelectionModel().getLeadSelectionIndex();
-	        	if(productByRefund.size() > 0){
-	        		if (e.getClickCount() == 1) {
+				if (e.getClickCount() == 1) {
+					if(productByRefund.size() > 0){
 		        		for(int i = 0; i < productByRefund.size(); i++){
 		        			//Change to TransactionRecord or add another loop to get price of product at the time the transaction took place,
 		        			//Not the actual price. Else this will cause problem when a product may have been at discount and customer will get full(more) money back
+		        			//ProductByRefund uses product details from product table
 		        			if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(productByRefund.get(i).getID()))){
 		        				textField_refund_name.setText(productByRefund.get(i).getName());
 		        				textField_refund_description_input.setText(productByRefund.get(i).getDescription());
 		        				textField_refund_quantity_remaining_input.setText(String.valueOf(productByRefund.get(i).getQuantity()));
-		        				textField_refund_product_unitPrice_input.setText("$" + String.valueOf(productByRefund.get(i).getSalePrice()));
-		        				int tempQuantity = (int) model_refund.getValueAt(row, refund_QuantitySold);
-		        				double rowPrice = tempQuantity * productByRefund.get(i).getSalePrice();
-		        				textField_refund_total_unitPrice_input.setText("$" + String.valueOf(rowPrice));
+		        				if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(tr.get(i).getProductID()))){
+		        					textField_refund_product_unitPrice_input.setText("$" + String.valueOf(tr.get(i).getUnitPrice()));
+			        				int tempQuantity = (int) model_refund.getValueAt(row, refund_QuantitySold);
+			        				double rowPrice = tempQuantity * tr.get(i).getUnitPrice();
+			        				textField_refund_total_unitPrice_input.setText("$" + String.valueOf(rowPrice));
+		        				}
 		        				break;
 		        			}
 		        		}
@@ -3153,6 +3164,13 @@ public class Home extends JFrame implements KeyListener{
 								panel_refund_confirm2.add(jsp2);
 								
 								DefaultTableModel model_refund_confirm = (DefaultTableModel) table_refund_confirm.getModel();
+								
+								TableRowSorter<TableModel> sorter = new TableRowSorter<>(table_refund_confirm.getModel());
+								table_refund_confirm.setRowSorter(sorter);
+								
+								//Disable column
+								sorter.setSortable(0, false);
+								sorter.setSortable(6, false);
 								
 								refund_cancel_confirm.addActionListener(new ActionListener() {
 									@Override
