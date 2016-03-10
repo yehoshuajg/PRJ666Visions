@@ -51,6 +51,7 @@ import javax.swing.UIManager;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 
@@ -242,8 +243,8 @@ public class Home extends JFrame implements KeyListener{
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 720);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane = new JPanel(new GridLayout());
+		//contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		setTitle("Home");
@@ -747,7 +748,12 @@ public class Home extends JFrame implements KeyListener{
 				}
 				else{
 					//MOD FRAME
-					loadDiscountFrame(e);
+					if(!table.isEditing()){
+						loadDiscountFrame(e);
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+					}
 				}
 			}	
 		});
@@ -1130,30 +1136,36 @@ public class Home extends JFrame implements KeyListener{
 		cashier_commands.add(btnNewButton_1);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(model.getRowCount() > 0){ // total > 0
-					//Checkout
-					//Increases button size
-					UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
-					Object[] options = {"Cancel","Credit","Cash"};
-					int cashCredit = JOptionPane.showOptionDialog(null,"Checout using: ","Checkout",
-					    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-					
-					//Cancel
-					if(cashCredit == JOptionPane.YES_OPTION){
+				if(!table.isEditing()){
+					if(model.getRowCount() > 0){ // total > 0
+						//Checkout
+						//Increases button size
+						UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
+						Object[] options = {"Cancel","Credit","Cash"};
+						int cashCredit = JOptionPane.showOptionDialog(null,"Checkout using: ","Checkout",
+						    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 						
+						//Cancel
+						if(cashCredit == JOptionPane.YES_OPTION){
+							
+						}
+						//Credit
+						else if(cashCredit == JOptionPane.NO_OPTION){
+							
+						}
+						//Cash
+						else if(cashCredit == JOptionPane.CANCEL_OPTION){
+							loadCheckoutFrame(e);
+						}
+						//tabbedPane_7.setVisible(true);
 					}
-					//Credit
-					else if(cashCredit == JOptionPane.NO_OPTION){
-						
+					else{
+						JOptionPane.showMessageDialog(null,"Please add an item to purchase list before doing a checkout.");
 					}
-					//Cash
-					else if(cashCredit == JOptionPane.CANCEL_OPTION){
-						loadCheckoutFrame(e);
-					}
-					//tabbedPane_7.setVisible(true);
+				
 				}
 				else{
-					JOptionPane.showMessageDialog(null,"Please add an item to purchase list before doing a checkout.");
+					JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
 				}
 				textField_productID_input.requestFocusInWindow();
 			}
@@ -2004,12 +2016,69 @@ public class Home extends JFrame implements KeyListener{
 	public void loadDiscountFrame(ActionEvent e){
 		JPanel panel_discount = new JPanel();
 		panel_discount.setLayout(null);
+					
+		//Discount details
+		JTabbedPane tabbedPane_discount = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_discount.setBounds(60, 10, 400, 215);
+		panel_discount.add(tabbedPane_discount);
+					
+		JPanel panel_discount_details = new JPanel();
+		tabbedPane_discount.addTab("Discount details:", null, panel_discount_details, null);
+		panel_discount_details.setLayout(null);
+					
+		//Text
+		JTextPane discount_message1 = new JTextPane();
+		discount_message1.setFocusable(false);
+		
+		discount_message1.setBounds(10, 13, 350, 96);
+		discount_message1.setBackground(Color.decode(defaultColor));
+		panel_discount_details.add(discount_message1);
+		
+		//Input
+		discount_option = new JTextField();
+		discount_option.setBounds(6, 110, 183, 26);
+		panel_discount_details.add(discount_option);
+		discount_option.setColumns(10);
+		discount_option.setFocusable(true);
+			
+		//Enter button
+		JButton discountOption_btnEnter = new JButton("Enter");
+		discountOption_btnEnter.setBounds(3, 135, 190, 29);
+		panel_discount_details.add(discountOption_btnEnter);
+		discountOption_btnEnter.requestFocusInWindow();
+		discountOption_btnEnter.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				calculateOneTimeDiscount();
+			}
+		});
+		
+		//Cancel button
+		JButton discountOption_btnCancel = new JButton("Cancel");
+		discountOption_btnCancel.setBounds(190, 135, 185, 29);
+		panel_discount_details.add(discountOption_btnCancel);
+		discountOption_btnCancel.requestFocusInWindow();
+		discountOption_btnCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				d3.dispose();
+				textField_productID_input.requestFocusInWindow();
+			}
+		});
+
+		JTabbedPane tabbedPane_discount_keypad = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_discount_keypad.setBounds(115, 215, 279, 416);
+		panel_discount.add(tabbedPane_discount_keypad);
+		
+		JPanel keypad_panel_checkout = new JPanel();
+		tabbedPane_discount_keypad.addTab("Keypad: ", null, keypad_panel_checkout, null);
+		keypad_panel_checkout.setLayout(null);
 		
 		JButton discount_keypad_1 = new JButton("1");
-		discount_keypad_1.setBounds(208, 0, 87, 93);
+		discount_keypad_1.setBounds(0, 0, 87, 93);
 		discount_keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_1.setFocusable(false);
-		panel_discount.add(discount_keypad_1);
+		keypad_panel_checkout.add(discount_keypad_1);
 		discount_keypad_1.addActionListener(new ActionListener() {
 		
 			@Override
@@ -2020,12 +2089,11 @@ public class Home extends JFrame implements KeyListener{
 			}
 		});
 		
-		
 		JButton discount_keypad_2 = new JButton("2");
-		discount_keypad_2.setBounds(294, 0, 87, 93);
+		discount_keypad_2.setBounds(86, 0, 87, 93);
 		discount_keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_2.setFocusable(false);
-		panel_discount.add(discount_keypad_2);
+		keypad_panel_checkout.add(discount_keypad_2);
 		discount_keypad_2.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2037,10 +2105,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_3 = new JButton("3");
-		discount_keypad_3.setBounds(379, 0, 87, 93);
+		discount_keypad_3.setBounds(172, 0, 87, 93);
 		discount_keypad_3.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_3.setFocusable(false);
-		panel_discount.add(discount_keypad_3);
+		keypad_panel_checkout.add(discount_keypad_3);
 		discount_keypad_3.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2052,10 +2120,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_4 = new JButton("4");
-		discount_keypad_4.setBounds(208, 93, 87, 93);
+		discount_keypad_4.setBounds(0, 93, 87, 93);
 		discount_keypad_4.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_4.setFocusable(false);
-		panel_discount.add(discount_keypad_4);
+		keypad_panel_checkout.add(discount_keypad_4);
 		discount_keypad_4.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2067,10 +2135,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_5 = new JButton("5");
-		discount_keypad_5.setBounds(294, 93, 87, 93);
+		discount_keypad_5.setBounds(86, 93, 87, 93);
 		discount_keypad_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_5.setFocusable(false);
-		panel_discount.add(discount_keypad_5);
+		keypad_panel_checkout.add(discount_keypad_5);
 		discount_keypad_5.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2082,10 +2150,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton checkout_keypad_6 = new JButton("6");
-		checkout_keypad_6.setBounds(379, 93, 87, 93);
+		checkout_keypad_6.setBounds(172, 93, 87, 93);
 		checkout_keypad_6.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		checkout_keypad_6.setFocusable(false);
-		panel_discount.add(checkout_keypad_6);
+		keypad_panel_checkout.add(checkout_keypad_6);
 		checkout_keypad_6.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2097,10 +2165,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_7 = new JButton("7");
-		discount_keypad_7.setBounds(208, 186, 87, 93);
+		discount_keypad_7.setBounds(0, 186, 87, 93);
 		discount_keypad_7.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_7.setFocusable(false);
-		panel_discount.add(discount_keypad_7);
+		keypad_panel_checkout.add(discount_keypad_7);
 		discount_keypad_7.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2112,10 +2180,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_8 = new JButton("8");
-		discount_keypad_8.setBounds(294, 186, 87, 93);
+		discount_keypad_8.setBounds(86, 186, 87, 93);
 		discount_keypad_8.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_8.setFocusable(false);
-		panel_discount.add(discount_keypad_8);
+		keypad_panel_checkout.add(discount_keypad_8);
 		discount_keypad_8.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2127,10 +2195,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_9 = new JButton("9");
-		discount_keypad_9.setBounds(379, 186, 87, 93);
+		discount_keypad_9.setBounds(172, 186, 87, 93);
 		discount_keypad_9.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_9.setFocusable(false);
-		panel_discount.add(discount_keypad_9);
+		keypad_panel_checkout.add(discount_keypad_9);
 		discount_keypad_9.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2143,10 +2211,10 @@ public class Home extends JFrame implements KeyListener{
 		
 		
 		JButton discount_keypad_decimal = new JButton(".");
-		discount_keypad_decimal.setBounds(208, 278, 87, 93);
+		discount_keypad_decimal.setBounds(0, 278, 87, 93);
 		discount_keypad_decimal.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_decimal.setFocusable(false);
-		panel_discount.add(discount_keypad_decimal);
+		keypad_panel_checkout.add(discount_keypad_decimal);
 		discount_keypad_decimal.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2158,10 +2226,10 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_0 = new JButton("0");
-		discount_keypad_0.setBounds(294, 278, 87, 93);
+		discount_keypad_0.setBounds(86, 278, 87, 93);
 		discount_keypad_0.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_0.setFocusable(false);
-		panel_discount.add(discount_keypad_0);
+		keypad_panel_checkout.add(discount_keypad_0);
 		discount_keypad_0.addActionListener(new ActionListener() {
 			
 			@Override
@@ -2173,50 +2241,14 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		JButton discount_keypad_enter = new JButton("Enter");
-		discount_keypad_enter.setBounds(379, 278, 87, 93);
+		discount_keypad_enter.setBounds(172, 278, 87, 93);
 		discount_keypad_enter.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		discount_keypad_enter.setFocusable(false);
-		panel_discount.add(discount_keypad_enter);
+		keypad_panel_checkout.add(discount_keypad_enter);
 		discount_keypad_enter.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				calculateOneTimeDiscount();
-			}
-		});
-		
-		JTextPane discount_message1 = new JTextPane();
-		discount_message1.setFocusable(false);
-		
-		discount_message1.setBounds(6, 6, 170, 95);
-		discount_message1.setBackground(Color.decode(defaultColor));
-		panel_discount.add(discount_message1);
-
-		discount_option = new JTextField();
-		discount_option.setBounds(6, 104, 190, 26);
-		panel_discount.add(discount_option);
-		discount_option.setColumns(10);
-		discount_option.setFocusable(true);
-		
-		JButton discountOption_btnEnter = new JButton("Enter");
-		discountOption_btnEnter.setBounds(6, 132, 190, 29);
-		panel_discount.add(discountOption_btnEnter);
-		discountOption_btnEnter.requestFocusInWindow();
-		discountOption_btnEnter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				calculateOneTimeDiscount();
-			}
-		});
-		
-		JButton discountOption_btnCancel = new JButton("Cancel");
-		discountOption_btnCancel.setBounds(6, 160, 190, 29);
-		panel_discount.add(discountOption_btnCancel);
-		discountOption_btnCancel.requestFocusInWindow();
-		discountOption_btnCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				d3.dispose();
-				textField_productID_input.requestFocusInWindow();
 			}
 		});
 		
@@ -2250,246 +2282,270 @@ public class Home extends JFrame implements KeyListener{
         JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
 		d3 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
 		d3.getContentPane().add(panel_discount);
-		d3.setBounds(0, 0, 475, 400);
+		d3.setBounds(0, 0, 500, 650);
 		d3.setLocationRelativeTo(null);
-		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
+		//d3.getRootPane().setDefaultButton(discountOption_btnEnter);
 		d3.setVisible(true);
 	}
 	
 	public void loadCheckoutFrame(ActionEvent e){
-		JPanel panel_checkout = new JPanel();
-		panel_checkout.setLayout(null);
-		
-		JButton checkout_keypad_1 = new JButton("1");
-		checkout_keypad_1.setBounds(208, 0, 87, 93);
-		checkout_keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_1.setFocusable(false);
-		panel_checkout.add(checkout_keypad_1);
-		checkout_keypad_1.addActionListener(new ActionListener() {
-		
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		
-		JButton checkout_keypad_2 = new JButton("2");
-		checkout_keypad_2.setBounds(294, 0, 87, 93);
-		checkout_keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_2.setFocusable(false);
-		panel_checkout.add(checkout_keypad_2);
-		checkout_keypad_2.addActionListener(new ActionListener() {
+		if(!table.isEditing()){
+			JPanel panel_checkout = new JPanel();
+			panel_checkout.setLayout(null);
+						
+			//Checkout details
+			JTabbedPane tabbedPane_checkout = new JTabbedPane(JTabbedPane.TOP);
+			tabbedPane_checkout.setBounds(220, 10, 400, 175);
+			panel_checkout.add(tabbedPane_checkout);
+						
+			JPanel panel_checkout_details = new JPanel();
+			tabbedPane_checkout.addTab("Checkout details:", null, panel_checkout_details, null);
+			panel_checkout_details.setLayout(null);
+						
+			//Text
+			JTextPane checkout_message1 = new JTextPane();
+			StringBuilder sb = new StringBuilder();
+			sb.append("Checkout using Cash: " + "\n");
+			sb.append("Total: $" + total + "\n");
+			sb.append("Cash Tender: $");
+			String message = sb.toString();
+			checkout_message1.setText(message);
+			checkout_message1.setFocusable(false);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_3 = new JButton("3");
-		checkout_keypad_3.setBounds(379, 0, 87, 93);
-		checkout_keypad_3.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_3.setFocusable(false);
-		panel_checkout.add(checkout_keypad_3);
-		checkout_keypad_3.addActionListener(new ActionListener() {
+			checkout_message1.setBounds(10, 13, 350, 50);
+			checkout_message1.setBackground(Color.decode(defaultColor));
+			panel_checkout_details.add(checkout_message1);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_4 = new JButton("4");
-		checkout_keypad_4.setBounds(208, 93, 87, 93);
-		checkout_keypad_4.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_4.setFocusable(false);
-		panel_checkout.add(checkout_keypad_4);
-		checkout_keypad_4.addActionListener(new ActionListener() {
+			checkout_amount_tender_input = new JTextField();
+			checkout_amount_tender_input.setBounds(6, 62, 183, 26);
+			panel_checkout_details.add(checkout_amount_tender_input);
+			checkout_amount_tender_input.setColumns(10);
+			checkout_amount_tender_input.setFocusable(true);
+					
+			//Enter button
+			JButton checkoutCash_btnEnter = new JButton("Enter");
+			checkoutCash_btnEnter.setBounds(3, 90, 190, 29);
+			panel_checkout_details.add(checkoutCash_btnEnter);
+			checkoutCash_btnEnter.requestFocusInWindow();
+			checkoutCash_btnEnter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					calculateCashCheckout();
+				}
+			});
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_5 = new JButton("5");
-		checkout_keypad_5.setBounds(294, 93, 87, 93);
-		checkout_keypad_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_5.setFocusable(false);
-		panel_checkout.add(checkout_keypad_5);
-		checkout_keypad_5.addActionListener(new ActionListener() {
+			//Cancel button
+			JButton checkoutCash_btnCancel = new JButton("Cancel");
+			checkoutCash_btnCancel.setBounds(190, 90, 185, 29);
+			panel_checkout_details.add(checkoutCash_btnCancel);
+			checkoutCash_btnCancel.requestFocusInWindow();
+			checkoutCash_btnCancel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					d4.dispose();
+					textField_productID_input.requestFocusInWindow();
+				}
+			});
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_6 = new JButton("6");
-		checkout_keypad_6.setBounds(379, 93, 87, 93);
-		checkout_keypad_6.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_6.setFocusable(false);
-		panel_checkout.add(checkout_keypad_6);
-		checkout_keypad_6.addActionListener(new ActionListener() {
+			JTabbedPane tabbedPane_checkout_keypad = new JTabbedPane(JTabbedPane.TOP);
+			tabbedPane_checkout_keypad.setBounds(300, 180, 279, 416);
+			panel_checkout.add(tabbedPane_checkout_keypad);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_7 = new JButton("7");
-		checkout_keypad_7.setBounds(208, 186, 87, 93);
-		checkout_keypad_7.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_7.setFocusable(false);
-		panel_checkout.add(checkout_keypad_7);
-		checkout_keypad_7.addActionListener(new ActionListener() {
+			JPanel keypad_panel_checkout = new JPanel();
+			tabbedPane_checkout_keypad.addTab("Keypad: ", null, keypad_panel_checkout, null);
+			keypad_panel_checkout.setLayout(null);
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_8 = new JButton("8");
-		checkout_keypad_8.setBounds(294, 186, 87, 93);
-		checkout_keypad_8.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_8.setFocusable(false);
-		panel_checkout.add(checkout_keypad_8);
-		checkout_keypad_8.addActionListener(new ActionListener() {
+			JButton checkout_keypad_1 = new JButton("1");
+			checkout_keypad_1.setBounds(0, 0, 87, 93);
+			checkout_keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_1.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_1);
+			checkout_keypad_1.addActionListener(new ActionListener() {
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
 		
-		JButton checkout_keypad_9 = new JButton("9");
-		checkout_keypad_9.setBounds(379, 186, 87, 93);
-		checkout_keypad_9.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_9.setFocusable(false);
-		panel_checkout.add(checkout_keypad_9);
-		checkout_keypad_9.addActionListener(new ActionListener() {
+			JButton checkout_keypad_2 = new JButton("2");
+			checkout_keypad_2.setBounds(86, 0, 87, 93);
+			checkout_keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_2.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_2);
+			checkout_keypad_2.addActionListener(new ActionListener() {
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
 		
-		
-		JButton checkout_keypad_decimal = new JButton(".");
-		checkout_keypad_decimal.setBounds(208, 278, 87, 93);
-		checkout_keypad_decimal.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_decimal.setFocusable(false);
-		panel_checkout.add(checkout_keypad_decimal);
-		checkout_keypad_decimal.addActionListener(new ActionListener() {
+			JButton checkout_keypad_3 = new JButton("3");
+			checkout_keypad_3.setBounds(172, 0, 87, 93);
+			checkout_keypad_3.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_3.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_3);
+			checkout_keypad_3.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
-		
-		JButton checkout_keypad_0 = new JButton("0");
-		checkout_keypad_0.setBounds(294, 278, 87, 93);
-		checkout_keypad_0.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_0.setFocusable(false);
-		panel_checkout.add(checkout_keypad_0);
-		checkout_keypad_0.addActionListener(new ActionListener() {
+			JButton checkout_keypad_4 = new JButton("4");
+			checkout_keypad_4.setBounds(0, 93, 87, 93);
+			checkout_keypad_4.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_4.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_4);
+			checkout_keypad_4.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
 			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String i = e.getActionCommand();
-				String input = checkout_amount_tender_input.getText();
-				checkout_amount_tender_input.setText(input+i);
-			}
-		});
+			JButton checkout_keypad_5 = new JButton("5");
+			checkout_keypad_5.setBounds(86, 93, 87, 93);
+			checkout_keypad_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_5.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_5);
+			checkout_keypad_5.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_6 = new JButton("6");
+			checkout_keypad_6.setBounds(172, 93, 87, 93);
+			checkout_keypad_6.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_6.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_6);
+			checkout_keypad_6.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_7 = new JButton("7");
+			checkout_keypad_7.setBounds(0, 186, 87, 93);
+			checkout_keypad_7.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_7.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_7);
+			checkout_keypad_7.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_8 = new JButton("8");
+			checkout_keypad_8.setBounds(86, 186, 87, 93);
+			checkout_keypad_8.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_8.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_8);
+			checkout_keypad_8.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_9 = new JButton("9");
+			checkout_keypad_9.setBounds(172, 186, 87, 93);
+			checkout_keypad_9.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_9.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_9);
+			checkout_keypad_9.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			
+			JButton checkout_keypad_decimal = new JButton(".");
+			checkout_keypad_decimal.setBounds(0, 278, 87, 93);
+			checkout_keypad_decimal.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_decimal.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_decimal);
+			checkout_keypad_decimal.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_0 = new JButton("0");
+			checkout_keypad_0.setBounds(86, 278, 87, 93);
+			checkout_keypad_0.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_0.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_0);
+			checkout_keypad_0.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String i = e.getActionCommand();
+					String input = checkout_amount_tender_input.getText();
+					checkout_amount_tender_input.setText(input+i);
+				}
+			});
+			
+			JButton checkout_keypad_enter = new JButton("Enter");
+			checkout_keypad_enter.setBounds(172, 278, 87, 93);
+			checkout_keypad_enter.setFont(new Font("Tahoma", Font.PLAIN, 20));
+			checkout_keypad_enter.setFocusable(false);
+			keypad_panel_checkout.add(checkout_keypad_enter);
+			
+			checkout_keypad_enter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					calculateCashCheckout();
+				}
+			});
 		
-		JButton checkout_keypad_enter = new JButton("Enter");
-		checkout_keypad_enter.setBounds(379, 278, 87, 93);
-		checkout_keypad_enter.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		checkout_keypad_enter.setFocusable(false);
-		panel_checkout.add(checkout_keypad_enter);
-		
-		checkout_keypad_enter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				calculateCashCheckout();
-			}
-		});
-		
-		JTextPane checkout_message1 = new JTextPane();
-		StringBuilder sb = new StringBuilder();
-		sb.append("Checkout using Cash: " + "\n");
-		sb.append("Total: $" + total + "\n");
-		sb.append("Cash Tender: $");
-		String message = sb.toString();
-		checkout_message1.setText(message);
-		checkout_message1.setFocusable(false);
-		
-		checkout_message1.setBounds(6, 6, 190, 50);
-		checkout_message1.setBackground(Color.decode(defaultColor));
-		panel_checkout.add(checkout_message1);
-
-		checkout_amount_tender_input = new JTextField();
-		checkout_amount_tender_input.setBounds(6, 56, 190, 26);
-		panel_checkout.add(checkout_amount_tender_input);
-		checkout_amount_tender_input.setColumns(10);
-		checkout_amount_tender_input.setFocusable(true);
-		
-		JButton checkoutCash_btnEnter = new JButton("Enter");
-		checkoutCash_btnEnter.setBounds(6, 82, 190, 29);
-		panel_checkout.add(checkoutCash_btnEnter);
-		checkoutCash_btnEnter.requestFocusInWindow();
-		checkoutCash_btnEnter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				calculateCashCheckout();
-			}
-		});
-		
-		JButton checkoutCash_btnCancel = new JButton("Cancel");
-		checkoutCash_btnCancel.setBounds(6, 110, 190, 29);
-		panel_checkout.add(checkoutCash_btnCancel);
-		checkoutCash_btnCancel.requestFocusInWindow();
-		checkoutCash_btnCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				d4.dispose();
-				textField_productID_input.requestFocusInWindow();
-			}
-		});
-		
-		Component component = (Component) e.getSource();
-        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
-		d4 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
-		d4.getContentPane().add(panel_checkout);
-		d4.setSize(475, 400);
-		d4.setLocationRelativeTo(null);
-		d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
-		d4.setVisible(true);
+			Component component = (Component) e.getSource();
+	        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+			d4 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+			d4.getContentPane().add(panel_checkout);
+			d4.setSize(900, 650);
+			d4.setLocationRelativeTo(null);
+			d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
+			d4.setVisible(true);
+		}
+		else{
+			JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+		}
 		
 	}
 	public void calculateSubtotal(){
@@ -2625,6 +2681,8 @@ public class Home extends JFrame implements KeyListener{
 	        	if(productByRefund.size() > 0){
 	        		if (e.getClickCount() == 1) {
 		        		for(int i = 0; i < productByRefund.size(); i++){
+		        			//Change to TransactionRecord or add another loop to get price of product at the time the transaction took place,
+		        			//Not the actual price. Else this will cause problem when a product may have been at discount and customer will get full(more) money back
 		        			if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(productByRefund.get(i).getID()))){
 		        				textField_refund_name.setText(productByRefund.get(i).getName());
 		        				textField_refund_description_input.setText(productByRefund.get(i).getDescription());

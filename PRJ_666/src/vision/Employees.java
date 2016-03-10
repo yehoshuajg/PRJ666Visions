@@ -126,6 +126,7 @@ public class Employees extends JFrame{
 		Connect connect = new Connect();
 		Connection con = null;
 		int count = 0;
+		boolean check = false;
 		
 		try{
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
@@ -170,13 +171,13 @@ public class Employees extends JFrame{
 		if(count == 1){
 			String hash = get_SHA_512_SecurePassword(pass, this.salt);
 			if(hash.equals(this.password)){
-				return true;
+				check = true;
 		       }
 		    else{
-		    	return false;
+		    	check = false;
 		    }
 	    }
-		return false;
+		return check;
 	}
 	private static String get_SHA_512_SecurePassword(String passwordToHash, String salt){
     	String generatedPassword = null;
