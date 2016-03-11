@@ -1128,3 +1128,24 @@ update `Order` SET InvoiceID = 23 where ID = 45;
 ALTER Table Employee Add Salt VARCHAR(50);
 update Employee Set Salt = '[B@3d4eac69' Where ID = 1;
 UPDATE Employee Set Password='765ee7dc269c81d36a6a19893def309f24fe1ef9eabdd9a1de6d2e54714c2bd6156488630cc69f5434d9e2a4dd6ffc944f4f57228359554fa37781729da54106' WHERE ID = 1;
+
+/* Adding a UnitCost column in product table that will be average cost from product from multiple supplier. */
+alter table Product
+add column UnitCost double default 0;
+
+update Product p 
+set UnitCost = (select avg(UnitCost) from product_supplier ps where ps.ProductID = p.ID);
+
+/* Products Retuned table to have record of products that was returned and when.*/
+create table ProductReturned (
+	ID					int			AUTO_INCREMENT,
+    TransactionID		int			not null,
+    ProductID			int(8)		not null,
+    ReturnedQTY			int			not null,
+    DateReturned		timestamp	not null,
+    
+    PRIMARY KEY (ID, TransactionID, ProductID),
+    FOREIGN KEY (TransactionID) References `Transaction`(ID),
+    FOREIGN KEY (ProductID) References Product(ID),
+    CONSTRAINT ProductsReturn_returned_qty CHECK (ReturnedQTY > 0)
+);
