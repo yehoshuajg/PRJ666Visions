@@ -425,7 +425,7 @@ public class Home extends JFrame implements KeyListener{
 						String tempInput = textField_productID_input.getText();
 						if (table.isEditing()){
 							JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
-							textField_productID_input.setText("");
+							textField_productID_input.requestFocusInWindow();
 						}
 						else if(validateEmpty(tempInput) == false){
 							//JOptionPane.showMessageDialog(null,"Product ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
@@ -435,14 +435,14 @@ public class Home extends JFrame implements KeyListener{
 						}
 						else if(containsSpace(tempInput) == true){
 							JOptionPane.showMessageDialog(null,"Product ID cannot have space(s).","Error",JOptionPane.ERROR_MESSAGE);
-							//textField_productID_input.setText("");
+							textField_productID_input.requestFocusInWindow();
 							textField_name_input.setText(null);
 							textField_description_input.setText(null);		
 							textField_quantity_input.setText(null);
 						}
 						else if(checkForNumbers(tempInput) == false){
 							JOptionPane.showMessageDialog(null,"Product ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-							//textField_productID_input.setText(""); // causes crash
+							textField_productID_input.requestFocusInWindow();
 							textField_name_input.setText(null);
 							textField_description_input.setText(null);		
 							textField_quantity_input.setText(null);
@@ -661,76 +661,84 @@ public class Home extends JFrame implements KeyListener{
 							}
 						}catch(Exception e1){}
 					}
-					if(items > 0){
-						String message = "Are you sure you would like to delete the selected items (" + items + ")?";
-						Object[] options = {"Yes","No"};
-						int n = JOptionPane.showOptionDialog(null,message,"Confirm", 
-								JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-						
-						if (n == JOptionPane.YES_OPTION){
-							for (int i = model.getRowCount()-1; i >= 0; --i) {
-								try{
-									boolean b = (boolean) model.getValueAt(i, productRemove_column);
-									if (b == true){
-										//Sales Total
-										String s = table.getValueAt(i, productPrice_column).toString();
-										String qCancel = table.getValueAt(i, productQuantity_column).toString();
-										
-										double t = Double.parseDouble(s) * Integer.parseInt(qCancel);
-										
-										subTotal -= t;
-										subTotal = Math.round(subTotal * 100.0) / 100.0;
-										subtotal_textField.setText("Subtotal: $" + subTotal);
-	
-										tax = subTotal * 0.13;
-										tax = Math.round(tax * 100.0) / 100.0;
-										tax_textField.setText("Tax: $" + tax);
+					if(!table.isEditing()){
+						if(items > 0){
+							String message = "Are you sure you would like to delete the selected items (" + items + ")?";
+							Object[] options = {"Yes","No"};
+							int n = JOptionPane.showOptionDialog(null,message,"Confirm", 
+									JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+							
+							if (n == JOptionPane.YES_OPTION){
+								for (int i = model.getRowCount()-1; i >= 0; --i) {
+									try{
+										boolean b = (boolean) model.getValueAt(i, productRemove_column);
+										if (b == true){
+											//Sales Total
+											String s = table.getValueAt(i, productPrice_column).toString();
+											String qCancel = table.getValueAt(i, productQuantity_column).toString();
 											
-										total = subTotal + tax;
-										total = Math.round(total * 100.0) / 100.0;
-										total_textField.setText("Total: $" + total);	
-										
-										if(productBySearch.size() > 0){
-											for(int j = 0; j < productBySearch.size(); j++){
-												//Convert to string, other values always cause problem due to object type
-												int idValue = (int) model.getValueAt(i, id_column);
-												String idValueString = String.valueOf(idValue);
-												String productTempID = String.valueOf(productBySearch.get(j).getID());
-												if(idValueString.equals(productTempID)){
-													//Removes product from vector and its previous value
-													productBySearch.remove(j);
-													previousValue.remove(j);
-													
+											double t = Double.parseDouble(s) * Integer.parseInt(qCancel);
+											
+											subTotal -= t;
+											subTotal = Math.round(subTotal * 100.0) / 100.0;
+											subtotal_textField.setText("Subtotal: $" + subTotal);
+		
+											tax = subTotal * 0.13;
+											tax = Math.round(tax * 100.0) / 100.0;
+											tax_textField.setText("Tax: $" + tax);
+												
+											total = subTotal + tax;
+											total = Math.round(total * 100.0) / 100.0;
+											total_textField.setText("Total: $" + total);	
+											
+											if(productBySearch.size() > 0){
+												for(int j = 0; j < productBySearch.size(); j++){
+													//Convert to string, other values always cause problem due to object type
+													int idValue = (int) model.getValueAt(i, id_column);
+													String idValueString = String.valueOf(idValue);
+													String productTempID = String.valueOf(productBySearch.get(j).getID());
+													if(idValueString.equals(productTempID)){
+														//Removes product from vector and its previous value
+														productBySearch.remove(j);
+														previousValue.remove(j);
+														
+													}
 												}
 											}
+											//Delete at end & put focus back to ID field
+											model.removeRow(i);
+											textField_productID_input.requestFocusInWindow();
+											
+											//Empty the product details field
+											textField_productID_input.setText("");
+											textField_name_input.setText("");
+											textField_description_input.setText("");		
+											textField_quantity_input.setText("");
 										}
-										//Delete at end & put focus back to ID field
-										model.removeRow(i);
-										textField_productID_input.requestFocusInWindow();
-										
-										//Empty the product details field
-										textField_productID_input.setText("");
-										textField_name_input.setText("");
-										textField_description_input.setText("");		
-										textField_quantity_input.setText("");
-									}
-								}catch(Exception e2){}
+									}catch(Exception e2){}
+								}
+								//After deleting, fixes the number order in table
+								for (int i = model.getRowCount()-1; i >= 0; --i) {
+					            	model.setValueAt(i+1, i, 0);
+					            }
+								if(model.getRowCount() == 0){
+									rowCount = 1;
+								}
 							}
-							//After deleting, fixes the number order in table
-							for (int i = model.getRowCount()-1; i >= 0; --i) {
-				            	model.setValueAt(i+1, i, 0);
-				            }
-							if(model.getRowCount() == 0){
-								rowCount = 1;
-							}
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Please select atleast one item in purchase list to remove it.");
+							textField_productID_input.requestFocusInWindow();
 						}
 					}
 					else{
-						JOptionPane.showMessageDialog(null,"Please select atleast one item in purchase list to remove it.");
+						JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+						textField_productID_input.requestFocusInWindow();
 					}
 				}
 				else{
 					JOptionPane.showMessageDialog(null,"Please add an item to purchase list.");
+					textField_productID_input.requestFocusInWindow();
 				}
 			}
 		});
@@ -1565,58 +1573,66 @@ public class Home extends JFrame implements KeyListener{
 				// TODO Auto-generated method stub
 				transaction_search_button.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						for (int i = model_refund.getRowCount()-1; i >= 0; --i) {
-							model_refund.removeRow(i);
-						}
-						//Find Transaction
-						String tempInput = textField_transaction_input.getText();
-						if(validateEmpty(tempInput) == false){
-							JOptionPane.showMessageDialog(null,"Transaction ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
-						}
-						else if(checkForNumbers(tempInput) == false){
-							JOptionPane.showMessageDialog(null,"Transaction ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-						}
-						else{
-							int tempTransactionID = Integer.parseInt(tempInput);
-							t = new Transaction();
-							if(t.getTransactionDetails(tempTransactionID) == true){
-								textField_transactionID.setText(String.valueOf(t.getId()));
-								textField_createDate.setText(parseDate(t.getCreateDate()));
-								textField_transaction_subtotal.setText("$" + String.valueOf(t.getSubTotal()));
-								textField_transaction_tax.setText("$" + String.valueOf(t.getTax()));
-								textField_transaction_total.setText("$" + String.valueOf(t.getTotal()));
-								textField_transactionType.setText(t.getTransactionType());
-								textField_method.setText(t.getMethod());
-								textField_promotionID.setText(String.valueOf(t.getPromotionID()));
-								textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
-								
-								productByRefund.clear();
-								tr.clear();
-								TransactionRecord temp = new TransactionRecord();
-								transactionRecordLength = temp.getTransactionCount(tempTransactionID);
-								if(transactionRecordLength > 0){
-									if(returning != null){
-										returning.clear();
+						if(!table_refund.isEditing()){
+							for (int i = model_refund.getRowCount()-1; i >= 0; --i) {
+								model_refund.removeRow(i);
+							}
+							//Find Transaction
+							String tempInput = textField_transaction_input.getText();
+							if(validateEmpty(tempInput) == false){
+								JOptionPane.showMessageDialog(null,"Transaction ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+							}
+							else if(checkForNumbers(tempInput) == false){
+								JOptionPane.showMessageDialog(null,"Transaction ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+							}
+							else{
+								int tempTransactionID = Integer.parseInt(tempInput);
+								t = new Transaction();
+								if(t.getTransactionDetails(tempTransactionID) == true){
+									textField_transactionID.setText(String.valueOf(t.getId()));
+									textField_createDate.setText(parseDate(t.getCreateDate()));
+									textField_transaction_subtotal.setText("$" + String.valueOf(t.getSubTotal()));
+									textField_transaction_tax.setText("$" + String.valueOf(t.getTax()));
+									textField_transaction_total.setText("$" + String.valueOf(t.getTotal()));
+									textField_transactionType.setText(t.getTransactionType());
+									textField_method.setText(t.getMethod());
+									textField_promotionID.setText(String.valueOf(t.getPromotionID()));
+									textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
+									
+									productByRefund.clear();
+									tr.clear();
+									TransactionRecord temp = new TransactionRecord();
+									transactionRecordLength = temp.getTransactionCount(tempTransactionID);
+									if(transactionRecordLength > 0){
+										if(returning != null){
+											returning.clear();
+										}
+										for(int i = 0; i < transactionRecordLength; i++){
+											tr.add(temp.getTransactionRecord(tempTransactionID, i));
+											model_refund.addRow(new Object[]{
+											i+1,tr.get(i).getProductID(),tr.get(i).getQuantitySold(),
+											tr.get(i).getReturned(),tr.get(i).getDateReturned()});
+											
+											//Removed tr.getEmployeeID() (reminder)
+											Cashier refundCashier = new Cashier();
+											productByRefund.add(refundCashier.findProductID(tr.get(i).getProductID()));
+											previousRefundValue.add(tr.get(i).getReturned());
+										}
 									}
-									for(int i = 0; i < transactionRecordLength; i++){
-										tr.add(temp.getTransactionRecord(tempTransactionID, i));
-										model_refund.addRow(new Object[]{
-										i+1,tr.get(i).getProductID(),tr.get(i).getQuantitySold(),
-										tr.get(i).getReturned(),tr.get(i).getDateReturned()});
-										
-										//Removed tr.getEmployeeID() (reminder)
-										Cashier refundCashier = new Cashier();
-										productByRefund.add(refundCashier.findProductID(tr.get(i).getProductID()));
-										previousRefundValue.add(tr.get(i).getReturned());
+									else{
+										JOptionPane.showMessageDialog(null,"Transaction Record for Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+										textField_transaction_input.requestFocus();
 									}
 								}
 								else{
-									JOptionPane.showMessageDialog(null,"Transaction Record for Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+									JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+									textField_transaction_input.requestFocus();
 								}
 							}
-							else{
-								JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
-							}
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+							textField_transaction_input.requestFocus();
 						}
 					}
 				});
@@ -2292,7 +2308,7 @@ public class Home extends JFrame implements KeyListener{
 		d3.getContentPane().add(panel_discount);
 		d3.setBounds(0, 0, 500, 650);
 		d3.setLocationRelativeTo(null);
-		//d3.getRootPane().setDefaultButton(discountOption_btnEnter);
+		d3.getRootPane().setDefaultButton(discountOption_btnEnter);
 		d3.setVisible(true);
 	}
 	
@@ -2909,7 +2925,7 @@ public class Home extends JFrame implements KeyListener{
 		JTextPane txtpnCreateDate = new JTextPane();
 		txtpnCreateDate.setText("Create Date:");
 		txtpnCreateDate.setBackground(Color.decode(defaultColor));
-		txtpnCreateDate.setBounds(6, 48, 87, 18);
+		txtpnCreateDate.setBounds(6, 48, 80, 18);
 		panel_transactionDetail.add(txtpnCreateDate);
 		
 		JSeparator separator = new JSeparator();
@@ -3123,9 +3139,15 @@ public class Home extends JFrame implements KeyListener{
 								refund_confirm_column_name.addElement("Returned Now");
 								refund_confirm_column_name.addElement("Price");
 								
-								JTable table_refund_confirm = new JTable(refund_confirm_row_data, refund_confirm_column_name);
+								JTable table_refund_confirm = new JTable(refund_confirm_row_data, refund_confirm_column_name){
+									public boolean isCellEditable(int row, int column) {
+										//Return true if the column (number) is editable, else false
+										return false;
+									}
+								};
 								panel_refund_confirm2.add(table_refund_confirm.getTableHeader(), BorderLayout.NORTH);
 								panel_refund_confirm2.add(table_refund_confirm, BorderLayout.CENTER);
+								
 								
 								//Row Height
 								table_refund_confirm.setRowHeight(30);
