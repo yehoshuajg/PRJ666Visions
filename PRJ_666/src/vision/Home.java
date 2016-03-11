@@ -3267,7 +3267,11 @@ public class Home extends JFrame implements KeyListener{
 										//Writing to transaction Record
 										TransactionRecord tempRecord = new TransactionRecord();
 										for(int i = 0; i < returning.size(); i++){
-											tempRecord.writeProductRefund(returning.get(i));
+											for(int j = 0; j < tr.size(); j++){
+												if(String.valueOf(returning.get(i).getProductID()).equals(String.valueOf(tr.get(j).getProductID()))){
+													tempRecord.writeProductRefund(returning.get(i),tr.get(j).getReturned());
+												}
+											}
 										}
 									}
 								});

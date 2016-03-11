@@ -266,9 +266,11 @@ public class TransactionRecord {
 			return 0;
 		}
 	}
-	public void writeProductRefund(TransactionRecord tr){
+	public void writeProductRefund(TransactionRecord tr, int previousReturn){
 		Connect connect = new Connect();
 		try {
+			refundUpdateProduct(tr,previousReturn);
+			
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			String sql = "UPDATE `TransactionRecord` SET Returned = ?, DateReturned = ? where TransactionID = ? AND ProductID = ?";
 			PreparedStatement ps = con.prepareStatement(sql);
@@ -276,6 +278,31 @@ public class TransactionRecord {
 			ps.setString(2, tr.getDateReturned());
 			ps.setInt(3, tr.getTransactionID());
 			ps.setInt(4, tr.getProductID());
+		    ps.executeUpdate();
+			
+			//Clean-up environment
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void refundUpdateProduct(TransactionRecord tr, int previousReturn) {
+		int newReturnQuantity = tr.getReturned() - previousReturn;
+		
+		int previousQuantity = getPreviousQuantity(tr.getProductID());
+		System.out.println("PreviousQuantity: " + previousQuantity);
+		
+		int newQuantity2 = previousQuantity + newReturnQuantity;
+		
+		Connect connect = new Connect();
+		try {
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			//PromotionID causing foreign key relationship error
+			String sql = "UPDATE `Product` SET Quantity = ? where ID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, newQuantity2);
+			ps.setInt(2, tr.getProductID());
 		    ps.executeUpdate();
 			
 			//Clean-up environment
