@@ -169,8 +169,9 @@ public class Employees extends JFrame{
 		    con.close();
 		}catch(Exception e){}
 		if(count == 1){
-			String hash = get_SHA_512_SecurePassword(pass, this.salt);
-			if(hash.equals(this.password)){
+			Hashing hash = new Hashing();
+			String hashString = hash.get_SHA_512_SecurePassword(pass, this.salt);
+			if(hashString.equals(this.password)){
 				check = true;
 		       }
 		    else{
@@ -179,25 +180,6 @@ public class Employees extends JFrame{
 	    }
 		return check;
 	}
-	private static String get_SHA_512_SecurePassword(String passwordToHash, String salt){
-    	String generatedPassword = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(salt.getBytes());
-            byte[] bytes = md.digest(passwordToHash.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
-                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            generatedPassword = sb.toString();
-        } 
-        catch (NoSuchAlgorithmException e) 
-        {
-            e.printStackTrace();
-        }
-        return generatedPassword;
-    }
 	public boolean validateEmpty(String temp){
 		if(temp.isEmpty()){
 			return false;
