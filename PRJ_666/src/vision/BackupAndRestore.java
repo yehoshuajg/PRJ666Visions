@@ -31,9 +31,11 @@ public class BackupAndRestore {
 	private static String machineUser;
 	BackupAndRestore(){
 		super();
+		dbName = null;
+		username = null;
+		password = null;
 		os = null;
 		path = null;
-		dbName = null;
 	}
 	BackupAndRestore(String os){
 		if(os != null){
@@ -57,7 +59,7 @@ public class BackupAndRestore {
 				//System.out.println("Your OS is not support!!");
 			}
 			//backupDB();
-			restoreDB();
+			//restoreDB();
 		}
 	}
 	public void restoreDB(){
@@ -69,9 +71,9 @@ public class BackupAndRestore {
 			int processComplete = runtimeProcess.waitFor();
 	 
 			if (processComplete == 0) {
-				//System.out.println("Backup restored successfully");
+				JOptionPane.showMessageDialog(null,"Backup restored successfully.");
 			} else {
-				System.out.println("Could not restore the backup");
+				JOptionPane.showMessageDialog(null,"Could not restore the backup.");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -86,9 +88,9 @@ public class BackupAndRestore {
             int processComplete = runtimeProcess.waitFor();
  
             if (processComplete == 0) {
-                //System.out.println("Backup created successfully");
+            	JOptionPane.showMessageDialog(null,"Backup created successfully.");
             } else {
-                //System.out.println("Could not create the backup");
+            	JOptionPane.showMessageDialog(null,"Could not create the backup.");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
