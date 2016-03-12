@@ -75,14 +75,12 @@ public class Login extends JFrame {
 		passwordField.setBounds(196, 110, 86, 20);
 		contentPane.add(passwordField);
 		
+		//BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+		
 		JButton btnLogIn = new JButton("Log in");
 		getRootPane().setDefaultButton(btnLogIn);
 		btnLogIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-				
-				
-				
 				try{
 					employee = new Employees();
 					if(employee.validateEmpty(textField.getText()) == false && employee.validateEmpty(passwordField.getText()) == false){

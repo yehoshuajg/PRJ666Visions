@@ -1,12 +1,16 @@
 package vision;
 
-import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
@@ -57,56 +61,24 @@ public class BackupAndRestore {
 		}
 	}
 	public void restoreDB(){
-		//writeToFile();
+		createDB();
 		String[] executeCmd = new String[]{"/usr/local/mysql/bin/mysql", "--user=" + getUsername(), "--password=" + getPassword(), getDbName(),"-e", "source "+getPath()};
-        Process runtimeProcess;
-        try {
-            runtimeProcess = Runtime.getRuntime().exec(executeCmd);
-            int processComplete = runtimeProcess.waitFor();
- 
-            if (processComplete == 0) {
-                System.out.println("Backup restored successfully");
-                //return true;
-            } else {
-                System.out.println("Could not restore the backup");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
- 
-        //return false;
-	}
-	private void writeToFile() {
-		String drop = "drop database if exists StoreDB;\n";
-		String updatedDrop = drop.replace("\n","\r\n");
-		String create = "create database StoreDB;\n";
-		String updatedCreate = create.replace("\n","\r\n");
-		String use = "use StoreDB;\n";
-		String updatedUse = use.replace("\n","\r\n");
-		String app = "\n\n\n";
-		String updatedApp = app.replace("\n","\r\n");
-		RandomAccessFile f;
+		Process runtimeProcess;
 		try {
-			f = new RandomAccessFile(new File(getPath()), "rw");
-			f.seek(0); // to the beginning
-			f.write(updatedDrop.getBytes());
-			f.write(updatedCreate.getBytes());
-			f.write(updatedUse.getBytes());
-			f.write(updatedApp.getBytes());
-			f.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+			int processComplete = runtimeProcess.waitFor();
+	 
+			if (processComplete == 0) {
+				//System.out.println("Backup restored successfully");
+			} else {
+				System.out.println("Could not restore the backup");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 	public void backupDB() {
-		//String executeCmd = "/usr/local/mysql/bin/mysqldump -u " + getUsername() + " -p" + getPassword() + " --add-drop-database -B " + getDbName() + " -r " + getPath();
 		String executeCmd = "/usr/local/mysql/bin/mysqldump -u " + getUsername() + " -p" + getPassword() + " " + getDbName() +" -r "+ getPath();
-
-		//System.out.println(executeCmd);
 		Process runtimeProcess;
         try {
  
@@ -115,16 +87,32 @@ public class BackupAndRestore {
  
             if (processComplete == 0) {
                 //System.out.println("Backup created successfully");
-                //return true;
             } else {
                 //System.out.println("Could not create the backup");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        //return false;
     }
+	public void createDB(){
+		Connect connect = new Connect();
+		try {
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306",connect.getUsername(),connect.getPassword());
+			String sql = "DROP DATABASE IF EXISTS " + getDbName();
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.executeUpdate();
+			
+			sql = "create database " + getDbName();
+			ps = con.prepareStatement(sql);
+			ps.executeUpdate();
+			
+			//Clean-up environment
+			con.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public static String getPath() {
 		return path;
 	}
