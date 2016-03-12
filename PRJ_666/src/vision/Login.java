@@ -75,8 +75,6 @@ public class Login extends JFrame {
 		passwordField.setBounds(196, 110, 86, 20);
 		contentPane.add(passwordField);
 		
-		//BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-		
 		JButton btnLogIn = new JButton("Log in");
 		getRootPane().setDefaultButton(btnLogIn);
 		btnLogIn.addActionListener(new ActionListener() {

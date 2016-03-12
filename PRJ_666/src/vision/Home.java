@@ -305,6 +305,47 @@ public class Home extends JFrame implements KeyListener{
 		btnSignOut.setBounds(521, 273, 276, 45);
 		panel_home.add(btnSignOut);
 		
+		JButton btnBackupRestore = new JButton("Backup/Restore");
+		btnBackupRestore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
+				Object[] options = {"Cancel","Restore","Backup"};
+				int cashCredit = JOptionPane.showOptionDialog(null,"Checkout using: ","Checkout",
+				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+				
+				//Cancel
+				if(cashCredit == JOptionPane.YES_OPTION){
+					
+				}
+				//Restore
+				else if(cashCredit == JOptionPane.NO_OPTION){
+					String passwordInput = JOptionPane.showInputDialog(null, "Username: " + employee.getUsername() + "\n" + "Password:");
+					Employees tempEmployee = new Employees();
+					if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+						BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+						br.restoreDB();
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"Invalid Password.");
+					}
+				}
+				//Backup
+				else if(cashCredit == JOptionPane.CANCEL_OPTION){
+					String passwordInput = JOptionPane.showInputDialog(null, "Username: " + employee.getUsername() + "\n" + "Password:");
+					Employees tempEmployee = new Employees();
+					if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+						BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+						br.backupDB();
+					}
+					else{
+						JOptionPane.showMessageDialog(null,"Invalid Password.");
+					}
+				}
+			}
+		});
+		btnBackupRestore.setBounds(501, 356, 117, 29);
+		panel_home.add(btnBackupRestore);
+		
 		JPanel panel_cashier = new JPanel();
 		tabbedPane.addTab("Cashier", null, panel_cashier, null);
 		panel_cashier.setLayout(null);
