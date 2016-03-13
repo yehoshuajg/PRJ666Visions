@@ -22,6 +22,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.swing.GroupLayout;
@@ -142,6 +143,9 @@ public class Employees extends JFrame{
 	//Date
 	String dateDelimiter = "/";
 	
+	//Current logged in employee
+	Employees currentEmployee;
+	
 	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
@@ -260,21 +264,11 @@ public class Employees extends JFrame{
 					        txtpnId_details_id.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(txtpnId_details_id);
 					        
-					        JTextPane textPane_details_id = new JTextPane();
-					        textPane_details_id.setBounds(30, 10, 150, 20);
-					        textPane_details_id.setBackground(Color.decode(defaultColor));
-					        panel_employeeDetails.add(textPane_details_id);
-					        
 					        JTextPane txtpn_details_FirstName = new JTextPane();
 					        txtpn_details_FirstName.setText("First Name:");
 					        txtpn_details_FirstName.setBounds(6, 42, 72, 20);
 					        txtpn_details_FirstName.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(txtpn_details_FirstName);
-					        
-					        JTextPane textPane_details_firstName = new JTextPane();
-					        textPane_details_firstName.setBounds(90, 42, 150, 20);
-					        textPane_details_firstName.setBackground(Color.decode(defaultColor));
-					        panel_employeeDetails.add(textPane_details_firstName);
 					        
 					        JTextPane txtpn_details_lastName = new JTextPane();
 					        txtpn_details_lastName.setText("Last Name:");
@@ -282,21 +276,11 @@ public class Employees extends JFrame{
 					        txtpn_details_lastName.setBounds(6, 74, 72, 20);
 					        panel_employeeDetails.add(txtpn_details_lastName);
 					        
-					        JTextPane textPane_details_lastName = new JTextPane();
-					        textPane_details_lastName.setBounds(90, 74, 150, 20);
-					        textPane_details_lastName.setBackground(Color.decode(defaultColor));
-					        panel_employeeDetails.add(textPane_details_lastName);
-					        
 					        JTextPane txtpn_details_Street = new JTextPane();
 					        txtpn_details_Street.setText("Street:");
 					        txtpn_details_Street.setBackground(Color.decode(defaultColor));
 					        txtpn_details_Street.setBounds(6, 106, 40, 20);
 					        panel_employeeDetails.add(txtpn_details_Street);
-					        
-					        JTextPane textPane_details_street = new JTextPane();
-					        textPane_details_street.setBounds(58, 106, 150, 20);
-					        textPane_details_street.setBackground(Color.decode(defaultColor));
-					        panel_employeeDetails.add(textPane_details_street);
 					        
 					        JTextPane txtpn_details_City = new JTextPane();
 					        txtpn_details_City.setText("City:");
@@ -358,58 +342,96 @@ public class Employees extends JFrame{
 					        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
 					        panel_employeeDetails.add(txtpn_details_HireDate);
 					        
-					        JTextPane textPane_details_city = new JTextPane();
+					        JTextField textPane_details_id = new JTextField();
+					        textPane_details_id.setBounds(30, 10, 150, 20);
+					        textPane_details_id.setEditable(false);
+					        textPane_details_id.setBackground(Color.decode(defaultColor));
+					        panel_employeeDetails.add(textPane_details_id);
+					        
+					        JTextField textPane_details_firstName = new JTextField();
+					        textPane_details_firstName.setBounds(90, 42, 150, 20);
+					        textPane_details_firstName.setEditable(false);
+					        textPane_details_firstName.setBackground(Color.decode(defaultColor));
+					        panel_employeeDetails.add(textPane_details_firstName);
+					        
+					        JTextField textPane_details_lastName = new JTextField();
+					        textPane_details_lastName.setBounds(90, 74, 150, 20);
+					        textPane_details_lastName.setEditable(false);
+					        textPane_details_lastName.setBackground(Color.decode(defaultColor));
+					        panel_employeeDetails.add(textPane_details_lastName);
+					        
+					        JTextField textPane_details_street = new JTextField();
+					        textPane_details_street.setBounds(58, 106, 150, 20);
+					        textPane_details_street.setEditable(false);
+					        textPane_details_street.setBackground(Color.decode(defaultColor));
+					        panel_employeeDetails.add(textPane_details_street);
+					        
+					        JTextField textPane_details_city = new JTextField();
 					        textPane_details_city.setBounds(47, 138, 150, 20);
+					        textPane_details_city.setEditable(false);
 					        textPane_details_city.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_city);
 					        
-					        JTextPane textPane_details_stateProvince = new JTextPane();
+					        JTextField textPane_details_stateProvince = new JTextField();
 					        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
+					        textPane_details_stateProvince.setEditable(false);
 					        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_stateProvince);
 					        
-					        JTextPane textPane_details_postalCode = new JTextPane();
+					        JTextField textPane_details_postalCode = new JTextField();
 					        textPane_details_postalCode.setBounds(96, 201, 150, 20);
+					        textPane_details_postalCode.setEditable(false);
 					        textPane_details_postalCode.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_postalCode);
 					        
-					        JTextPane textPane_details_homePhone = new JTextPane();
+					        JTextField textPane_details_homePhone = new JTextField();
 					        textPane_details_homePhone.setBounds(100, 234, 150, 20);
+					        textPane_details_homePhone.setEditable(false);
 					        textPane_details_homePhone.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_homePhone);
 					        
-					        JTextPane textPane_details_cellPhone = new JTextPane();
+					        JTextField textPane_details_cellPhone = new JTextField();
 					        textPane_details_cellPhone.setBounds(90, 266, 150, 20);
+					        textPane_details_cellPhone.setEditable(false);
 					        textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_cellPhone);
 					        
-					        JTextPane textPane_details_email = new JTextPane();
+					        JTextField textPane_details_email = new JTextField();
 					        textPane_details_email.setBounds(58, 298, 150, 20);
+					        textPane_details_email.setEditable(false);
 					        textPane_details_email.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_email);
 					        
-					        JTextPane textPane_positionID = new JTextPane();
+					        JTextField textPane_positionID = new JTextField();
 					        textPane_positionID.setBounds(90, 330, 150, 20);
+					        textPane_positionID.setEditable(false);
 					        textPane_positionID.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_positionID);
 					        
-					        JTextPane textPane_details_JobType = new JTextPane();
+					        JTextField textPane_details_JobType = new JTextField();
 					        textPane_details_JobType.setBounds(76, 362, 150, 20);
+					        textPane_details_JobType.setEditable(false);
 					        textPane_details_JobType.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_JobType);
 					        
-					        JTextPane textPane_details_username = new JTextPane();
+					        JTextField textPane_details_username = new JTextField();
 					        textPane_details_username.setBounds(90, 394, 150, 20);
+					        textPane_details_username.setEditable(false);
 					        textPane_details_username.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_username);
 					        
-					        JTextPane textPane_details_hireDate = new JTextPane();
+					        JTextField textPane_details_hireDate = new JTextField();
 					        textPane_details_hireDate.setBounds(90, 426, 150, 20);
+					        textPane_details_hireDate.setEditable(false);
 					        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
 					        panel_employeeDetails.add(textPane_details_hireDate);
 					        
 					        //Edit button
 					        JButton btn_edit = new JButton("Edit");
+					        
+					        //Save button initialize
+					        JButton btn_save = new JButton("Save");
+					        
 					        btn_edit.setBounds(90, 570, 100, 40);
 					        btn_edit.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					        btn_edit.setFocusable(false);
@@ -418,7 +440,168 @@ public class Employees extends JFrame{
 							btn_edit.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent e) {
-									// TODO Auto-generated method stub
+									//First name
+									textPane_details_firstName.setBackground(null);
+									textPane_details_firstName.setEditable(true);
+									
+									//Last name
+									textPane_details_lastName.setBackground(null);
+									textPane_details_lastName.setEditable(true);
+									
+									//Street
+									textPane_details_street.setBackground(null);
+									textPane_details_street.setEditable(true);
+									
+									//City
+									textPane_details_city.setBackground(null);
+									textPane_details_city.setEditable(true);
+
+									//State/Province
+									textPane_details_stateProvince.setBackground(null);
+									textPane_details_stateProvince.setEditable(true);
+									
+									//Postal code
+									textPane_details_postalCode.setBackground(null);
+									textPane_details_postalCode.setEditable(true);
+									
+									//Home phone
+									textPane_details_homePhone.setBackground(null);
+									textPane_details_homePhone.setEditable(true);
+									
+									//Cell phone
+									textPane_details_cellPhone.setBackground(null);
+									textPane_details_cellPhone.setEditable(true);
+									
+									//Email
+									textPane_details_email.setBackground(null);
+									textPane_details_email.setEditable(true);
+									
+									//Position ID
+									textPane_positionID.setBackground(null);
+									textPane_positionID.setEditable(true);
+									
+									//Job Type
+									textPane_details_JobType.setBackground(null);
+									textPane_details_JobType.setEditable(true);
+									
+									//Username
+									//textPane_details_username.setBackground(null);
+									//textPane_details_username.setEditable(true);
+									
+									btn_edit.setVisible(false);
+									btn_save.setVisible(true);
+								}
+							});
+							
+					        //Save button
+					        btn_save.setBounds(90, 570, 100, 40);
+					        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
+					        btn_save.setFocusable(false);
+							staffDetails.add(btn_save);
+							//Cancel button closes the window
+							btn_save.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									String passwordInput = JOptionPane.showInputDialog(null, "Username: " + currentEmployee.getUsername() + "\n" + "Password:");
+									Employees tempEmployee = new Employees();
+									if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
+										//First name
+										textPane_details_firstName.setBackground(Color.decode(defaultColor));
+										textPane_details_firstName.setEditable(false);
+										
+										//Last name
+										textPane_details_lastName.setBackground(Color.decode(defaultColor));
+										textPane_details_lastName.setEditable(false);
+										
+										//Street
+										textPane_details_street.setBackground(Color.decode(defaultColor));
+										textPane_details_street.setEditable(false);
+										
+										//City
+										textPane_details_city.setBackground(Color.decode(defaultColor));
+										textPane_details_city.setEditable(false);
+
+										//State/Province
+										textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+										textPane_details_stateProvince.setEditable(false);
+										
+										//Postal code
+										textPane_details_postalCode.setBackground(Color.decode(defaultColor));
+										textPane_details_postalCode.setEditable(false);
+										
+										//Home phone
+										textPane_details_homePhone.setBackground(Color.decode(defaultColor));
+										textPane_details_homePhone.setEditable(false);
+										
+										//Cell phone
+										textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
+										textPane_details_cellPhone.setEditable(false);
+										
+										//Email
+										textPane_details_email.setBackground(Color.decode(defaultColor));
+										textPane_details_email.setEditable(false);
+										
+										//Position ID
+										textPane_positionID.setBackground(Color.decode(defaultColor));
+										textPane_positionID.setEditable(false);
+										
+										//Job Type
+										textPane_details_JobType.setBackground(Color.decode(defaultColor));
+										textPane_details_JobType.setEditable(false);
+										
+										//Username
+										//textPane_details_username.setBackground(Color.decode(defaultColor));
+										//textPane_details_username.setEditable(false);
+										
+										btn_save.setVisible(false);
+										btn_edit.setVisible(true);
+										
+										//Write to DB
+										Connect connect = new Connect();
+										try {
+											Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+											String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
+											PreparedStatement ps = con.prepareStatement(sql);
+											ps.setString(1, textPane_details_firstName.getText().trim());
+											ps.setString(2, textPane_details_lastName.getText().trim());
+											ps.setString(3, textPane_details_street.getText().trim());
+											ps.setString(4, textPane_details_city.getText().trim());
+											ps.setString(5, textPane_details_stateProvince.getText().trim());
+											ps.setString(6, textPane_details_postalCode.getText().trim());
+											ps.setString(7, textPane_details_homePhone.getText().trim());
+											ps.setString(8, textPane_details_cellPhone.getText().trim());
+											ps.setString(9, textPane_details_email.getText().trim());
+											ps.setString(10, textPane_positionID.getText().trim());
+											ps.setString(11, textPane_details_JobType.getText().trim());
+											ps.setString(12, textPane_details_id.getText().trim());
+										    ps.executeUpdate();
+											
+											//Clean-up environment
+											con.close();
+										} catch (SQLException e2) {
+											// TODO Auto-generated catch block
+											e2.printStackTrace();
+										}
+										
+										//removing vector elements
+										staffList.clear();
+										//remove previous rows
+										for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
+											employeeModel.removeRow(i);
+										}
+										//Refreshing main staff table and getting new values
+										getStaffList();
+										if(staffList.size() > 0){
+											for(int i = 0; i < staffList.size(); i++){
+												employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+											}
+										}
+									}
+									else{
+										//btn_save.setVisible(false);
+										//btn_edit.setVisible(true);
+										JOptionPane.showMessageDialog(null,"Invalid Password.");
+									}
 								}
 							});
 					        
@@ -936,6 +1119,9 @@ public class Employees extends JFrame{
         textPane_details_hireDate.setBackground(Color.decode(defaultColor));
         panel_employeeDetails.add(textPane_details_hireDate);
         */
+	}
+	public void setCurrentEmployee(Employees currentEmployee){
+		this.currentEmployee = currentEmployee;
 	}
 	private String parseDate(String date) {
 		String finalOutput = null;

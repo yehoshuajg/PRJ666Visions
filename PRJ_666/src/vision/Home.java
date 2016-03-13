@@ -351,9 +351,9 @@ public class Home extends JFrame implements KeyListener{
 		panel_cashier.setLayout(null);
 		
 		//Staff
-		Employees staff = new Employees();
-		JPanel panel_staff = staff.getWindow();
-		tabbedPane.addTab("Staff", panel_staff);
+		//Employees staff = new Employees();
+		//JPanel panel_staff = staff.getWindow();
+		//tabbedPane.addTab("Staff", panel_staff);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.setBounds(0, 0, 1260, 650); //cashier tab
@@ -1880,8 +1880,9 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Reports",panel_reports);
 			
 			//Staff
-			//JPanel panel_staff = employee.getWindow();
-			//tabbedPane.addTab("Staff", panel_staff);
+			JPanel panel_staff = employee.getWindow();
+			employee.setCurrentEmployee(employee);
+			tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
 			JPanel panel_supplier = new JPanel();
