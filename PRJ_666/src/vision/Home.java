@@ -1880,8 +1880,7 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Reports",panel_reports);
 			
 			//Staff
-			//Employees staff = new Employees();
-			//JPanel panel_staff = staff.getWindow();
+			//JPanel panel_staff = employee.getWindow();
 			//tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
