@@ -17,6 +17,7 @@ import java.sql.Statement;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -25,6 +26,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import java.sql.*;
 
@@ -32,7 +35,10 @@ import java.util.ArrayList;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Employees extends JFrame{
 	//Employee
@@ -96,6 +102,22 @@ public class Employees extends JFrame{
 	private JTextField textField_password;
 	private JTextField textField_hireDate;
 	
+	//Error message fields
+	private JTextPane textPane_error_firstName;
+	private JTextPane textPane_error_lastName;
+	private JTextPane textPane_error_street;
+	private JTextPane textPane_error_city;
+	private JTextPane textPane_error_stateProvince;
+	private JTextPane textPane_error_postalCode;
+	private JTextPane textPane_error_homePhone;
+	private JTextPane textPane_error_cellPhone;
+	private JTextPane textPane_error_email;
+	private JTextPane textPane_error_positionID;
+	private JTextPane textPane_error_jobType;
+	private JTextPane textPane_error_username;
+	private JTextPane textPane_error_password;
+	private JTextPane textPane_error_hireDate;
+	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
 		//Close connection when done using it. Add try/catch rather than throw exception in function prototype.
@@ -118,7 +140,7 @@ public class Employees extends JFrame{
         panel_add_staff.setLayout(null);
         
         JTabbedPane tabbedPane_add_employee = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_add_employee.setBounds(350, 6, 533, 615);
+        tabbedPane_add_employee.setBounds(67, 6, 763, 615);
         panel_add_staff.add(tabbedPane_add_employee);
         
         JPanel panel_add_employee = new JPanel();
@@ -214,6 +236,22 @@ public class Employees extends JFrame{
         panel_add_employee.add(textField_firstName);
         textField_firstName.setColumns(10);
         
+        textField_firstName.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {}
+			@Override
+			public void ancestorMoved(AncestorEvent event) {}
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				SwingUtilities.invokeLater(new Runnable() {
+		            @Override
+		            public void run() {
+		                textField_firstName.requestFocusInWindow();
+		            }
+		        });
+			}
+		});
+        
         textField_lastName = new JTextField();
         textField_lastName.setBounds(85, 34, 150, 26);
         panel_add_employee.add(textField_lastName);
@@ -279,11 +317,383 @@ public class Employees extends JFrame{
         panel_add_employee.add(textField_hireDate);
         textField_hireDate.setColumns(10);
         
+        JButton btnSubmit = new JButton("Submit");
+        btnSubmit.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(checkFields() == true){
+        			//System.out.println("Valid");
+        		}
+        		else{
+        			//System.out.println("Invalid");
+        		}
+        	}
+        });
+        btnSubmit.setBounds(10, 458, 350, 75);
+        panel_add_employee.add(btnSubmit);
+        
+        JButton btnClear = new JButton("Clear");
+        btnClear.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		clearFields();
+        		textField_firstName.requestFocus();
+        	}
+        });
+        btnClear.setBounds(386, 458, 350, 75);
+        panel_add_employee.add(btnClear);
+        
+        textPane_error_firstName = new JTextPane();
+        textPane_error_firstName.setBounds(247, 7, 489, 20);
+        textPane_error_firstName.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_firstName);
+        
+        textPane_error_lastName = new JTextPane();
+        textPane_error_lastName.setBounds(247, 37, 489, 20);
+        textPane_error_lastName.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_lastName);
+        
+        textPane_error_street = new JTextPane();
+        textPane_error_street.setBounds(267, 68, 469, 20);
+        textPane_error_street.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_street);
+        
+        textPane_error_city = new JTextPane();
+        textPane_error_city.setBounds(207, 100, 529, 20);
+        textPane_error_city.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_city);
+        
+        textPane_error_stateProvince = new JTextPane();
+        textPane_error_stateProvince.setBounds(272, 132, 464, 20);
+        textPane_error_stateProvince.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_stateProvince);
+        
+        textPane_error_postalCode = new JTextPane();
+        textPane_error_postalCode.setBounds(254, 165, 482, 20);
+        textPane_error_postalCode.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_postalCode);
+        
+        textPane_error_homePhone = new JTextPane();
+        textPane_error_homePhone.setBounds(262, 196, 474, 20);
+        textPane_error_homePhone.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_homePhone);
+        
+        textPane_error_cellPhone = new JTextPane();
+        textPane_error_cellPhone.setBounds(247, 229, 489, 20);
+        textPane_error_cellPhone.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_cellPhone);
+        
+        textPane_error_email = new JTextPane();
+        textPane_error_email.setBounds(215, 261, 521, 20);
+        textPane_error_email.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_email);
+        
+        textPane_error_positionID = new JTextPane();
+        textPane_error_positionID.setBounds(254, 294, 482, 20);
+        textPane_error_positionID.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_positionID);
+        
+        textPane_error_jobType = new JTextPane();
+        textPane_error_jobType.setBounds(235, 325, 501, 20);
+        textPane_error_jobType.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_jobType);
+        
+        textPane_error_username = new JTextPane();
+        textPane_error_username.setBounds(234, 355, 502, 20);
+        textPane_error_username.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_username);
+        
+        textPane_error_password = new JTextPane();
+        textPane_error_password.setBounds(240, 387, 496, 20);
+        textPane_error_password.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_password);
+        
+        textPane_error_hireDate = new JTextPane();
+        textPane_error_hireDate.setBounds(240, 420, 496, 20);
+        textPane_error_hireDate.setBackground(Color.decode(defaultColor));
+        panel_add_employee.add(textPane_error_hireDate);
+        
         JPanel panel_staff_edit = new JPanel();
         tabbedPane.addTab("Edit", null, panel_staff_edit, null);
         
         JPanel panel_details = new JPanel();
         tabbedPane.addTab("Details", null, panel_details, null);
+	}
+	public boolean checkFields(){
+		boolean check = true;
+		boolean ok = true;
+		//First name
+		if(validateEmpty(textField_firstName.getText()) == false){
+			textPane_error_firstName.setText("First name cannot be Empty.");
+			check = false;
+		}
+		else if(checkForAlphabets(textField_firstName.getText()) == false){
+			textPane_error_firstName.setText("First name must contain alphabets only.");
+			ok = false;
+		}
+		else{
+			textPane_error_firstName.setText(null);
+		}
+		
+		//Last name
+		if(validateEmpty(textField_lastName.getText()) == false){
+			textPane_error_lastName.setText("Last name cannot be Empty.");
+			check = false;
+		}
+		else if(checkForAlphabets(textField_lastName.getText()) == false){
+			textPane_error_lastName.setText("Last name must contain alphabets only.");
+			ok = false;
+		}
+		else{
+			textPane_error_lastName.setText(null);
+		}
+		
+		//Street
+		if(validateEmpty(textField_street.getText()) == false){
+			textPane_error_street.setText("Street field cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_street.getText().trim().matches("^['#A-Za-z0-9]*$")){
+				textPane_error_street.setText(null);
+			}
+			else{
+				textPane_error_street.setText("Street can only contain alphabets, numbers, '#', '''.");
+				ok = false;
+			}
+		}
+		
+		//City
+		if(validateEmpty(textField_city.getText()) == false){
+			textPane_error_city.setText("City field cannot be Empty.");
+			check = false;
+		}
+		else if(checkForAlphabets(textField_city.getText()) == false){
+			textPane_error_city.setText("City field must contain alphabets only.");
+			ok = false;
+		}
+		else{
+			textPane_error_city.setText(null);
+		}
+		
+		//Province
+		if(validateEmpty(textField_province.getText()) == false){
+			textPane_error_stateProvince.setText("State/Province field cannot be Empty.");
+			check = false;
+		}
+		else if(checkForAlphabets(textField_province.getText()) == false){
+			textPane_error_stateProvince.setText("State/Province field must contain alphabets only.");
+			ok = false;
+		}
+		else{
+			textPane_error_stateProvince.setText(null);
+		}
+		
+		//Postal code
+		if(validateEmpty(textField_postalCode.getText()) == false){
+			textPane_error_postalCode.setText("Postal Code cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
+				textPane_error_postalCode.setText(null);
+			}
+			else if(textField_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[ ]{1}([0-9][A-Za-z][0-9])$")){ //A1B 2C3
+				textPane_error_postalCode.setText(null);
+			}
+			else if(textField_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[-]{1}([0-9][A-Za-z][0-9])$")){ //A1B-2C3
+				textPane_error_postalCode.setText(null);
+			}
+			else{
+				textPane_error_postalCode.setText("Postal code does not have a valid code pattern.");
+				ok = false;
+			}
+		}
+		
+		//Home phone
+		if(validateEmpty(textField_homePhone.getText()) == false){
+			textPane_error_homePhone.setText("Home phone cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_homePhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
+				textPane_error_homePhone.setText(null);
+			}
+			else if(textField_homePhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
+				textPane_error_homePhone.setText(null);
+			}
+			else if(textField_homePhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
+				textPane_error_homePhone.setText(null);
+			}
+			else if(textField_homePhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
+				textPane_error_homePhone.setText(null);
+			}
+			else{
+				textPane_error_homePhone.setText("Home phone does not have a valid phone pattern.");
+				check = false;
+			}
+		}
+		
+		//Cell phone
+		if(validateEmpty(textField_cellPhone.getText()) == false){
+			textPane_error_cellPhone.setText("Cell phone cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_cellPhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
+				textPane_error_cellPhone.setText(null);
+			}
+			else if(textField_cellPhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
+				textPane_error_cellPhone.setText(null);
+			}
+			else if(textField_cellPhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
+				textPane_error_cellPhone.setText(null);
+			}
+			else if(textField_cellPhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
+				textPane_error_cellPhone.setText(null);
+			}
+			else{
+				textPane_error_cellPhone.setText("Cell phone does not have a valid phone pattern.");
+				ok = false;
+			}
+		}
+		
+		//Email
+		if(validateEmpty(textField_email.getText()) == false){
+			textPane_error_email.setText("Email cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_email.getText().trim().matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+				textPane_error_email.setText(null);
+			}
+			else{
+				textPane_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-'.");
+				ok = false;
+			}
+		}
+		
+		//Position
+		if(validateEmpty(textField_positionID.getText()) == false){
+			textPane_error_positionID.setText("Position ID cannot be Empty.");
+			check = false;
+		}
+		//show positions, which will go to db and get position # for u
+		else if(checkForNumbers(textField_positionID.getText()) == false){
+			textPane_error_positionID.setText("Position ID must contain numbers only.");
+			check = false;
+		}
+		else{
+			textPane_error_positionID.setText(null);
+		}
+		
+		//Job type
+		if(validateEmpty(textField_jobType.getText()) == false){
+			textPane_error_jobType.setText("Job Type cannot be Empty.");
+			check = false;
+		}
+		else if(checkForAlphabets(textField_jobType.getText()) == false){
+			textPane_error_jobType.setText("Job Type must contain alphabets only.");
+			check = false;
+		}
+		else{
+			textPane_error_jobType.setText(null);
+		}
+		
+		//Username
+		if(validateEmpty(textField_userName.getText()) == false){
+			textPane_error_username.setText("Username cannot be Empty.");
+			check = false;
+		}
+		else{
+			textPane_error_username.setText(null);
+		}
+		//Password
+		if(validateEmpty(textField_password.getText()) == false){
+			textPane_error_password.setText("Password cannot be Empty.");
+			check = false;
+		}
+		else{
+			if(textField_password.getText().trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+				textPane_error_password.setText(null);
+			}
+			else{
+				textPane_error_password.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+				ok = false;
+			}
+		}
+		
+		//Hire date
+		if(validateEmpty(textField_hireDate.getText()) == false){
+			textPane_error_hireDate.setText("Hire Date cannot be Empty.");
+			check = false;
+		}
+		else{
+			textPane_error_hireDate.setText(null);
+		}
+		if(check && ok){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	public boolean checkForNumbers(String input){
+		String regexStr = "^[0-9]*$";
+		if(input.trim().matches(regexStr)){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	public boolean checkForAlphabets(String input){
+		String regexStr = "^[A-Za-z']*$";
+		if(input.trim().matches(regexStr)){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	public boolean validateEmpty(String temp){
+		temp = temp.trim();
+		if(temp.isEmpty() || temp == null || temp.length() <= 0){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	public boolean containsSpace(String input){
+		input = input.trim();
+		boolean check = false;
+		for(int i = 0; i < input.length(); i++){
+			char c = input.charAt(i);
+			if(c == ' '){
+				check = true;
+				break;
+			}
+			else{
+				check = false;
+			}
+		}
+		return check;
+	}
+	public void clearFields(){
+		textField_firstName.setText(null);
+		textField_lastName.setText(null);
+		textField_street.setText(null);
+		textField_city.setText(null);
+		textField_province.setText(null);
+		textField_postalCode.setText(null);
+		textField_homePhone.setText(null);
+		textField_cellPhone.setText(null);
+		textField_email.setText(null);
+		textField_positionID.setText(null);
+		textField_jobType.setText(null);
+		textField_userName.setText(null);
+		textField_password.setText(null);
+		textField_hireDate.setText(null);
 	}
 	private void CreateWindow(){
         /*jPanel1 = new javax.swing.JPanel();
@@ -502,14 +912,14 @@ public class Employees extends JFrame{
 	    }
 		return check;
 	}
-	public boolean validateEmpty(String temp){
+	/*public boolean validateEmpty(String temp){
 		if(temp.isEmpty()){
 			return false;
 		}
 		else{
 			return true;
 		}
-	}
+	}*/
 	public boolean login(String name, String pass) throws Exception{
 		if(fetchLogin(name,pass) == true){
 			return true;
