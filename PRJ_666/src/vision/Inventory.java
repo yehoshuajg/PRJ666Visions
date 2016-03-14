@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,7 +21,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
@@ -1160,111 +1164,22 @@ JPanel panel_3 = new JPanel();
 		
 		ord_Sup_cb.setRenderer(new CbSupListRenderer());
 		
-		JButton btn_createOrderSheets = new JButton("Create Order Sheet(s)");
-		btn_createOrderSheets.addActionListener(new ActionListener() {
+		JButton btn_createOrder = new JButton("Create Order");
+		btn_createOrder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				int dialogButton = JOptionPane.YES_NO_OPTION;
-				int dialogResult = JOptionPane.showConfirmDialog (null, "This will create new order(s). Do you want to proceed?", "New Order will be created", dialogButton);
-				if(dialogResult == JOptionPane.YES_OPTION) {
-					
-				//stop editing otherwise null may be assigend to order quanitity
-				if(table_createOrder.isEditing()){
-					table_createOrder.getCellEditor().stopCellEditing();
-				}
-				int flag = 0;
-				
-				for (int i = 0; i < table_createOrder.getRowCount(); i++){
-					if (table_createOrder.getValueAt(i, 8) == null)flag = 1;
-					if (table_createOrder.getValueAt(i, 9) == null)flag = 1;
-				}
-				
-				if (flag == 0){ 
-				Vector<String> sup_list = new Vector<String>();
-				Vector<String> uni_list = new Vector<String>();
-				String orderID = ""; 
-				//String supplierID;
-				
-				//******get all supplier rows
-				for (int i=0; i < table_createOrder.getRowCount(); i++ ){  
-					sup_list.add((String) table_createOrder.getValueAt(i, 8));
-				}
-				Collections.sort(sup_list);//sort the vector
-				
-				for (int i = 0; i < sup_list.size(); i++){
-					if (i == 0 ){uni_list.add(sup_list.get(i)); }
-					else if ( !sup_list.get(i).equals(uni_list.lastElement()) ){
-						uni_list.add(sup_list.get(i));
-					}
-				}// end of for
-				
-		    	try {
-					Connection connForCreateOrder = Connect.connectionSetup();
-					
-				//loop through each unique supplier and create order and order details for the supplier
-				for (int i = 0; i < uni_list.size(); i++ ) {
-					String supplierID =  uni_list.get(i).substring(0, uni_list.get(i).indexOf("-") - 1);
-					
-					
-					//insert new order
-					String query = "Insert into `order` (SupplierID, EmployeeID, CreateDate, Cost ) "
-							                 + "VALUES (" + supplierID + ", 1, NOW(), 1000)";		
-					PreparedStatement pst = connForCreateOrder.prepareStatement(query);
-					pst.executeUpdate(); 
-					
-					//get new order ID
-					String query2 = "SELECT Max(ID) FROM `order` ";
-					pst = connForCreateOrder.prepareStatement(query2);
-					
-					ResultSet rs = pst.executeQuery(); 	
-					while(rs.next()){
-					orderID = Integer.toString( (int) rs.getObject(1) );	
-					}
-					System.out.println("new order ID is " + orderID);
-					
-					//for loop for each new order details
-					String sup_fortherow;
-					Object productID ;
-					Object orderQty;
-					for (int k = 0; k < table_createOrder.getRowCount(); k++){
-						sup_fortherow = ((String) table_createOrder.getValueAt(k, 8)).substring(0, ((String)table_createOrder.getValueAt(k,8)).indexOf("-") - 1);
-						if (sup_fortherow.equals(supplierID))
-						{
-							productID =  table_createOrder.getValueAt(k, 0);
-							orderQty =  (String)table_createOrder.getValueAt(k, 9);
-					System.out.println("OrderID: " +orderID +" / productID: " + productID + " / orderQty: " + orderQty);
-					
-						query = "Insert into orderdetail (OrderID, ProductID, OrderedQuantity) VALUES (" 
-						+ orderID + ", " + productID + ", "	+ orderQty +")";
-						
-						pst = connForCreateOrder.prepareStatement(query);
-						pst.executeUpdate();
-						
-
-						} // end of if
-							
-					}// end of for loop (int k)
-					pst.close();
-					
-				} // end of for loop (int i)
-				connForCreateOrder.close();
-				JOptionPane.showMessageDialog(null, "New Order record(s) have been created");
-				scrollPane_ceateOrder.setViewportView(null);
-				refreshInventoryTable();
-				tabbedPane_Inventory.setSelectedIndex(0); 
-				
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} // end of catch 
-				} // end of if (flag == 0) 
-				
-				else JOptionPane.showMessageDialog(null, "Supplier and/or order quantity cannot be left blank");
-				}// end of Yes option
+			//stop editing otherwise null may be assigend to order quanitity
+			if(table_createOrder.isEditing()){
+				table_createOrder.getCellEditor().stopCellEditing();
+			}
+				//call displayOrderSheet() function
+				displayOrderSheet();
 				
 			} //end of action performed
 		});
-		jp_createOrder_north.add(btn_createOrderSheets);
+		
+		
+		jp_createOrder_north.add(btn_createOrder);
 		
 		JPanel jp_createOrder_center = new JPanel();
 		jp_createOrder.add(jp_createOrder_center, BorderLayout.CENTER);
@@ -1287,9 +1202,7 @@ JPanel panel_3 = new JPanel();
 
 		
 
-}// end of Constructor Inventory() =========================================================================================================
-
-
+}// end of Constructor Inventory() ====================================================================================================
 //======================================================================================================================================
 // Begining of inventory class functions
  
@@ -1607,44 +1520,12 @@ JPanel panel_3 = new JPanel();
 	public void createOrderSummary (StringBuilder mySelection){
 		Vector<Object> columnNames = new Vector<Object>();
 	    Vector<Object> data = new Vector<Object>();
-	    Vector<Integer> selectedRows = getSelectedRows();
-	    try{
-	    	
-	    	con_Invoice = Connect.connectionSetup();
-	    	String query = 
-	    			"Select Distinct s.ID, s.Name as Supplier, s.MinimumOrderCost "
-	    			+ "FROM supplier s "
-	    			+ "INNER JOIN product_supplier ps ON s.ID = ps.SupplierID "
-	    			+ "WHERE ps.ProductID IN ( " + mySelection + " )";
-
-	    			
-			PreparedStatement pst = con_Invoice.prepareStatement(query);
-			ResultSet rs = pst.executeQuery();
-			ResultSetMetaData md = rs.getMetaData();
-
-			int columnCount = md.getColumnCount();
-			
-			columnNames.addElement("Supplier ID"); 				
+	    
+	    columnNames.addElement("Supplier ID"); 				
 			columnNames.addElement("Supplier"); 
 			columnNames.addElement("Minimum Order");
 			columnNames.addElement("Order Total");
-
-			//Get row data
-			/*
-			while(rs.next()){
-				Vector<Object> row = new Vector<Object>(columnCount);
-				for (int i = 1; i <= columnCount; i++)  {
-					row.addElement(rs.getObject(i));
-				}
-				data.addElement(row);
-			} //while 
-			*/
-			pst.close();
-			rs.close();
-			con_Invoice.close();
-	    }catch (Exception e1) {	
-		e1.printStackTrace();
-		}
+			
 	    TM_CreateOrderSummary myModel_createOrderSummary = new TM_CreateOrderSummary(data, columnNames);
 	    
 	    table_createOrderSummary = new JTable(myModel_createOrderSummary);
@@ -1652,9 +1533,171 @@ JPanel panel_3 = new JPanel();
 	    table_createOrderSummary.setRowHeight(30);
 	}
 	
-
 	
 	//===========================================================================
+	public void displayOrderSheet(){
+		
+		int flag = 0;
+		int prodID_col = 0;
+		int sup_col = 6;
+		int qty_col = 8;
+		int prodName_col = 3;
+		int cat_col = 1;
+		int subCat_col = 2;
+		int orderID = 0;
+		
+			for (int i = 0; i < table_createOrder.getRowCount(); i++){
+				if (table_createOrder.getValueAt(i, sup_col) == null)flag = 1;
+				if (table_createOrder.getValueAt(i, qty_col) == null)flag = 1;
+			}
+			if (flag == 1){
+				JOptionPane.showMessageDialog(null, "Supplier and/or order quantity cannot be left blank");
+			}
+			else if (flag == 0){ // if both supplierID and quantity to order is filled
+
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog (null, "This will create new order(s). Do you want to proceed?", "New Order will be created", dialogButton);
+				if(dialogResult == JOptionPane.YES_OPTION) {
+				
+				double orderTotal = 0;
+				Vector<Integer> orgSupIDList = new Vector<Integer>();
+				//Vector<Integer> uniSupIDList = new Vector<Integer>();
+				Vector<CbSupItem> supID_list = new Vector<CbSupItem>(); //supplier list that contains duplicate values
+				Set<Integer> uniSupID_list = new HashSet<Integer>(); //supplier list that contains unique values
+			
+			//add supplier to org list
+			for (int i=0; i < table_createOrder.getRowCount(); i++ ){  
+				supID_list.add( (CbSupItem) table_createOrder.getValueAt(i, sup_col));
+				orgSupIDList.add(  ((CbSupItem) table_createOrder.getValueAt(i, sup_col)).getID()  );
+			}
+			//add orgSupIDList to Set to retrive unique values
+			uniSupID_list.addAll(orgSupIDList);
+			
+	 try {
+		   Connection connForCreateOrder = Connect.connectionSetup();
+				
+			//loop through each unique supplier and create order and order details for the supplier
+		   		int count = 0;
+			for ( Iterator<Integer> it = uniSupID_list.iterator(); it.hasNext(); ){
+				count++;
+				int supplierID = it.next(); 
+				OrderInfo order = new OrderInfo();
+				Vector<Object> detailList = new Vector<Object>();
+				
+				//Vector<OrderDetailsInfo> ordDetailList = new Vector<OrderDetailsInfo>();
+				System.out.println("1) unique sup list - supplier ID is " + supplierID); 
+
+				//get orderTotal from table_createOrderSummary
+				for (int j = 0; j < table_createOrderSummary.getModel().getRowCount() ; j++){//#10
+					if( (int)table_createOrderSummary.getValueAt(j, 0) == supplierID){
+						orderTotal =  (double) table_createOrderSummary.getValueAt(j, 3) ;
+					}
+				} //#10
+				
+				
+				//get new order ID
+				String query2 = "SELECT Max(ID) FROM `order` ";
+				PreparedStatement pst = connForCreateOrder.prepareStatement(query2);
+				ResultSet rs = pst.executeQuery(); 	
+				while(rs.next()){
+				orderID =  (int) rs.getObject(1) ;			
+				}
+				order.setOrderID(orderID);
+				
+				//insert new order
+				String query = "Insert into `order` (SupplierID, EmployeeID, CreateDate, Cost ) "
+						                 + "VALUES (" + supplierID + ", 1, NOW(), "+ orderTotal +")";		
+				pst = connForCreateOrder.prepareStatement(query);
+				pst.executeUpdate(); 
+				
+						//get supplier info for supplier order sheet later 
+						//fill sup
+						query = "Select ID, Name, Street, City, State_Province, PostalCode, PhoneNumber, Email, Status "
+								+ "From supplier "
+								+ "Where ID = " + supplierID;
+						pst = connForCreateOrder.prepareStatement(query);
+						 rs = pst.executeQuery();
+						while(rs.next()){
+							order.setID( rs.getInt(1) );
+							order.setName( rs.getString(2) );
+							order.setStreet( rs.getString(3) );
+							order.setCity(rs.getString(4));
+							order.setState( rs.getString(5) );
+							order.setPostalCode( rs.getString(6) );
+							order.setPhone( rs.getString(7) );
+							order.setEmail( rs.getString(8) );
+							order.setStatus( rs.getString(9) );
+						}
+						
+						
+					//insert order details
+					// need to loop same times as the size of the unique list ??
+					
+					for (int k = 0; k < table_createOrder.getRowCount(); k++){ //for #20
+						
+						CbSupItem item = (CbSupItem) table_createOrder.getValueAt(k, sup_col);
+						if (supplierID == item.getID()){ //if #21
+							
+							//OrderDetailsInfo ordDetail = new OrderDetailsInfo();
+							
+							int productID =  (int)table_createOrder.getValueAt(k, prodID_col);
+							int orderQty =  Integer.parseInt((String) table_createOrder.getValueAt(k, qty_col)) ;
+							String prodName = (String) table_createOrder.getValueAt(k, prodName_col);
+							String category = (String) table_createOrder.getValueAt(k, cat_col);
+							String subCategory = (String) table_createOrder.getValueAt(k, subCat_col);
+							
+							query = "Insert into orderdetail (OrderID, ProductID, OrderedQuantity) VALUES (" 
+									+ orderID + ", " + productID + ", "	+ orderQty +")";
+																						
+							pst = connForCreateOrder.prepareStatement(query);
+							pst.executeUpdate();
+							
+							Vector<Object> detailItem = new Vector<Object>();
+							detailItem.addElement(productID);
+							detailItem.addElement(prodName);
+							detailItem.addElement(orderQty);
+
+							detailList.addElement(detailItem);
+
+						} //if #21
+					} //for #20
+				
+				pst.close();
+				
+				
+				//create a frame for each supplier
+				InventoryOrderSheetFrame orderSheet = new InventoryOrderSheetFrame(order, detailList);
+				orderSheet.setSize(new Dimension(650, 750));
+				Dimension screenSize = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
+				Dimension windowSize = orderSheet.getPreferredSize();
+				
+				int offset = count * 30 - 300;
+				int left = offset + screenSize.width / 2 + windowSize.width / 2;
+				int top = offset + screenSize.height / 2 - windowSize.height / 2;
+			
+				orderSheet.setLocation(left, top);
+				orderSheet.setVisible(true);
+				
+			} // end of for loop uniSupID_list iterator it
+			
+			connForCreateOrder.close();
+			JOptionPane.showMessageDialog(null, "New Order record(s) have been created");
+			
+			scrollPane_ceateOrder.setViewportView(null);
+			refreshInventoryTable();
+			tabbedPane_Inventory.setSelectedIndex(0); 
+			
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} // end of catch 
+			} // end of Yes option 
+
+			}// end of if flag == 0
+	} // end of displayOrderSheet()
+
+	
+	//=========================================================================================
 	// Table Model Listener for updating prev @ price, Order Total column for table_createORder
 	private void setTMLforCreateOrderTable(){
 		tml_CreateTable = new TableModelListener(){
@@ -1886,6 +1929,25 @@ class MyTableModelClass extends DefaultTableModel{ //***************************
 	}
 }
 
+class TM_basic extends DefaultTableModel{
+	public TM_basic (Vector<Object> data, Vector<Object> columnNames) {
+		super(data,columnNames);
+	}
+	@Override
+	public Class getColumnClass(int column)
+	{
+	 for (int row = 0; row < getRowCount(); row++)
+	 {
+	     Object o = getValueAt(row, column);
+	
+	     if (o != null)
+	     {
+	         return o.getClass();
+	     }
+	 }
+	 return Object.class;
+	}
+}
 
 
 

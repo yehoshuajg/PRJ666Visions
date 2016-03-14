@@ -244,7 +244,7 @@ public class Home extends JFrame implements KeyListener{
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 720);
-		contentPane = new JPanel(new GridLayout());
+		contentPane = new JPanel();
 		//contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -267,6 +267,7 @@ public class Home extends JFrame implements KeyListener{
 	          });
 	      getContentPane().add(closeButton, BorderLayout.CENTER);
 */		
+		contentPane.setLayout(new BorderLayout(0, 0));
 		//connect = new Connect();
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
