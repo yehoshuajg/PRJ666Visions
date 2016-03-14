@@ -2,6 +2,7 @@ package vision;
 
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,11 +44,12 @@ public class Login extends JFrame {
 	public Login() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Log in");
-		setBounds(100, 100, 450, 300);
+		setSize(450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		setLocationRelativeTo(null); //Center's the frame, regardless of screen resolution
 		initialize();
 	}
 	public void initialize(){
@@ -81,17 +83,22 @@ public class Login extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					employee = new Employees();
-					if(employee.validateEmpty(textField.getText()) == false && employee.validateEmpty(passwordField.getText()) == false){
+					String pass = null;
+					if(passwordField.getPassword() != null){
+						char[] password = passwordField.getPassword();
+						pass = new String(password);
+					}
+					if(employee.validateEmpty(textField.getText()) == false && employee.validateEmpty(pass) == false){
 						JOptionPane.showMessageDialog(null,"Please enter a username and a password.");
 					}
 					else if(employee.validateEmpty(textField.getText()) == false){
 						JOptionPane.showMessageDialog(null,"Please enter a username.");
 					}
-					else if(employee.validateEmpty(passwordField.getText()) == false){
+					else if(employee.validateEmpty(pass) == false){
 						JOptionPane.showMessageDialog(null,"Please enter a password.");
 					}
 					else{
-						if(employee.login(textField.getText(),passwordField.getText()) == true){
+						if(employee.login(textField.getText(),pass) == true){
 							dispose();
 							Home home = new Home();
 							home.setEmployee(employee);					

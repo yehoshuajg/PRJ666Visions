@@ -128,8 +128,10 @@ public class TransactionRecord {
 				tr.productID = rs.getInt("ProductID");
 				tr.quantitySold = rs.getInt("QuantitySold");
 				tr.unitPrice = rs.getDouble("UnitPrice");
-				tr.returned = rs.getInt("Returned");
-				tr.dateReturned = rs.getString("DateReturned");
+				//tr.returned = rs.getInt("Returned");
+				//tr.dateReturned = rs.getString("DateReturned");
+				tr.returned = getProductReturnedQTY(tr.transactionID, tr.productID);
+				tr.dateReturned = getProductReturnedDate(tr.transactionID, tr.productID);
 				tr.employeeID = rs.getInt("EmployeeID");
 				tr.unitCost = rs.getDouble("UnitCost");
 				//row is coming from for loop, so it stops when it finds the record (row#) it was looking for in that transactionRecord
@@ -148,6 +150,56 @@ public class TransactionRecord {
 			e.printStackTrace();
 		}
 		return tr;
+	}
+	public int getProductReturnedQTY(int transactionID, int productID){
+		Connect connect = new Connect();
+		int data = 0;
+		try {
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			String sql = "SELECT ReturnedQTY FROM ProductReturned Where TransactionID = ? AND ProductID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, transactionID);
+			ps.setInt(2, productID);
+			ResultSet rs = ps.executeQuery();
+			
+			//Extract data from result set
+			while(rs.next()){
+				data = rs.getInt("ReturnedQTY");
+			}
+			//Clean-up environment
+			rs.close();
+			con.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+	}
+	public String getProductReturnedDate(int transactionID, int productID){
+		Connect connect = new Connect();
+		String data = null;
+		try {
+			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+			String sql = "SELECT DateReturned FROM ProductReturned Where TransactionID = ? AND ProductID = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, transactionID);
+			ps.setInt(2, productID);
+			ResultSet rs = ps.executeQuery();
+			
+			//Extract data from result set
+			while(rs.next()){
+				data = rs.getString("DateReturned");
+			}
+			//Clean-up environment
+			rs.close();
+			con.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
 	}
 	public void insertTransactionRecord(int transactionID, int productID, int productQuantity, double productSalePrice, int employeeID){
 		Connect connect = new Connect();
@@ -272,13 +324,14 @@ public class TransactionRecord {
 			refundUpdateProduct(tr,previousReturn);
 			
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			String sql = "UPDATE `TransactionRecord` SET Returned = ?, DateReturned = ? where TransactionID = ? AND ProductID = ?";
+			String sql = "INSERT INTO `ProductReturned`(TransactionID,ProductID,ReturnedQTY,DateReturned) "
+					+ "VALUE (?,?,?,?)";
 			PreparedStatement ps = con.prepareStatement(sql);
-			ps.setInt(1, tr.getReturned());
-			ps.setString(2, tr.getDateReturned());
-			ps.setInt(3, tr.getTransactionID());
-			ps.setInt(4, tr.getProductID());
-		    ps.executeUpdate();
+			ps.setInt(1, tr.getTransactionID());
+			ps.setInt(2, tr.getProductID());
+			ps.setInt(3, tr.getReturned());
+			ps.setString(4, tr.getDateReturned());
+			ps.executeUpdate();
 			
 			//Clean-up environment
 			con.close();
@@ -291,7 +344,6 @@ public class TransactionRecord {
 		int newReturnQuantity = tr.getReturned() - previousReturn;
 		
 		int previousQuantity = getPreviousQuantity(tr.getProductID());
-		System.out.println("PreviousQuantity: " + previousQuantity);
 		
 		int newQuantity2 = previousQuantity + newReturnQuantity;
 		

@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
@@ -309,7 +310,7 @@ public class Home extends JFrame implements KeyListener{
 		JButton btnBackupRestore = new JButton("Backup/Restore");
 		btnBackupRestore.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
+				//UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
 				Object[] options = {"Cancel","Restore","Backup"};
 				int cashCredit = JOptionPane.showOptionDialog(null,"Checkout using: ","Checkout",
 				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
@@ -320,26 +321,54 @@ public class Home extends JFrame implements KeyListener{
 				}
 				//Restore
 				else if(cashCredit == JOptionPane.NO_OPTION){
-					String passwordInput = JOptionPane.showInputDialog(null, "Username: " + employee.getUsername() + "\n" + "Password:");
-					Employees tempEmployee = new Employees();
-					if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
-						BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-						br.restoreDB();
-					}
-					else{
-						JOptionPane.showMessageDialog(null,"Invalid Password.");
+					JPanel panel = new JPanel();
+					JLabel label = new JLabel("Enter a password:");
+					JPasswordField pass = new JPasswordField(10);
+					panel.add(label);
+					panel.add(pass);
+					String[] options1 = new String[]{"OK", "Cancel"};
+					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+					                         null, options1, options1[0]);
+					if(option == 0) // pressing OK button
+					{
+					    char[] password = pass.getPassword();
+					    String passwordInput = new String(password);
+					
+						Employees tempEmployee = new Employees();
+						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+							br.restoreDB();
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+						}
 					}
 				}
 				//Backup
 				else if(cashCredit == JOptionPane.CANCEL_OPTION){
-					String passwordInput = JOptionPane.showInputDialog(null, "Username: " + employee.getUsername() + "\n" + "Password:");
-					Employees tempEmployee = new Employees();
-					if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
-						BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-						br.backupDB();
-					}
-					else{
-						JOptionPane.showMessageDialog(null,"Invalid Password.");
+					JPanel panel = new JPanel();
+					JLabel label = new JLabel("Enter a password:");
+					JPasswordField pass = new JPasswordField(10);
+					panel.add(label);
+					panel.add(pass);
+					String[] options1 = new String[]{"OK", "Cancel"};
+					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+					                         null, options1, options1[0]);
+					// pressing OK button
+					if(option == 0) {
+					    char[] password = pass.getPassword();
+					    String passwordInput = new String(password);
+
+						Employees tempEmployee = new Employees();
+						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+							br.backupDB();
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+						}
 					}
 				}
 			}
@@ -549,7 +578,7 @@ public class Home extends JFrame implements KeyListener{
 													else if(tempProductSearch.getQuantity() > 0){
 														boolean qCheck = false;
 														if(model.getRowCount() == 0){
-															model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
+															model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),(tempProductSearch.getSalePrice()*quantity)});
 															//System.out.println("Before: " + tempProductSearch.getQuantity());
 															tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
 															//System.out.println("After: " + tempProductSearch.getQuantity());
@@ -579,7 +608,7 @@ public class Home extends JFrame implements KeyListener{
 																}
 															}
 															if(qCheck == false){
-																model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),tempProductSearch.getSalePrice()});
+																model.addRow(new Object[]{rowCount,tempProductSearch.getID(),tempProductSearch.getName(),quantity,tempProductSearch.getSalePrice(),(tempProductSearch.getSalePrice()*quantity)});
 																//System.out.println("Before: " + tempProductSearch.getQuantity());
 																tempProductSearch.setQuantity(tempProductSearch.getQuantity()-1);
 																//System.out.println("After: " + tempProductSearch.getQuantity());												
@@ -1421,7 +1450,7 @@ public class Home extends JFrame implements KeyListener{
 											if(tableListenerCount == 1){
 												calculateSubtotal();
 												calculateInventoryQuantity();
-												calculateSalePrice(row,model.getValueAt(row, id_column));
+												//calculateSalePrice(row,model.getValueAt(row, id_column));
 											}
 											else if(tableListenerCount == 0){
 												stringTempPrice = model.getValueAt(row, productQuantityAndPrice_column).toString();
@@ -1906,7 +1935,7 @@ public class Home extends JFrame implements KeyListener{
 		}
 	}
 	
-	public void calculateSalePrice(int row, Object objID){
+	/*public void calculateSalePrice(int row, Object objID){
 		int id = (int) objID;
 		for(int i = 0; i < productBySearch.size(); i++){
 			if(id == productBySearch.get(i).getID()){
@@ -1915,7 +1944,7 @@ public class Home extends JFrame implements KeyListener{
 				break;
 			}
 		}
-	}
+	}*/
 	
 	public void calculateCashCheckout(){
 		String cashTenderInput = checkout_amount_tender_input.getText();
