@@ -163,6 +163,8 @@ public class Home extends JFrame implements KeyListener{
 	private JDialog d3;
 	private JDialog d4;
 	private JDialog d5;
+	private JDialog d6;
+	private JDialog d7;
 	private JTextField textField_transaction_input;
 	
 	//Refund
@@ -1915,9 +1917,8 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
-			Supplier supplier = new Supplier();
-			JPanel panel_supplier = supplier.getWindow();
-			tabbedPane.addTab("Supplier", panel_supplier);
+			JPanel panel_supplier = new JPanel();
+			tabbedPane.addTab("Supplier", null, panel_supplier, null);
 			
 			//Inventory
 			//JPanel panel_inventory = new JPanel();
@@ -2790,9 +2791,13 @@ public class Home extends JFrame implements KeyListener{
 		        				textField_refund_description_input.setText(productByRefund.get(i).getDescription());
 		        				textField_refund_quantity_remaining_input.setText(String.valueOf(productByRefund.get(i).getQuantity()));
 		        				if(String.valueOf(model_refund.getValueAt(row, id_column)).equals(String.valueOf(tr.get(i).getProductID()))){
-		        					textField_refund_product_unitPrice_input.setText("$" + String.valueOf(tr.get(i).getUnitPrice()));
+		        					double uPrice = tr.get(i).getUnitPrice();
+		        					uPrice = Math.round(uPrice * 100.0) / 100.0;
+		        					textField_refund_product_unitPrice_input.setText("$" + String.valueOf(uPrice));
+		        					
 			        				int tempQuantity = (int) model_refund.getValueAt(row, refund_QuantitySold);
 			        				double rowPrice = tempQuantity * tr.get(i).getUnitPrice();
+			        				rowPrice = Math.round(rowPrice * 100.0) / 100.0;
 			        				textField_refund_total_unitPrice_input.setText("$" + String.valueOf(rowPrice));
 		        				}
 		        				break;
@@ -2800,6 +2805,125 @@ public class Home extends JFrame implements KeyListener{
 		        		}
 	        		}
 	        	}
+				else if(e.getClickCount() == 2){
+					int column = table_refund.getSelectedColumn();
+					if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4){
+						if(row > -1){
+							int modelProductID = (Integer) model_refund.getValueAt(row, 1);
+							if(tr.size() > 0){
+								for(int i = 0; i < tr.size(); i++){
+									if(modelProductID == tr.get(i).getProductID()){
+										if(tr.get(i).getReturned() >= 1){
+											JPanel productRefundHistory = new JPanel();
+											productRefundHistory.setLayout(null);
+														
+											//Cancel button
+											JButton refundHistoryCancel = new JButton("Cancel");
+											refundHistoryCancel.setBounds(38, 380, 820, 40);
+											productRefundHistory.add(refundHistoryCancel);
+											
+											refundHistoryCancel.addActionListener(new ActionListener() {
+												@Override
+												public void actionPerformed(ActionEvent e) {
+													d6.dispose();
+												}
+											});
+											
+											//Table
+											JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
+											tabbedPane_refund_table.setBounds(30, 10, 835, 375);
+											productRefundHistory.add(tabbedPane_refund_table);
+														
+											JPanel panel_table_refundHistory = new JPanel(new BorderLayout());
+											tabbedPane_refund_table.addTab("Product Refund History: ", null, panel_table_refundHistory, null);
+														
+											Vector<String> search_row_data = new Vector<String>();
+											Vector<String> search_column_name = new Vector<String>();
+											search_column_name.addElement("#");
+											search_column_name.addElement("Name");
+											search_column_name.addElement("Quantity Sold");
+											search_column_name.addElement("Returned");
+											search_column_name.addElement("Return Date");
+											
+											JTable table_refundHistory = new JTable(search_row_data, search_column_name){
+												public boolean isCellEditable(int row, int column) {
+													//Return true if the column (number) is editable, else false
+													return false;
+												}
+											};
+											panel_table_refundHistory.add(table_refundHistory.getTableHeader(), BorderLayout.NORTH);
+											panel_table_refundHistory.add(table_refundHistory, BorderLayout.CENTER);
+											
+											//Row Height
+											table_refundHistory.setRowHeight(30);
+											
+											//Column Width
+											TableColumnModel columnModel_search = table_refundHistory.getColumnModel();
+											columnModel_search.getColumn(0).setPreferredWidth(1); //#
+											columnModel_search.getColumn(1).setPreferredWidth(200); //Name
+											columnModel_search.getColumn(2).setPreferredWidth(10); //Quantity Sold
+											columnModel_search.getColumn(3).setPreferredWidth(10); //Returned
+											columnModel_search.getColumn(4).setPreferredWidth(75); //Return Date
+											
+											//Columns won't be able to moved around
+											table_refundHistory.getTableHeader().setReorderingAllowed(false);
+											
+											//Center table data 
+											DefaultTableCellRenderer centerRenderer_search = new DefaultTableCellRenderer();
+											centerRenderer_search.setHorizontalAlignment( SwingConstants.CENTER );
+											table_refundHistory.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //#
+											table_refundHistory.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Product Name
+											table_refundHistory.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Quantity Sold
+											table_refundHistory.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Returned
+											table_refundHistory.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Return Date
+											
+											//Center table column names
+											centerRenderer_search = (DefaultTableCellRenderer) table_refundHistory.getTableHeader().getDefaultRenderer();
+											centerRenderer_search.setHorizontalAlignment(JLabel.CENTER);
+											
+											JScrollPane jsp2 = new JScrollPane(table_refundHistory);
+											jsp2.setBounds(2, 2, 810, 344);
+											jsp2.setVisible(true);
+											panel_table_refundHistory.add(jsp2);
+											
+											DefaultTableModel model_refundHistory = (DefaultTableModel) table_refundHistory.getModel();
+											
+											//Fetch's values from ProductReturned
+											Vector<TransactionRecord> tempRefundHistory = new Vector<TransactionRecord>();
+											TransactionRecord tNew = new TransactionRecord();
+											tempRefundHistory = tNew.getProductRefundHistory(tr.get(0).getTransactionID(),tr.get(i).getProductID());
+											
+											//Fill table with the history of refund transactions that took place for specific product
+											if(tempRefundHistory.size() > 0 && productByRefund.size() > 0){
+												for(int j = 0; j < tempRefundHistory.size(); j++){
+													for(int k = 0; k < productByRefund.size(); k++){
+														if(tempRefundHistory.get(j).getProductID() == productByRefund.get(k).getID()){
+															model_refundHistory.addRow(new Object[]{i+1,productByRefund.get(k).getName(),
+															tr.get(i).getQuantitySold(),tempRefundHistory.get(j).getReturned(),tempRefundHistory.get(j).getDateReturned()});
+														}
+													}
+												}
+											}
+											
+											Component component = (Component) e.getSource();
+											JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+											d6 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+											d6.getContentPane().add(productRefundHistory);
+											d6.setSize(900, 465);
+											d6.setLocationRelativeTo(null);
+											d6.getRootPane().setDefaultButton(refundHistoryCancel);
+											d6.setVisible(true);
+										}
+										else{
+											JOptionPane.showMessageDialog(null,"This product has no return history.");
+										}
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		});
 		
@@ -2986,7 +3110,7 @@ public class Home extends JFrame implements KeyListener{
 	public void loadRefundInfo(){
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(685, 0, 279, 405);
+		tabbedPane.setBounds(685, 0, 279, 449);
 		panel_refund.add(tabbedPane);
 		
 		JPanel panel_transactionDetail = new JPanel();
@@ -3133,6 +3257,126 @@ public class Home extends JFrame implements KeyListener{
 		separator_7.setBounds(0, 314, 258, 12);
 		panel_transactionDetail.add(separator_7);
 		
+		JSeparator separator_8 = new JSeparator();
+		separator_8.setBounds(0, 350, 258, 12);
+		panel_transactionDetail.add(separator_8);
+		
+		JButton btnRefundHistory = new JButton("Refund History");
+		btnRefundHistory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JPanel productRefundHistory = new JPanel();
+				productRefundHistory.setLayout(null);
+					
+				//Cancel button
+				JButton refundHistoryCancel = new JButton("Cancel");
+				refundHistoryCancel.setBounds(38, 380, 820, 40);
+				productRefundHistory.add(refundHistoryCancel);
+				
+				refundHistoryCancel.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						d7.dispose();
+					}
+				});
+					
+				//Table
+				JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
+				tabbedPane_refund_table.setBounds(30, 10, 835, 375);
+				productRefundHistory.add(tabbedPane_refund_table);
+				
+				JPanel panel_table_refundHistory = new JPanel(new BorderLayout());
+				tabbedPane_refund_table.addTab("Product Refund History: ", null, panel_table_refundHistory, null);
+				
+				Vector<String> search_row_data = new Vector<String>();
+				Vector<String> search_column_name = new Vector<String>();
+				search_column_name.addElement("#");
+				search_column_name.addElement("Name");
+				search_column_name.addElement("Quantity Sold");
+				search_column_name.addElement("Returned");
+				search_column_name.addElement("Return Date");
+				
+				JTable table_refundHistory = new JTable(search_row_data, search_column_name){
+					public boolean isCellEditable(int row, int column) {
+						//Return true if the column (number) is editable, else false
+						return false;
+					}
+				};
+				panel_table_refundHistory.add(table_refundHistory.getTableHeader(), BorderLayout.NORTH);
+				panel_table_refundHistory.add(table_refundHistory, BorderLayout.CENTER);
+				
+				//Row Height
+				table_refundHistory.setRowHeight(30);
+				
+				//Column Width
+				TableColumnModel columnModel_search = table_refundHistory.getColumnModel();
+				columnModel_search.getColumn(0).setPreferredWidth(1); //#
+				columnModel_search.getColumn(1).setPreferredWidth(200); //Name
+				columnModel_search.getColumn(2).setPreferredWidth(10); //Quantity Sold
+				columnModel_search.getColumn(3).setPreferredWidth(10); //Returned
+				columnModel_search.getColumn(4).setPreferredWidth(75); //Return Date
+				
+				//Columns won't be able to moved around
+				table_refundHistory.getTableHeader().setReorderingAllowed(false);
+				
+				//Center table data 
+				DefaultTableCellRenderer centerRenderer_search = new DefaultTableCellRenderer();
+				centerRenderer_search.setHorizontalAlignment( SwingConstants.CENTER );
+				table_refundHistory.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //#
+				table_refundHistory.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Product Name
+				table_refundHistory.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Quantity Sold
+				table_refundHistory.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Returned
+				table_refundHistory.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Return Date
+					
+				//Center table column names
+				centerRenderer_search = (DefaultTableCellRenderer) table_refundHistory.getTableHeader().getDefaultRenderer();
+				centerRenderer_search.setHorizontalAlignment(JLabel.CENTER);
+				
+				JScrollPane jsp2 = new JScrollPane(table_refundHistory);
+				jsp2.setBounds(2, 2, 810, 344);
+				jsp2.setVisible(true);
+				panel_table_refundHistory.add(jsp2);
+				
+				DefaultTableModel model_refundHistory = (DefaultTableModel) table_refundHistory.getModel();
+				
+				if(tr.size() > 0){
+					for(int i = 0; i < tr.size(); i++){
+						if(tr.get(i).getReturned() >= 1){
+							//Fetch's values from ProductReturned
+							Vector<TransactionRecord> tempRefundHistory = new Vector<TransactionRecord>();
+							TransactionRecord tNew = new TransactionRecord();
+							
+							tempRefundHistory = tNew.getProductRefundHistory(tr.get(0).getTransactionID(),tr.get(i).getProductID());
+							
+							//Fill table with the history of refund transactions that took place for specific product
+							if(tempRefundHistory.size() > 0 && productByRefund.size() > 0){
+								for(int j = 0; j < tempRefundHistory.size(); j++){
+									for(int k = 0; k < productByRefund.size(); k++){
+										if(tempRefundHistory.get(j).getProductID() == productByRefund.get(k).getID()){
+											model_refundHistory.addRow(new Object[]{productByRefund.get(k).getID(),productByRefund.get(k).getName(),
+											tr.get(i).getQuantitySold(),tempRefundHistory.get(j).getReturned(),tempRefundHistory.get(j).getDateReturned()});
+										}
+									}
+								}
+							}
+							else{
+								//JOptionPane.showMessageDialog(null,"This product has no return history.");
+							}				
+						}
+					}
+				}
+				Component component = (Component) e.getSource();
+				JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+				d7 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+				d7.getContentPane().add(productRefundHistory);
+				d7.setSize(900, 465);
+				d7.setLocationRelativeTo(null);
+				d7.getRootPane().setDefaultButton(refundHistoryCancel);
+				d7.setVisible(true);
+			}
+		});
+		btnRefundHistory.setBounds(11, 365, 155, 29);
+		panel_transactionDetail.add(btnRefundHistory);
+		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.setBounds(961, 428, 279, 81);
 		panel_refund.add(tabbedPane_1);
@@ -3208,13 +3452,13 @@ public class Home extends JFrame implements KeyListener{
 											
 								Vector<String> refund_confirm_row_data = new Vector<String>();
 								Vector<String> refund_confirm_column_name = new Vector<String>();
-								refund_confirm_column_name.addElement("#");
 								refund_confirm_column_name.addElement("Product ID");
 								refund_confirm_column_name.addElement("Name");
 								refund_confirm_column_name.addElement("Quantity Sold");
 								refund_confirm_column_name.addElement("Returned Before");
 								refund_confirm_column_name.addElement("Returned Now");
-								refund_confirm_column_name.addElement("Price");
+								refund_confirm_column_name.addElement("Unit Price");
+								refund_confirm_column_name.addElement("Refund Price");
 								
 								JTable table_refund_confirm = new JTable(refund_confirm_row_data, refund_confirm_column_name){
 									public boolean isCellEditable(int row, int column) {
@@ -3231,13 +3475,13 @@ public class Home extends JFrame implements KeyListener{
 								
 								//Column Width
 								TableColumnModel columnModel_search = table_refund_confirm.getColumnModel();
-								columnModel_search.getColumn(0).setPreferredWidth(1); //#
-								columnModel_search.getColumn(1).setPreferredWidth(15); //product ID
-								columnModel_search.getColumn(2).setPreferredWidth(200); //Name
-								columnModel_search.getColumn(3).setPreferredWidth(10); //Quantity Sold 
-								columnModel_search.getColumn(4).setPreferredWidth(20); //Returned Before
-								columnModel_search.getColumn(5).setPreferredWidth(10); //Returning Now
-								columnModel_search.getColumn(6).setPreferredWidth(15); //Price
+								columnModel_search.getColumn(0).setPreferredWidth(15); //product ID
+								columnModel_search.getColumn(1).setPreferredWidth(150); //Name
+								columnModel_search.getColumn(2).setPreferredWidth(10); //Quantity Sold 
+								columnModel_search.getColumn(3).setPreferredWidth(20); //Returned Before
+								columnModel_search.getColumn(4).setPreferredWidth(10); //Returning Now
+								columnModel_search.getColumn(5).setPreferredWidth(15); //Unit Price
+								columnModel_search.getColumn(6).setPreferredWidth(15); //Refund price
 								
 								//Columns won't be able to moved around
 								table_refund_confirm.getTableHeader().setReorderingAllowed(false);
@@ -3245,13 +3489,13 @@ public class Home extends JFrame implements KeyListener{
 								//Center table data 
 								DefaultTableCellRenderer centerRenderer_search = new DefaultTableCellRenderer();
 								centerRenderer_search.setHorizontalAlignment( SwingConstants.CENTER );
-								table_refund_confirm.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //ID
-								table_refund_confirm.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Product ID
-								table_refund_confirm.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Name
-								table_refund_confirm.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Quantity
-								table_refund_confirm.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Price
-								table_refund_confirm.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_search ); //Quantity * Price
-								table_refund_confirm.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_search ); //Remove
+								table_refund_confirm.getColumnModel().getColumn(0).setCellRenderer( centerRenderer_search ); //Product ID
+								table_refund_confirm.getColumnModel().getColumn(1).setCellRenderer( centerRenderer_search ); //Name
+								table_refund_confirm.getColumnModel().getColumn(2).setCellRenderer( centerRenderer_search ); //Quantity
+								table_refund_confirm.getColumnModel().getColumn(3).setCellRenderer( centerRenderer_search ); //Price
+								table_refund_confirm.getColumnModel().getColumn(4).setCellRenderer( centerRenderer_search ); //Quantity * Price
+								table_refund_confirm.getColumnModel().getColumn(5).setCellRenderer( centerRenderer_search ); //Remove
+								table_refund_confirm.getColumnModel().getColumn(6).setCellRenderer( centerRenderer_search ); //Total refund price
 								
 								//Center table column names
 								centerRenderer_search = (DefaultTableCellRenderer) table_refund_confirm.getTableHeader().getDefaultRenderer();
@@ -3297,9 +3541,10 @@ public class Home extends JFrame implements KeyListener{
 												Cashier cashTemp = new Cashier();
 												Product pTemp = new Product();
 												pTemp = cashTemp.findProductID(returning.get(i).getProductID());
-												model_refund_confirm.addRow(new Object[]{i+1,returning.get(i).getProductID(),
+												model_refund_confirm.addRow(new Object[]{returning.get(i).getProductID(),
 												pTemp.getName(),returning.get(i).getQuantitySold(),
-												tr.get(j).getReturned(),returning.get(i).getReturned(),returning.get(i).getUnitPrice()});
+												tr.get(j).getReturned(),(returning.get(i).getReturned()-tr.get(j).getReturned()),(returning.get(i).getUnitPrice()),
+												((returning.get(i).getReturned()-tr.get(j).getReturned())*returning.get(i).getUnitPrice())});
 												
 												//Calculating new Subtotal
 												//Subtotal = Product of returning Unitprice * (new quantity - previous quantity of returned), so it doesn't go into negative

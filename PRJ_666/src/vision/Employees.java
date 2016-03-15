@@ -143,6 +143,9 @@ public class Employees extends JFrame{
 	//Frame for details
 	private JDialog d1;
 	
+	//Frame for password
+	private JDialog d2;
+	
 	//Date
 	String dateDelimiter = "/";
 	
@@ -570,7 +573,7 @@ public class Employees extends JFrame{
 									boolean check = true;
 									boolean ok = true;
 									//First name
-									if(validateEmpty(textPane_details_firstName.getText()) == false){
+									/*if(validateEmpty(textPane_details_firstName.getText()) == false){
 										textPane_edit_error_firstName.setText("First name cannot be Empty.");
 										check = false;
 									}
@@ -746,112 +749,125 @@ public class Employees extends JFrame{
 									else{
 										textPane_error_edit_jobType.setText(null);
 									}
+									*/
 									if(check && ok){
-										//String passwordInput = JOptionPane.showInputDialog(null, "Username: " + currentEmployee.getUsername() + "\n" + "Password:");
-										//Employees tempEmployee = new Employees();
-										//if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
-											//First name
-											textPane_details_firstName.setBackground(Color.decode(defaultColor));
-											textPane_details_firstName.setEditable(false);
-											
-											//Last name
-											textPane_details_lastName.setBackground(Color.decode(defaultColor));
-											textPane_details_lastName.setEditable(false);
-											
-											//Street
-											textPane_details_street.setBackground(Color.decode(defaultColor));
-											textPane_details_street.setEditable(false);
-											
-											//City
-											textPane_details_city.setBackground(Color.decode(defaultColor));
-											textPane_details_city.setEditable(false);
-	
-											//State/Province
-											textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-											textPane_details_stateProvince.setEditable(false);
-											
-											//Postal code
-											textPane_details_postalCode.setBackground(Color.decode(defaultColor));
-											textPane_details_postalCode.setEditable(false);
-											
-											//Home phone
-											textPane_details_homePhone.setBackground(Color.decode(defaultColor));
-											textPane_details_homePhone.setEditable(false);
-											
-											//Cell phone
-											textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
-											textPane_details_cellPhone.setEditable(false);
-											
-											//Email
-											textPane_details_email.setBackground(Color.decode(defaultColor));
-											textPane_details_email.setEditable(false);
-											
-											//Position ID
-											textPane_positionID.setBackground(Color.decode(defaultColor));
-											textPane_positionID.setEditable(false);
-											
-											//Job Type
-											textPane_details_JobType.setBackground(Color.decode(defaultColor));
-											textPane_details_JobType.setEditable(false);
-											
-											//Username
-											//textPane_details_username.setBackground(Color.decode(defaultColor));
-											//textPane_details_username.setEditable(false);
-											
-											btn_save.setVisible(false);
-											btn_edit.setVisible(true);
-											
-											//Write to DB
-											Connect connect = new Connect();
-											try {
-												Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-												String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
-												PreparedStatement ps = con.prepareStatement(sql);
-												ps.setString(1, textPane_details_firstName.getText().trim());
-												ps.setString(2, textPane_details_lastName.getText().trim());
-												ps.setString(3, textPane_details_street.getText().trim());
-												ps.setString(4, textPane_details_city.getText().trim());
-												ps.setString(5, textPane_details_stateProvince.getText().trim());
-												ps.setString(6, textPane_details_postalCode.getText().trim());
-												ps.setString(7, textPane_details_homePhone.getText().trim());
-												ps.setString(8, textPane_details_cellPhone.getText().trim());
-												ps.setString(9, textPane_details_email.getText().trim());
-												ps.setString(10, textPane_positionID.getText().trim());
-												ps.setString(11, textPane_details_JobType.getText().trim());
-												ps.setString(12, textPane_details_id.getText().trim());
-											    ps.executeUpdate();
+										JPanel panel = new JPanel();
+										JLabel label = new JLabel("Enter a password:");
+										JPasswordField pass = new JPasswordField(10);
+										panel.add(label);
+										panel.add(pass);
+										String[] options = new String[]{"OK", "Cancel"};
+										int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+										                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+										                         null, options, options[0]);
+										if(option == 0) // pressing OK button
+										{
+										    char[] password = pass.getPassword();
+										    String passwordInput = new String(password);
+										    
+										    Employees tempEmployee = new Employees();
+											if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
+												//First name
+												textPane_details_firstName.setBackground(Color.decode(defaultColor));
+												textPane_details_firstName.setEditable(false);
 												
-												//Clean-up environment
-												con.close();
-											} catch (SQLException e2) {
-												// TODO Auto-generated catch block
-												e2.printStackTrace();
-											}
-											
-											//removing vector elements
-											if(staffList != null){
-												staffList.clear();
-											}
-											//remove previous rows
-											for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
-												employeeModel.removeRow(i);
-											}
-											//Refreshing main staff table and getting new values
-											getStaffList();
-											if(staffList.size() > 0){
-												for(int i = 0; i < staffList.size(); i++){
-													employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+												//Last name
+												textPane_details_lastName.setBackground(Color.decode(defaultColor));
+												textPane_details_lastName.setEditable(false);
+												
+												//Street
+												textPane_details_street.setBackground(Color.decode(defaultColor));
+												textPane_details_street.setEditable(false);
+												
+												//City
+												textPane_details_city.setBackground(Color.decode(defaultColor));
+												textPane_details_city.setEditable(false);
+		
+												//State/Province
+												textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+												textPane_details_stateProvince.setEditable(false);
+												
+												//Postal code
+												textPane_details_postalCode.setBackground(Color.decode(defaultColor));
+												textPane_details_postalCode.setEditable(false);
+												
+												//Home phone
+												textPane_details_homePhone.setBackground(Color.decode(defaultColor));
+												textPane_details_homePhone.setEditable(false);
+												
+												//Cell phone
+												textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
+												textPane_details_cellPhone.setEditable(false);
+												
+												//Email
+												textPane_details_email.setBackground(Color.decode(defaultColor));
+												textPane_details_email.setEditable(false);
+												
+												//Position ID
+												textPane_positionID.setBackground(Color.decode(defaultColor));
+												textPane_positionID.setEditable(false);
+												
+												//Job Type
+												textPane_details_JobType.setBackground(Color.decode(defaultColor));
+												textPane_details_JobType.setEditable(false);
+												
+												//Username
+												//textPane_details_username.setBackground(Color.decode(defaultColor));
+												//textPane_details_username.setEditable(false);
+												
+												btn_save.setVisible(false);
+												btn_edit.setVisible(true);
+												
+												//Write to DB
+												Connect connect = new Connect();
+												try {
+													Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+													String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
+													PreparedStatement ps = con.prepareStatement(sql);
+													ps.setString(1, textPane_details_firstName.getText().trim());
+													ps.setString(2, textPane_details_lastName.getText().trim());
+													ps.setString(3, textPane_details_street.getText().trim());
+													ps.setString(4, textPane_details_city.getText().trim());
+													ps.setString(5, textPane_details_stateProvince.getText().trim());
+													ps.setString(6, textPane_details_postalCode.getText().trim());
+													ps.setString(7, textPane_details_homePhone.getText().trim());
+													ps.setString(8, textPane_details_cellPhone.getText().trim());
+													ps.setString(9, textPane_details_email.getText().trim());
+													ps.setString(10, textPane_positionID.getText().trim());
+													ps.setString(11, textPane_details_JobType.getText().trim());
+													ps.setString(12, textPane_details_id.getText().trim());
+												    ps.executeUpdate();
+													
+													//Clean-up environment
+													con.close();
+												} catch (SQLException e2) {
+													// TODO Auto-generated catch block
+													e2.printStackTrace();
+												}
+												
+												//removing vector elements
+												if(staffList != null){
+													staffList.clear();
+												}
+												//remove previous rows
+												for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
+													employeeModel.removeRow(i);
+												}
+												//Refreshing main staff table and getting new values
+												getStaffList();
+												if(staffList.size() > 0){
+													for(int i = 0; i < staffList.size(); i++){
+														employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+													}
+												}
+												else{
+													JOptionPane.showMessageDialog(null,"No staff was found in the database.");
 												}
 											}
 											else{
-												JOptionPane.showMessageDialog(null,"No staff was found in the database.");
+												JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
 											}
-										/*}
-										else{
-											//btn_save.setVisible(false);
-											//btn_edit.setVisible(true);
-											JOptionPane.showMessageDialog(null,"Invalid Password.");
-										}*/
+										}
 									}
 								}
 							});
@@ -914,8 +930,7 @@ public class Employees extends JFrame{
 							d1.getContentPane().add(staffDetails);
 							d1.setSize(900, 650);
 							d1.setLocationRelativeTo(null);
-							//d1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-							//d1.getRootPane().setDefaultButton(product_search_button);
+							d1.getRootPane().setDefaultButton(btn_cancel);
 							d1.setVisible(true);
 						}
 					}
