@@ -44,9 +44,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableRowSorter;
 import net.proteanit.sql.DbUtils;
 import org.jdatepicker.impl.*;
 
@@ -54,7 +51,7 @@ import org.jdatepicker.impl.*;
  *
  * @author Gaurav
  */
-public class Reports extends JFrame {
+public class Reports extends JFrame implements AutoCloseable {
     //Setting up GUI
     private JPanel Reports;
     private JButton Filter_Inventory;
@@ -2077,6 +2074,13 @@ public class Reports extends JFrame {
         }
         
         return Reports;
+    }
+
+    @Override
+    public void close() throws Exception {
+        if(c != null) {
+            c.close();
+        }
     }
     
     //Class for formatting Date.

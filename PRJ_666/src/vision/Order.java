@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -304,6 +306,12 @@ public class Order extends JPanel {
                 
             } catch (Exception sql){
                 JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                try {
+                    if (s != null) s.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
             
         });
