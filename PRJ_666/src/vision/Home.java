@@ -396,32 +396,56 @@ public class Home extends JFrame implements KeyListener{
 			    chooser.setAcceptAllFileFilterUsed(false);
 
 			    if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			    	//System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
-			    	//System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
-			    	String path = chooser.getSelectedFile() + "/backup.sql";
-			    	BackupAndRestore.setPath(path);
-			    	//Write path to file, set this path as normal path
-			    	File file = new File("backupPath.txt");
-			        try {
-			            file.createNewFile();
-			        } catch (IOException e1) {
-			            e1.printStackTrace();
-			        }
-			        if (file.exists()) {
-			            PrintWriter writer = null;
-			            try {
-			                writer = new PrintWriter(file, "UTF-8");
-			            } catch (FileNotFoundException e1) {
-			                e1.printStackTrace();
-			            } catch (UnsupportedEncodingException e1) {
-			                e1.printStackTrace();
-			            }
-			            writer.println(path);
-			            writer.close();
-			        }
+			    	JPanel panel = new JPanel();
+					JLabel label = new JLabel("Enter a password:");
+					JPasswordField pass = new JPasswordField(10);
+					panel.add(label);
+					panel.add(pass);
+					String[] options1 = new String[]{"OK", "Cancel"};
+					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+					                         null, options1, options1[0]);
+					// pressing OK button
+					if(option == 0) {
+					    char[] password = pass.getPassword();
+					    String passwordInput = new String(password);
+
+						Employees tempEmployee = new Employees(employee.getUsername());
+						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+							//System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
+					    	//System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
+					    	String path = chooser.getSelectedFile() + "/backup.sql";
+					    	BackupAndRestore.setPath(path);
+					    	//Write path to file, set this path as normal path
+					    	File file = new File("backupPath.txt");
+					        try {
+					            file.createNewFile();
+					        } catch (IOException e1) {
+					            e1.printStackTrace();
+					        }
+					        if (file.exists()) {
+					            PrintWriter writer = null;
+					            try {
+					                writer = new PrintWriter(file, "UTF-8");
+					            } catch (FileNotFoundException e1) {
+					                e1.printStackTrace();
+					            } catch (UnsupportedEncodingException e1) {
+					                e1.printStackTrace();
+					            }
+					            writer.println(path);
+					            writer.close();
+					        }
+					        JOptionPane.showMessageDialog(null,"Backup and Restore location has been changed to " + path + ".");
+					        BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+							br.backupDB();
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+						}
+					}	    	
 			    }
 			    else {
-			    	System.out.println("No Selection ");
+			    	//System.out.println("No Selection ");
 			    }
 			}
 		});
@@ -1987,29 +2011,46 @@ public class Home extends JFrame implements KeyListener{
 		}
 		setBackupRestorePath();
 	}
+	
 	public void setBackupRestorePath(){
 		File file = new File("backupPath.txt");
-        try {
-            file.createNewFile();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        
         Scanner in;
 
-        if (file.exists()) {
+        if (file.exists()){
             try{
                 in = new Scanner(file);
                 while(in.hasNext()){
                     String input = in.next();
                     if(input != null){
                     	BackupAndRestore.setPath(input);
-                    	BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
                     }
                 }
                 in.close();
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             }
+        }
+        //If file does not exist, create one and write the default location (Desktop)
+        else{
+        	try {
+        		file.createNewFile();
+	        } catch (IOException e1) {
+	            e1.printStackTrace();
+	        }
+        	BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+        	if (file.exists()) {
+	            PrintWriter writer = null;
+	            try {
+	                writer = new PrintWriter(file, "UTF-8");
+	            } catch (FileNotFoundException e1) {
+	                e1.printStackTrace();
+	            } catch (UnsupportedEncodingException e1) {
+	                e1.printStackTrace();
+	            }
+	            writer.println(BackupAndRestore.getPath());
+	            writer.close();
+	        }
         }
 	}
 	

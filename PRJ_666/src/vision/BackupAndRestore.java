@@ -57,7 +57,6 @@ public class BackupAndRestore {
 				defaultPath = "/Users/"+ getMachineUser() +"/Desktop/backup.sql";
 				//System.out.println("This is Mac");
 				if(path != null){
-					System.out.println(path);
 					setPath(path);
 				}
 				else{
