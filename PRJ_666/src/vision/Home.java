@@ -337,7 +337,7 @@ public class Home extends JFrame implements KeyListener{
 					    char[] password = pass.getPassword();
 					    String passwordInput = new String(password);
 					
-						Employees tempEmployee = new Employees();
+						Employees tempEmployee = new Employees(employee.getUsername());
 						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
 							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
 							br.restoreDB();
@@ -363,7 +363,7 @@ public class Home extends JFrame implements KeyListener{
 					    char[] password = pass.getPassword();
 					    String passwordInput = new String(password);
 
-						Employees tempEmployee = new Employees();
+						Employees tempEmployee = new Employees(employee.getUsername());
 						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
 							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
 							br.backupDB();

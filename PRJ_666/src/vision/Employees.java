@@ -765,7 +765,7 @@ public class Employees extends JFrame{
 										    char[] password = pass.getPassword();
 										    String passwordInput = new String(password);
 										    
-										    Employees tempEmployee = new Employees();
+										    Employees tempEmployee = new Employees(currentEmployee.getUsername());
 											if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
 												//First name
 												textPane_details_firstName.setBackground(Color.decode(defaultColor));
@@ -1509,6 +1509,9 @@ public class Employees extends JFrame{
 		this.hireDate = hireDate;
 		this.terminationDate = terminationDate;
 		this.salt = salt;
+	}
+	public Employees(String username){
+		
 	}
 	public void getStaffList(){
 		Connect connect = new Connect();

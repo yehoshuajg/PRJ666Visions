@@ -82,12 +82,12 @@ public class Login extends JFrame {
 		btnLogIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					employee = new Employees();
 					String pass = null;
 					if(passwordField.getPassword() != null){
 						char[] password = passwordField.getPassword();
 						pass = new String(password);
 					}
+					employee = new Employees(textField.getText());
 					if(employee.validateEmpty(textField.getText()) == false && employee.validateEmpty(pass) == false){
 						JOptionPane.showMessageDialog(null,"Please enter a username and a password.");
 					}
