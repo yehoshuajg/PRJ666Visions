@@ -100,6 +100,7 @@ public class Home extends JFrame implements KeyListener{
 	private JTextPane textField_name_input;
 	private JTextPane textField_description_input;
 	private JTextPane textField_quantity_input;
+	private JTextPane textPane_productID_notFound;
 	
 	//Table
 	private JTable table;
@@ -331,55 +332,71 @@ public class Home extends JFrame implements KeyListener{
 				}
 				//Restore
 				else if(cashCredit == JOptionPane.NO_OPTION){
-					JPanel panel = new JPanel();
-					JLabel label = new JLabel("Enter a password:");
-					JPasswordField pass = new JPasswordField(10);
-					panel.add(label);
-					panel.add(pass);
-					String[] options1 = new String[]{"OK", "Cancel"};
-					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
-					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-					                         null, options1, options1[0]);
-					if(option == 0) // pressing OK button
-					{
-					    char[] password = pass.getPassword();
-					    String passwordInput = new String(password);
-					
-						Employees tempEmployee = new Employees(employee.getUsername());
-						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
-							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-							br.restoreDB();
+					boolean go = false;
+					do{
+						JPanel panel = new JPanel();
+						JLabel label = new JLabel("Enter a password:");
+						JPasswordField pass = new JPasswordField(10);
+						panel.add(label);
+						panel.add(pass);
+						String[] options1 = new String[]{"OK", "Cancel"};
+						int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+						                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+						                         null, options1, options1[0]);
+						if(option == 0) // pressing OK button
+						{
+						    char[] password = pass.getPassword();
+						    String passwordInput = new String(password);
+						
+							Employees tempEmployee = new Employees(employee.getUsername());
+							if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+								BackupAndRestore br = new BackupAndRestore();
+								br.initialize();
+								br.restoreDB();
+								go = true;
+							}
+							else{
+								JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+							}
 						}
 						else{
-							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+							go = true;
 						}
-					}
+					}while(go == false);
 				}
 				//Backup
 				else if(cashCredit == JOptionPane.CANCEL_OPTION){
-					JPanel panel = new JPanel();
-					JLabel label = new JLabel("Enter a password:");
-					JPasswordField pass = new JPasswordField(10);
-					panel.add(label);
-					panel.add(pass);
-					String[] options1 = new String[]{"OK", "Cancel"};
-					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
-					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-					                         null, options1, options1[0]);
-					// pressing OK button
-					if(option == 0) {
-					    char[] password = pass.getPassword();
-					    String passwordInput = new String(password);
-
-						Employees tempEmployee = new Employees(employee.getUsername());
-						if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
-							BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
-							br.backupDB();
+					boolean go = false;
+					do{
+						JPanel panel = new JPanel();
+						JLabel label = new JLabel("Enter a password:");
+						JPasswordField pass = new JPasswordField(10);
+						panel.add(label);
+						panel.add(pass);
+						String[] options1 = new String[]{"OK", "Cancel"};
+						int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+						                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+						                         null, options1, options1[0]);
+						// pressing OK button
+						if(option == 0) {
+						    char[] password = pass.getPassword();
+						    String passwordInput = new String(password);
+	
+							Employees tempEmployee = new Employees(employee.getUsername());
+							if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
+								BackupAndRestore br = new BackupAndRestore();
+								br.initialize();
+								br.backupDB();
+								go = true;
+							}
+							else{
+								JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+							}
 						}
 						else{
-							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+							go = true;
 						}
-					}
+					}while(go == false);
 				}
 			}
 		});
@@ -436,7 +453,8 @@ public class Home extends JFrame implements KeyListener{
 					            writer.close();
 					        }
 					        JOptionPane.showMessageDialog(null,"Backup and Restore location has been changed to " + path + ".");
-					        BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+					        BackupAndRestore br = new BackupAndRestore();
+					        br.initialize();
 							br.backupDB();
 						}
 						else{
@@ -757,6 +775,9 @@ public class Home extends JFrame implements KeyListener{
 												}
 											}
 										}
+										else{
+											textPane_productID_notFound.setText("- Product '" + textField_productID_input.getText().trim() + "' could not be found.");
+										}
 									}
 								}
 							};
@@ -786,6 +807,11 @@ public class Home extends JFrame implements KeyListener{
 		textField_quantity_input.setBackground(Color.decode(defaultColor));
 		textField_quantity_input.setEditable(false);
 		item_info.add(textField_quantity_input);
+		
+		textPane_productID_notFound = new JTextPane();
+		textPane_productID_notFound.setBounds(238, 11, 483, 20);
+		textPane_productID_notFound.setBackground(Color.decode(defaultColor));
+		item_info.add(textPane_productID_notFound);
 		//textField_quantity_input.setColumns(10);
 		
 		JTabbedPane tabbedPane_3 = new JTabbedPane(JTabbedPane.TOP);
@@ -1986,8 +2012,9 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Reports",panel_reports);
 			
 			//Staff
-			JPanel panel_staff = employee.getWindow();
-			employee.setCurrentEmployee(employee);
+			Employees staff = new Employees();
+			JPanel panel_staff = staff.getWindow();
+			staff.setCurrentEmployee(employee);
 			tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
@@ -2038,7 +2065,8 @@ public class Home extends JFrame implements KeyListener{
 	        } catch (IOException e1) {
 	            e1.printStackTrace();
 	        }
-        	BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+        	BackupAndRestore br = new BackupAndRestore();
+        	br.initialize();
         	if (file.exists()) {
 	            PrintWriter writer = null;
 	            try {
@@ -3015,7 +3043,7 @@ public class Home extends JFrame implements KeyListener{
 												for(int j = 0; j < tempRefundHistory.size(); j++){
 													for(int k = 0; k < productByRefund.size(); k++){
 														if(tempRefundHistory.get(j).getProductID() == productByRefund.get(k).getID()){
-															model_refundHistory.addRow(new Object[]{i+1,productByRefund.get(k).getName(),
+															model_refundHistory.addRow(new Object[]{j+1,productByRefund.get(k).getName(),
 															tr.get(i).getQuantitySold(),tempRefundHistory.get(j).getReturned(),tempRefundHistory.get(j).getDateReturned()});
 														}
 													}
@@ -3032,7 +3060,7 @@ public class Home extends JFrame implements KeyListener{
 											d6.setVisible(true);
 										}
 										else{
-											JOptionPane.showMessageDialog(null,"This product has no return history.");
+											JOptionPane.showMessageDialog(null,"This product has no refund history.");
 										}
 										break;
 									}

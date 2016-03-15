@@ -32,7 +32,10 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -47,6 +50,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -143,7 +147,7 @@ public class Employees extends JFrame{
 	//Frame for details
 	private JDialog d1;
 	
-	//Frame for password
+	//Frame for changing current password
 	private JDialog d2;
 	
 	//Date
@@ -151,6 +155,11 @@ public class Employees extends JFrame{
 	
 	//Current logged in employee
 	Employees currentEmployee;
+	private JPasswordField textField_input_currentPassword;
+	private JPasswordField textField_input_newPassword;
+	private JPasswordField textField_input_confirmNewPassword;
+	private JTextPane textField_error_newPassword;
+	private JTextPane textField_error_confirmNewPassword;
 	
 	
 	public Employees() {
@@ -256,8 +265,6 @@ public class Employees extends JFrame{
 					int column = employeeTable.getSelectedColumn();
 					if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
 						if(row > -1){
-							String n = (String) employeeModel.getValueAt(row, 1);
-							
 							JPanel staffDetails = new JPanel();
 							staffDetails.setLayout(null);
 							
@@ -499,7 +506,7 @@ public class Employees extends JFrame{
 					        //Save button initialize
 					        JButton btn_save = new JButton("Save");
 					        
-					        btn_edit.setBounds(90, 570, 100, 40);
+					        btn_edit.setBounds(300, 570, 150, 40);
 					        btn_edit.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					        btn_edit.setFocusable(false);
 							staffDetails.add(btn_edit);
@@ -561,7 +568,7 @@ public class Employees extends JFrame{
 							});
 							
 					        //Save button
-					        btn_save.setBounds(90, 570, 100, 40);
+					        btn_save.setBounds(300, 570, 150, 40);
 					        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					        btn_save.setFocusable(false);
 							staffDetails.add(btn_save);
@@ -751,130 +758,137 @@ public class Employees extends JFrame{
 									}
 									*/
 									if(check && ok){
-										JPanel panel = new JPanel();
-										JLabel label = new JLabel("Enter a password:");
-										JPasswordField pass = new JPasswordField(10);
-										panel.add(label);
-										panel.add(pass);
-										String[] options = new String[]{"OK", "Cancel"};
-										int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
-										                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-										                         null, options, options[0]);
-										if(option == 0) // pressing OK button
-										{
-										    char[] password = pass.getPassword();
-										    String passwordInput = new String(password);
-										    
-										    Employees tempEmployee = new Employees(currentEmployee.getUsername());
-											if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
-												//First name
-												textPane_details_firstName.setBackground(Color.decode(defaultColor));
-												textPane_details_firstName.setEditable(false);
-												
-												//Last name
-												textPane_details_lastName.setBackground(Color.decode(defaultColor));
-												textPane_details_lastName.setEditable(false);
-												
-												//Street
-												textPane_details_street.setBackground(Color.decode(defaultColor));
-												textPane_details_street.setEditable(false);
-												
-												//City
-												textPane_details_city.setBackground(Color.decode(defaultColor));
-												textPane_details_city.setEditable(false);
-		
-												//State/Province
-												textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-												textPane_details_stateProvince.setEditable(false);
-												
-												//Postal code
-												textPane_details_postalCode.setBackground(Color.decode(defaultColor));
-												textPane_details_postalCode.setEditable(false);
-												
-												//Home phone
-												textPane_details_homePhone.setBackground(Color.decode(defaultColor));
-												textPane_details_homePhone.setEditable(false);
-												
-												//Cell phone
-												textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
-												textPane_details_cellPhone.setEditable(false);
-												
-												//Email
-												textPane_details_email.setBackground(Color.decode(defaultColor));
-												textPane_details_email.setEditable(false);
-												
-												//Position ID
-												textPane_positionID.setBackground(Color.decode(defaultColor));
-												textPane_positionID.setEditable(false);
-												
-												//Job Type
-												textPane_details_JobType.setBackground(Color.decode(defaultColor));
-												textPane_details_JobType.setEditable(false);
-												
-												//Username
-												//textPane_details_username.setBackground(Color.decode(defaultColor));
-												//textPane_details_username.setEditable(false);
-												
-												btn_save.setVisible(false);
-												btn_edit.setVisible(true);
-												
-												//Write to DB
-												Connect connect = new Connect();
-												try {
-													Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-													String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
-													PreparedStatement ps = con.prepareStatement(sql);
-													ps.setString(1, textPane_details_firstName.getText().trim());
-													ps.setString(2, textPane_details_lastName.getText().trim());
-													ps.setString(3, textPane_details_street.getText().trim());
-													ps.setString(4, textPane_details_city.getText().trim());
-													ps.setString(5, textPane_details_stateProvince.getText().trim());
-													ps.setString(6, textPane_details_postalCode.getText().trim());
-													ps.setString(7, textPane_details_homePhone.getText().trim());
-													ps.setString(8, textPane_details_cellPhone.getText().trim());
-													ps.setString(9, textPane_details_email.getText().trim());
-													ps.setString(10, textPane_positionID.getText().trim());
-													ps.setString(11, textPane_details_JobType.getText().trim());
-													ps.setString(12, textPane_details_id.getText().trim());
-												    ps.executeUpdate();
+										boolean go = false;
+										do{
+											JPanel panel = new JPanel();
+											JLabel label = new JLabel("Enter a password:");
+											JPasswordField pass = new JPasswordField(10);
+											panel.add(label);
+											panel.add(pass);
+											String[] options = new String[]{"OK", "Cancel"};
+											int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+											                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+											                         null, options, options[0]);
+											if(option == 0) // pressing OK button
+											{
+											    char[] password = pass.getPassword();
+											    String passwordInput = new String(password);
+											    
+											    Employees tempEmployee = new Employees(currentEmployee.getUsername());
+												if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
+													//First name
+													textPane_details_firstName.setBackground(Color.decode(defaultColor));
+													textPane_details_firstName.setEditable(false);
 													
-													//Clean-up environment
-													con.close();
-												} catch (SQLException e2) {
-													// TODO Auto-generated catch block
-													e2.printStackTrace();
-												}
-												
-												//removing vector elements
-												if(staffList != null){
-													staffList.clear();
-												}
-												//remove previous rows
-												for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
-													employeeModel.removeRow(i);
-												}
-												//Refreshing main staff table and getting new values
-												getStaffList();
-												if(staffList.size() > 0){
-													for(int i = 0; i < staffList.size(); i++){
-														employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+													//Last name
+													textPane_details_lastName.setBackground(Color.decode(defaultColor));
+													textPane_details_lastName.setEditable(false);
+													
+													//Street
+													textPane_details_street.setBackground(Color.decode(defaultColor));
+													textPane_details_street.setEditable(false);
+													
+													//City
+													textPane_details_city.setBackground(Color.decode(defaultColor));
+													textPane_details_city.setEditable(false);
+			
+													//State/Province
+													textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+													textPane_details_stateProvince.setEditable(false);
+													
+													//Postal code
+													textPane_details_postalCode.setBackground(Color.decode(defaultColor));
+													textPane_details_postalCode.setEditable(false);
+													
+													//Home phone
+													textPane_details_homePhone.setBackground(Color.decode(defaultColor));
+													textPane_details_homePhone.setEditable(false);
+													
+													//Cell phone
+													textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
+													textPane_details_cellPhone.setEditable(false);
+													
+													//Email
+													textPane_details_email.setBackground(Color.decode(defaultColor));
+													textPane_details_email.setEditable(false);
+													
+													//Position ID
+													textPane_positionID.setBackground(Color.decode(defaultColor));
+													textPane_positionID.setEditable(false);
+													
+													//Job Type
+													textPane_details_JobType.setBackground(Color.decode(defaultColor));
+													textPane_details_JobType.setEditable(false);
+													
+													//Username
+													//textPane_details_username.setBackground(Color.decode(defaultColor));
+													//textPane_details_username.setEditable(false);
+													
+													btn_save.setVisible(false);
+													btn_edit.setVisible(true);
+													
+													//Write to DB
+													Connect connect = new Connect();
+													try {
+														Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+														String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
+														PreparedStatement ps = con.prepareStatement(sql);
+														ps.setString(1, textPane_details_firstName.getText().trim());
+														ps.setString(2, textPane_details_lastName.getText().trim());
+														ps.setString(3, textPane_details_street.getText().trim());
+														ps.setString(4, textPane_details_city.getText().trim());
+														ps.setString(5, textPane_details_stateProvince.getText().trim());
+														ps.setString(6, textPane_details_postalCode.getText().trim());
+														ps.setString(7, textPane_details_homePhone.getText().trim());
+														ps.setString(8, textPane_details_cellPhone.getText().trim());
+														ps.setString(9, textPane_details_email.getText().trim());
+														ps.setString(10, textPane_positionID.getText().trim());
+														ps.setString(11, textPane_details_JobType.getText().trim());
+														ps.setString(12, textPane_details_id.getText().trim());
+													    ps.executeUpdate();
+														
+														//Clean-up environment
+														con.close();
+													} catch (SQLException e2) {
+														// TODO Auto-generated catch block
+														e2.printStackTrace();
 													}
+													
+													//removing vector elements
+													if(staffList != null){
+														staffList.clear();
+													}
+													//remove previous rows
+													for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
+														employeeModel.removeRow(i);
+													}
+													//Refreshing main staff table and getting new values
+													getStaffList();
+													if(staffList.size() > 0){
+														for(int i = 0; i < staffList.size(); i++){
+															employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+														}
+													}
+													else{
+														JOptionPane.showMessageDialog(null,"No staff was found in the database.");
+													}
+													go = true;
 												}
 												else{
-													JOptionPane.showMessageDialog(null,"No staff was found in the database.");
+													JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
 												}
 											}
 											else{
-												JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+												go = true;
 											}
-										}
+										}while(go == false);
 									}
 								}
 							});
 					        
 							//Print button
 					        JButton btn_print = new JButton("Print");
-					        btn_print.setBounds(210, 570, 100, 40);
+					        btn_print.setBounds(485, 570, 150, 40);
 					        btn_print.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					        btn_print.setFocusable(false);
 							staffDetails.add(btn_print);
@@ -888,7 +902,7 @@ public class Employees extends JFrame{
 					        
 							//Cancel button
 					        JButton btn_cancel = new JButton("Cancel");
-					        btn_cancel.setBounds(330, 570, 100, 40);
+					        btn_cancel.setBounds(670, 570, 150, 40);
 					        btn_cancel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					        btn_cancel.setFocusable(false);
 							staffDetails.add(btn_cancel);
@@ -899,6 +913,34 @@ public class Employees extends JFrame{
 									d1.dispose();
 								}
 							});
+							
+							if(currentEmployee != null){
+								int tempID = (Integer) employeeModel.getValueAt(row, 0);
+								String tempUsername = (String) employeeModel.getValueAt(row,5);
+								for(int i = 0; i < staffList.size(); i++){
+									//Checking if user double clicked / being viewed is in vector, to get more details
+									if(tempID == staffList.get(i).getID() && tempUsername.equals(staffList.get(i).getUsername())){
+										//Check if the current user is the one being viewed
+										if(currentEmployee.getID() == staffList.get(i).getID() && currentEmployee.getUsername().equals(staffList.get(i).getUsername())){
+											//Change Password button
+									        JButton btn_chgpwd = new JButton("Change Password");
+									        btn_chgpwd.setBounds(90, 570, 200, 40);
+									        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+									        btn_chgpwd.setFocusable(false);
+											staffDetails.add(btn_chgpwd);
+											int tID = staffList.get(i).getID();
+											String tUserName = staffList.get(i).getUsername();
+											btn_chgpwd.addActionListener(new ActionListener() {
+												@Override
+												public void actionPerformed(ActionEvent e) {
+													loadPasswordFrame(e,tID,tUserName);
+												}
+											});
+										}
+										break;
+									}
+								}
+							}
 					        
 					        //Filling fields
 					        if(staffList.size() > 0){
@@ -943,7 +985,7 @@ public class Employees extends JFrame{
         panel_add_staff.setLayout(null);
         
         JTabbedPane tabbedPane_add_employee = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_add_employee.setBounds(67, 6, 763, 615);
+        tabbedPane_add_employee.setBounds(250, 6, 763, 615);
         panel_add_staff.add(tabbedPane_add_employee);
         
         JPanel panel_add_employee = new JPanel();
@@ -1221,7 +1263,73 @@ public class Employees extends JFrame{
         JPanel panel_details = new JPanel();
         tabbedPane.addTab("Details", null, panel_details, null);
         panel_details.setLayout(null);
+        /*
+        JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane_chgpwd.setBounds(301, 38, 790, 220);
+        panel_details.add(tabbedPane_chgpwd);
         
+        JPanel panel_chgpwd = new JPanel();
+        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
+        panel_chgpwd.setLayout(null);
+        
+        JTextPane txtpnCurrentPassword = new JTextPane();
+        txtpnCurrentPassword.setText("Current Password:");
+        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
+        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
+        panel_chgpwd.add(txtpnCurrentPassword);
+        
+        JTextPane txtpnNewPassword = new JTextPane();
+        txtpnNewPassword.setText("New Password:");
+        txtpnNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnNewPassword.setBounds(10, 45, 94, 20);
+        panel_chgpwd.add(txtpnNewPassword);
+        
+        JTextPane txtpnConfirmNewPassword = new JTextPane();
+        txtpnConfirmNewPassword.setText("Confirm New Password:");
+        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
+        panel_chgpwd.add(txtpnConfirmNewPassword);
+        
+        textField_input_currentPassword = new JPasswordField();
+        textField_input_currentPassword.setBounds(136, 6, 150, 26);
+        panel_chgpwd.add(textField_input_currentPassword);
+        textField_input_currentPassword.setColumns(10);
+        
+        textField_input_newPassword = new JPasswordField();
+        textField_input_newPassword.setBounds(116, 42, 150, 26);
+        panel_chgpwd.add(textField_input_newPassword);
+        textField_input_newPassword.setColumns(10);
+        
+        textField_input_confirmNewPassword = new JPasswordField();
+        textField_input_confirmNewPassword.setBounds(171, 77, 150, 26);
+        panel_chgpwd.add(textField_input_confirmNewPassword);
+        textField_input_confirmNewPassword.setColumns(10);
+        
+        JTextPane textPane_error_currentPassword = new JTextPane();
+        textPane_error_currentPassword.setBounds(298, 10, 465, 20);
+        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textPane_error_currentPassword);
+        
+        textField_error_newPassword = new JTextField();
+        textField_error_newPassword.setBounds(274, 42, 489, 26);
+        textField_error_newPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_newPassword);
+        textField_error_newPassword.setColumns(10);
+        
+        textField_error_confirmNewPassword = new JTextField();
+        textField_error_confirmNewPassword.setBounds(333, 77, 430, 26);
+        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_confirmNewPassword);
+        textField_error_confirmNewPassword.setColumns(10);
+        
+        JButton btnChgPassword = new JButton("Change Password");
+        btnChgPassword.setBounds(10, 120, 350, 38);
+        panel_chgpwd.add(btnChgPassword);
+        
+        JButton btnCancel_chgpwd = new JButton("Cancel");
+        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
+        panel_chgpwd.add(btnCancel_chgpwd);
+        */
         /*
         JTabbedPane tabbedPane_details = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane_details.setBounds(85, 15, 740, 551);
@@ -1443,6 +1551,191 @@ public class Employees extends JFrame{
         textPane_error_edit_jobType.setBounds(238, 362, 475, 20);
         panel_employeeDetails.add(textPane_error_edit_jobType);
         */
+	}
+	private void loadPasswordFrame(ActionEvent e, int employeeID, String username) {
+		JPanel chgpwd_panel = new JPanel();
+		chgpwd_panel.setLayout(null);
+					
+		JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane_chgpwd.setBounds(55, 25, 790, 220);
+        chgpwd_panel.add(tabbedPane_chgpwd);
+        
+        JPanel panel_chgpwd = new JPanel();
+        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
+        panel_chgpwd.setLayout(null);
+        
+        JTextPane txtpnCurrentPassword = new JTextPane();
+        txtpnCurrentPassword.setText("Current Password:");
+        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
+        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
+        panel_chgpwd.add(txtpnCurrentPassword);
+        
+        JTextPane txtpnNewPassword = new JTextPane();
+        txtpnNewPassword.setText("New Password:");
+        txtpnNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnNewPassword.setBounds(10, 45, 94, 20);
+        panel_chgpwd.add(txtpnNewPassword);
+        
+        JTextPane txtpnConfirmNewPassword = new JTextPane();
+        txtpnConfirmNewPassword.setText("Confirm New Password:");
+        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
+        panel_chgpwd.add(txtpnConfirmNewPassword);
+        
+        textField_input_currentPassword = new JPasswordField();
+        textField_input_currentPassword.setBounds(130, 4, 150, 26);
+        panel_chgpwd.add(textField_input_currentPassword);
+        textField_input_currentPassword.setColumns(10);
+        
+        textField_input_newPassword = new JPasswordField();
+        textField_input_newPassword.setBounds(110, 38, 150, 26);
+        panel_chgpwd.add(textField_input_newPassword);
+        textField_input_newPassword.setColumns(10);
+        
+        textField_input_confirmNewPassword = new JPasswordField();
+        textField_input_confirmNewPassword.setBounds(165, 73, 150, 26);
+        panel_chgpwd.add(textField_input_confirmNewPassword);
+        textField_input_confirmNewPassword.setColumns(10);
+        
+        JTextPane textPane_error_currentPassword = new JTextPane();
+        textPane_error_currentPassword.setBounds(290, 10, 465, 20);
+        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textPane_error_currentPassword);
+        
+        textField_error_newPassword = new JTextPane();
+        textField_error_newPassword.setBounds(270, 42, 489, 26);
+        textField_error_newPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_newPassword);
+        
+        textField_error_confirmNewPassword = new JTextPane();
+        textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
+        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_confirmNewPassword);
+        
+        JButton btnChgPassword = new JButton("Change Password");
+        btnChgPassword.setBounds(10, 120, 350, 38);
+        panel_chgpwd.add(btnChgPassword);
+        btnChgPassword.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean check = true;
+				boolean ok = true;
+				//Current Password
+				char[] cpassword = textField_input_currentPassword.getPassword();
+				String currentPass = new String(cpassword);
+				if(validateEmpty(currentPass) == false){
+					textPane_error_currentPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(currentPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textPane_error_currentPassword.setText(null);
+					}
+					else{
+						textPane_error_currentPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				//New Password
+				char[] npassword = textField_input_newPassword.getPassword();
+				String newPass = new String(npassword);
+				if(validateEmpty(newPass) == false){
+					textField_error_newPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_newPassword.setText(null);
+					}
+					else{
+						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				//Confirm New Password
+				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
+				String cnewPass = new String(cnpassword);
+				if(validateEmpty(cnewPass) == false){
+					textField_error_confirmNewPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_confirmNewPassword.setText(null);
+					}
+					else{
+						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				if(check && ok){
+					//Current password
+					Employees tempEmployee = new Employees(username);
+					if(tempEmployee.fetchLogin(username, currentPass)){
+						if(newPass.equals(cnewPass)){
+							Hashing hash = new Hashing();
+							String salt;
+							try {
+								salt = hash.getSalt();
+								String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
+								Connect connect = new Connect();
+								try {
+									Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+									String sql = "UPDATE `Employee` SET Password = ?, Salt = ? where ID = ? AND UserName = ?";
+									PreparedStatement ps = con.prepareStatement(sql);
+									ps.setString(1, hashedPassword);
+									ps.setString(2, salt);
+									ps.setInt(3, employeeID);
+									ps.setString(4, username);
+								    ps.executeUpdate();
+									
+									//Clean-up environment
+									con.close();
+								} catch (SQLException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							} catch (NoSuchAlgorithmException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							JOptionPane.showMessageDialog(null,"Password successfully changed for Employee '" + username + "'.");
+							d2.dispose();
+						}
+						else{
+							textField_error_newPassword.setText("Password entered does not match confirm password.");
+							textField_error_confirmNewPassword.setText("Confirm password entered does not match new password.");
+						}
+					}
+					else{
+						textPane_error_currentPassword.setText("Invalid Password");
+					}
+				}
+			}
+		});
+        
+        JButton btnCancel_chgpwd = new JButton("Cancel");
+        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
+        panel_chgpwd.add(btnCancel_chgpwd);
+        btnCancel_chgpwd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				d2.dispose();
+			}
+		});
+        
+		Component component = (Component) e.getSource();
+		//Call parent jframe/jdialog
+		JFrame topFrame2 = (JFrame)(d1.getParent());
+		d2 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d2.getContentPane().add(chgpwd_panel);
+		d2.setSize(900, 300);
+		d2.setLocationRelativeTo(null);
+		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
+		d2.setVisible(true);
 	}
 	public void setCurrentEmployee(Employees currentEmployee){
 		this.currentEmployee = currentEmployee;

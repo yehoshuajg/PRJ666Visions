@@ -41,36 +41,36 @@ public class BackupAndRestore {
 		defaultPath = null;
 		fileName = null;
 	}
-	BackupAndRestore(String os){
-		if(os != null){
-			os = os.toLowerCase();
-			BackupAndRestore.os = os;
-			setDbName("StoreDB");
-			Connect connect = new Connect();
-			setUsername(connect.getUsername());
-			setPassword(connect.getPassword());
-			setMachineUser(System.getProperty("user.name"));
-			if (isWindows()) {
-				//System.out.println("This is Windows");
-				setPath("");
-			} else if (isMac()) {
-				defaultPath = "/Users/"+ getMachineUser() +"/Desktop/backup.sql";
-				//System.out.println("This is Mac");
-				if(path != null){
-					setPath(path);
-				}
-				else{
-					setPath(defaultPath);
-				}
-			} else if (isUnix()) {
-				//System.out.println("This is Unix or Linux");
-			}
-			else {
-				//System.out.println("Your OS is not support!!");
-			}
-			//backupDB();
-			//restoreDB();
+	public void initialize(){
+		BackupAndRestore.os = System.getProperty("os.name");
+		BackupAndRestore.os = BackupAndRestore.os.toLowerCase();
+		setDbName("StoreDB");
+		Connect connect = new Connect();
+		setUsername(connect.getUsername());
+		setPassword(connect.getPassword());
+		setMachineUser(System.getProperty("user.name"));
+		if (isWindows()) {
+			//System.out.println("This is Windows");
+			setPath("");
 		}
+		else if (isMac()) {
+			defaultPath = "/Users/"+ getMachineUser() +"/Desktop/backup.sql";
+			//System.out.println("This is Mac");
+			if(path != null){
+				setPath(path);
+			}
+			else{
+				setPath(defaultPath);
+			}
+		} 
+		else if (isUnix()) {
+			//System.out.println("This is Unix or Linux");
+		}
+		else {
+			//System.out.println("Your OS is not support!!");
+		}
+		//backupDB();
+		//restoreDB();
 	}
 	public void restoreDB(){
 		createDB();
