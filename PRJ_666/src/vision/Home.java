@@ -31,6 +31,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -38,11 +39,18 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -375,8 +383,50 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		});
-		btnBackupRestore.setBounds(501, 356, 117, 29);
+		btnBackupRestore.setBounds(501, 356, 153, 29);
 		panel_home.add(btnBackupRestore);
+		
+		JButton btnChangeBackupAnd = new JButton("Change Backup and Restore Directory");
+		btnChangeBackupAnd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("choosertitle");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    chooser.setAcceptAllFileFilterUsed(false);
+
+			    if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			    	//System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
+			    	//System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
+			    	String path = chooser.getSelectedFile() + "/backup.sql";
+			    	BackupAndRestore.setPath(path);
+			    	//Write path to file, set this path as normal path
+			    	File file = new File("backupPath.txt");
+			        try {
+			            file.createNewFile();
+			        } catch (IOException e1) {
+			            e1.printStackTrace();
+			        }
+			        if (file.exists()) {
+			            PrintWriter writer = null;
+			            try {
+			                writer = new PrintWriter(file, "UTF-8");
+			            } catch (FileNotFoundException e1) {
+			                e1.printStackTrace();
+			            } catch (UnsupportedEncodingException e1) {
+			                e1.printStackTrace();
+			            }
+			            writer.println(path);
+			            writer.close();
+			        }
+			    }
+			    else {
+			    	System.out.println("No Selection ");
+			    }
+			}
+		});
+		btnChangeBackupAnd.setBounds(430, 397, 320, 29);
+		panel_home.add(btnChangeBackupAnd);
 		
 		JPanel panel_cashier = new JPanel();
 		tabbedPane.addTab("Cashier", null, panel_cashier, null);
@@ -1935,6 +1985,32 @@ public class Home extends JFrame implements KeyListener{
 			JPanel panel_getHelp = new JPanel();
 			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
+		setBackupRestorePath();
+	}
+	public void setBackupRestorePath(){
+		File file = new File("backupPath.txt");
+        try {
+            file.createNewFile();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        Scanner in;
+
+        if (file.exists()) {
+            try{
+                in = new Scanner(file);
+                while(in.hasNext()){
+                    String input = in.next();
+                    if(input != null){
+                    	BackupAndRestore.setPath(input);
+                    	BackupAndRestore br = new BackupAndRestore(System.getProperty("os.name"));
+                    }
+                }
+                in.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        }
 	}
 	
 	/*public void calculateSalePrice(int row, Object objID){

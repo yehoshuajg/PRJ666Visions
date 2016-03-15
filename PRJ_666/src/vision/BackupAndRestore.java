@@ -21,6 +21,8 @@ public class BackupAndRestore {
 	private static String password;
 	private static String os;
 	private static String path;
+	private static String defaultPath;
+	private static String fileName;
 	
 	/*
 	To get the currently logged in user:
@@ -36,6 +38,8 @@ public class BackupAndRestore {
 		password = null;
 		os = null;
 		path = null;
+		defaultPath = null;
+		fileName = null;
 	}
 	BackupAndRestore(String os){
 		if(os != null){
@@ -50,8 +54,15 @@ public class BackupAndRestore {
 				//System.out.println("This is Windows");
 				setPath("");
 			} else if (isMac()) {
+				defaultPath = "/Users/"+ getMachineUser() +"/Desktop/backup.sql";
 				//System.out.println("This is Mac");
-				setPath("/Users/"+ getMachineUser() +"/Desktop/backup.sql");
+				if(path != null){
+					System.out.println(path);
+					setPath(path);
+				}
+				else{
+					setPath(defaultPath);
+				}
 			} else if (isUnix()) {
 				//System.out.println("This is Unix or Linux");
 			}
