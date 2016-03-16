@@ -26,6 +26,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -44,6 +50,9 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JSeparator;
@@ -150,6 +159,8 @@ public class Employees extends JFrame{
 	
 	//Frame for changing current password
 	private JDialog d2;
+	private HashMap resetUserEmail = new HashMap<>();
+	private String tempResetUserEmail;
 	
 	//Date
 	String dateDelimiter = "/";
@@ -257,6 +268,12 @@ public class Employees extends JFrame{
 		//Checking for double click
 		employeeTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
+				Positions position = new Positions();
+				if(position.checkPosition(currentEmployee.getPositionID()) == false){
+					JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
+					//System.exit(0);
+				}
+				else{
 				if (e.getClickCount() == 1) {
 					//System.out.println("1");
 				}
@@ -266,10 +283,10 @@ public class Employees extends JFrame{
 					int column = employeeTable.getSelectedColumn();
 					if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
 						if(row > -1){
-							Positions position2 = new Positions();
-							if(position2.checkPosition(currentEmployee.getPositionID()) == false){
+							//Positions position = new Positions();
+							if(position.checkPosition(currentEmployee.getPositionID()) == false){
 								JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-								System.exit(0);
+								//System.exit(0);
 							}
 							else{
 								JPanel staffDetails = new JPanel();
@@ -764,10 +781,9 @@ public class Employees extends JFrame{
 											textPane_error_edit_jobType.setText(null);
 										}
 										*/
-										Positions position3 = new Positions();
-										if(position3.checkPosition(currentEmployee.getPositionID()) == false){
+										if(position.checkPosition(currentEmployee.getPositionID()) == false){
 											JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-											System.exit(0);
+											//System.exit(0);
 										}
 										else{
 											if(check && ok){
@@ -898,6 +914,10 @@ public class Employees extends JFrame{
 														go = true;
 													}
 												}while(go == false);
+												if(position.checkPosition(currentEmployee.getPositionID()) == false){
+													JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
+													//System.exit(0);
+												}
 											}
 										}
 									}
@@ -941,7 +961,7 @@ public class Employees extends JFrame{
 											if(currentEmployee.getID() == staffList.get(i).getID() && currentEmployee.getUsername().equals(staffList.get(i).getUsername())){
 												//Check if the user is a manager, cashier, etc. Only managers (higher employee's) are allowed to change passwords.
 												//Cashiers must change password using/requesting a manager account.
-												Positions position = new Positions();
+												//Positions position = new Positions();
 												if(position.checkPosition(staffList.get(i).getPositionID()) == true){
 													//Change Password button
 											        JButton btn_chgpwd = new JButton("Change Password");
@@ -962,7 +982,7 @@ public class Employees extends JFrame{
 											else{
 												//Check if the manager account is allowed to edit only cashier, etc positions.
 												//Not higher positions, such as other managers.
-												Positions position = new Positions();
+												//Positions position = new Positions();
 												if(position.checkPosition(staffList.get(i).getPositionID()) == false){
 													//Change Password button
 											        JButton btn_chgpwd = new JButton("Change Password");
@@ -976,6 +996,95 @@ public class Employees extends JFrame{
 														@Override
 														public void actionPerformed(ActionEvent e) {
 															loadPasswordFrame(e,tID,tUserName);
+														}
+													});
+												}
+												else{
+													//Forgot Password for managers
+													JButton btn_forgot = new JButton("Forgot password?");
+													btn_forgot.setBounds(90, 570, 200, 40);
+													btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
+													btn_forgot.setFocusable(false);
+													staffDetails.add(btn_forgot);
+													tempResetUserEmail = staffList.get(i).getEmail();
+													btn_forgot.addActionListener(new ActionListener() {
+														@Override
+														public void actionPerformed(ActionEvent e) {
+															if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
+																Object[] options = {"Cancel","Enter Code","Send Email"};
+																int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
+																	JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+																	
+																//Cancel
+																if(selection == JOptionPane.YES_OPTION){
+																	
+																}
+																//Enter Code
+																else if(selection == JOptionPane.NO_OPTION){
+																	
+																}
+																//Send Email
+																else if(selection == JOptionPane.CANCEL_OPTION){
+																	Random random = new Random();
+																	//random.nextInt(max - min + 1) + min
+																	int value = random.nextInt(9999 - 1000 + 1) + 1000;
+																	String sValue = String.valueOf(value);
+																	if(!sValue.isEmpty() && sValue.length() == 4){
+																		//Send Generated code to Email
+																		resetUserEmail.put(tempResetUserEmail, sValue);
+																		//System.out.println("Size: " + resetUserEmail.size());
+																		// Recipient's email ID needs to be mentioned.
+																	    //String to = tempResetUserEmail;
+																		String to = "nitish111@hotmail.com";
+																		
+																	    // Sender's email ID needs to be mentioned
+																	    //Change to senders email (current signed in employee), or zenit
+																	    String from = "nsbajaj@myseneca.com";
+																	    
+																	    // Assuming you are sending email from localhost
+																	    //Change localhost to host
+																	    String host = "localhost";
+																	    
+																	    // Get system properties
+																	    Properties properties = System.getProperties();
+																	    
+																	    // Setup mail server
+																	    properties.setProperty("mail.smtp.host", host);
+
+																	    // Get the default Session object.
+																	    Session session = Session.getDefaultInstance(properties);
+																		
+																	    try{
+																	         // Create a default MimeMessage object.
+																	         MimeMessage message = new MimeMessage(session);
+
+																	         // Set From: header field of the header.
+																	         message.setFrom(new InternetAddress(from));
+
+																	         // Set To: header field of the header.
+																	         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+																	         // Set Subject: header field
+																	         message.setSubject("This is the Subject Line!");
+
+																	         // Now set the actual message
+																	         message.setText("This is actual message");
+
+																	         // Send message
+																	         Transport.send(message);
+																	         System.out.println("Sent message successfully....");
+																	      }catch (MessagingException mex) {
+																	         mex.printStackTrace();
+																	      }
+																		
+																		//Reset to null, just to be safe
+																		tempResetUserEmail = null;
+																	}
+																}
+															}
+															else{
+																JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
+															}
 														}
 													});
 												}
@@ -1017,9 +1126,10 @@ public class Employees extends JFrame{
 								d1.setLocationRelativeTo(null);
 								d1.getRootPane().setDefaultButton(btn_cancel);
 								d1.setVisible(true);
+								}
 							}
 						}
-					}
+					}			
 				}
 			}
 		});
@@ -1636,6 +1746,14 @@ public class Employees extends JFrame{
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public HashMap getResetUserEmail() {
+		return resetUserEmail;
+	}
+	public void setResetUserEmail(HashMap resetUserEmail) {
+		this.resetUserEmail = resetUserEmail;
+	}
 	private void loadPasswordFrame(ActionEvent e, int employeeID, String username) {
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -1651,18 +1769,21 @@ public class Employees extends JFrame{
         JTextPane txtpnCurrentPassword = new JTextPane();
         txtpnCurrentPassword.setText("Current Password:");
         txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
+        txtpnCurrentPassword.setEditable(false);
         txtpnCurrentPassword.setBounds(10, 10, 114, 20);
         panel_chgpwd.add(txtpnCurrentPassword);
         
         JTextPane txtpnNewPassword = new JTextPane();
         txtpnNewPassword.setText("New Password:");
         txtpnNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnNewPassword.setEditable(false);
         txtpnNewPassword.setBounds(10, 45, 94, 20);
         panel_chgpwd.add(txtpnNewPassword);
         
         JTextPane txtpnConfirmNewPassword = new JTextPane();
         txtpnConfirmNewPassword.setText("Confirm New Password:");
         txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnConfirmNewPassword.setEditable(false);
         txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
         panel_chgpwd.add(txtpnConfirmNewPassword);
         
@@ -1683,16 +1804,19 @@ public class Employees extends JFrame{
         
         JTextPane textPane_error_currentPassword = new JTextPane();
         textPane_error_currentPassword.setBounds(290, 10, 465, 20);
+        textPane_error_currentPassword.setEditable(false);
         textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
         panel_chgpwd.add(textPane_error_currentPassword);
         
         textField_error_newPassword = new JTextPane();
         textField_error_newPassword.setBounds(270, 42, 489, 26);
+        textField_error_newPassword.setEditable(false);
         textField_error_newPassword.setBackground(Color.decode(defaultColor));
         panel_chgpwd.add(textField_error_newPassword);
         
         textField_error_confirmNewPassword = new JTextPane();
         textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
+        textField_error_confirmNewPassword.setEditable(false);
         textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
         panel_chgpwd.add(textField_error_confirmNewPassword);
         
@@ -1774,6 +1898,197 @@ public class Employees extends JFrame{
 									ps.setString(2, salt);
 									ps.setInt(3, employeeID);
 									ps.setString(4, username);
+								    ps.executeUpdate();
+									
+									//Clean-up environment
+									con.close();
+								} catch (SQLException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							} catch (NoSuchAlgorithmException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							JOptionPane.showMessageDialog(null,"Password successfully changed for Employee '" + username + "'.");
+							d2.dispose();
+						}
+						else{
+							textField_error_newPassword.setText("Password entered does not match confirm password.");
+							textField_error_confirmNewPassword.setText("Confirm password entered does not match new password.");
+						}
+					}
+					else{
+						textPane_error_currentPassword.setText("Invalid Password");
+					}
+				}
+			}
+		});
+        
+        JButton btnCancel_chgpwd = new JButton("Cancel");
+        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
+        panel_chgpwd.add(btnCancel_chgpwd);
+        btnCancel_chgpwd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				d2.dispose();
+			}
+		});
+        
+		Component component = (Component) e.getSource();
+		//Call parent jframe/jdialog
+		JFrame topFrame2 = (JFrame)(d1.getParent());
+		d2 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d2.getContentPane().add(chgpwd_panel);
+		d2.setSize(900, 300);
+		d2.setLocationRelativeTo(null);
+		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
+		d2.setVisible(true);
+	}
+	public void loadForgotPassword(ActionEvent e){
+		JPanel chgpwd_panel = new JPanel();
+		chgpwd_panel.setLayout(null);
+					
+		JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane_chgpwd.setBounds(55, 25, 790, 220);
+        chgpwd_panel.add(tabbedPane_chgpwd);
+        
+        JPanel panel_chgpwd = new JPanel();
+        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
+        panel_chgpwd.setLayout(null);
+        
+        JTextPane txtpnCurrentPassword = new JTextPane();
+        txtpnCurrentPassword.setText("Current Password:");
+        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
+        txtpnCurrentPassword.setEditable(false);
+        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
+        panel_chgpwd.add(txtpnCurrentPassword);
+        
+        JTextPane txtpnNewPassword = new JTextPane();
+        txtpnNewPassword.setText("New Password:");
+        txtpnNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnNewPassword.setEditable(false);
+        txtpnNewPassword.setBounds(10, 45, 94, 20);
+        panel_chgpwd.add(txtpnNewPassword);
+        
+        JTextPane txtpnConfirmNewPassword = new JTextPane();
+        txtpnConfirmNewPassword.setText("Confirm New Password:");
+        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnConfirmNewPassword.setEditable(false);
+        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
+        panel_chgpwd.add(txtpnConfirmNewPassword);
+        
+        textField_input_currentPassword = new JPasswordField();
+        textField_input_currentPassword.setBounds(130, 4, 150, 26);
+        panel_chgpwd.add(textField_input_currentPassword);
+        textField_input_currentPassword.setColumns(10);
+        
+        textField_input_newPassword = new JPasswordField();
+        textField_input_newPassword.setBounds(110, 38, 150, 26);
+        panel_chgpwd.add(textField_input_newPassword);
+        textField_input_newPassword.setColumns(10);
+        
+        textField_input_confirmNewPassword = new JPasswordField();
+        textField_input_confirmNewPassword.setBounds(165, 73, 150, 26);
+        panel_chgpwd.add(textField_input_confirmNewPassword);
+        textField_input_confirmNewPassword.setColumns(10);
+        
+        JTextPane textPane_error_currentPassword = new JTextPane();
+        textPane_error_currentPassword.setBounds(290, 10, 465, 20);
+        textPane_error_currentPassword.setEditable(false);
+        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textPane_error_currentPassword);
+        
+        textField_error_newPassword = new JTextPane();
+        textField_error_newPassword.setBounds(270, 42, 489, 26);
+        textField_error_newPassword.setEditable(false);
+        textField_error_newPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_newPassword);
+        
+        textField_error_confirmNewPassword = new JTextPane();
+        textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
+        textField_error_confirmNewPassword.setEditable(false);
+        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_confirmNewPassword);
+        
+        JButton btnChgPassword = new JButton("Change Password");
+        btnChgPassword.setBounds(10, 120, 350, 38);
+        panel_chgpwd.add(btnChgPassword);
+        btnChgPassword.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean check = true;
+				boolean ok = true;
+				//Current Password
+				char[] cpassword = textField_input_currentPassword.getPassword();
+				String currentPass = new String(cpassword);
+				if(validateEmpty(currentPass) == false){
+					textPane_error_currentPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(currentPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textPane_error_currentPassword.setText(null);
+					}
+					else{
+						textPane_error_currentPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				//New Password
+				char[] npassword = textField_input_newPassword.getPassword();
+				String newPass = new String(npassword);
+				if(validateEmpty(newPass) == false){
+					textField_error_newPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_newPassword.setText(null);
+					}
+					else{
+						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				//Confirm New Password
+				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
+				String cnewPass = new String(cnpassword);
+				if(validateEmpty(cnewPass) == false){
+					textField_error_confirmNewPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_confirmNewPassword.setText(null);
+					}
+					else{
+						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				if(check && ok){
+					//Current password
+					Employees tempEmployee = new Employees(username);
+					if(tempEmployee.fetchLogin(username, currentPass)){
+						if(newPass.equals(cnewPass)){
+							Hashing hash = new Hashing();
+							String salt;
+							try {
+								salt = hash.getSalt();
+								String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
+								Connect connect = new Connect();
+								try {
+									Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+									String sql = "UPDATE `Employee` SET Password = ?, Salt = ? where ID = ? AND UserName = ?";
+									PreparedStatement ps = con.prepareStatement(sql);
+									ps.setString(1, hashedPassword);
+									ps.setString(2, salt);
+									//ps.setInt(3, employeeID);
+									//ps.setString(4, username);
 								    ps.executeUpdate();
 									
 									//Clean-up environment
