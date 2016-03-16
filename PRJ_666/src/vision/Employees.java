@@ -922,20 +922,46 @@ public class Employees extends JFrame{
 									if(tempID == staffList.get(i).getID() && tempUsername.equals(staffList.get(i).getUsername())){
 										//Check if the current user is the one being viewed
 										if(currentEmployee.getID() == staffList.get(i).getID() && currentEmployee.getUsername().equals(staffList.get(i).getUsername())){
-											//Change Password button
-									        JButton btn_chgpwd = new JButton("Change Password");
-									        btn_chgpwd.setBounds(90, 570, 200, 40);
-									        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
-									        btn_chgpwd.setFocusable(false);
-											staffDetails.add(btn_chgpwd);
-											int tID = staffList.get(i).getID();
-											String tUserName = staffList.get(i).getUsername();
-											btn_chgpwd.addActionListener(new ActionListener() {
-												@Override
-												public void actionPerformed(ActionEvent e) {
-													loadPasswordFrame(e,tID,tUserName);
-												}
-											});
+											//Check if the user is a manager, cashier, etc. Only managers (higher employee's) are allowed to change passwords.
+											//Cashiers must change password using/requesting a manager account.
+											Positions position = new Positions();
+											if(position.checkPosition(staffList.get(i).getPositionID()) == true){
+												//Change Password button
+										        JButton btn_chgpwd = new JButton("Change Password");
+										        btn_chgpwd.setBounds(90, 570, 200, 40);
+										        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+										        btn_chgpwd.setFocusable(false);
+												staffDetails.add(btn_chgpwd);
+												int tID = staffList.get(i).getID();
+												String tUserName = staffList.get(i).getUsername();
+												btn_chgpwd.addActionListener(new ActionListener() {
+													@Override
+													public void actionPerformed(ActionEvent e) {
+														//loadPasswordFrame(e,tID,tUserName);
+													}
+												});
+											}
+										}
+										else{
+											//Check if the manager account is allowed to edit only cashier, etc positions.
+											//Not higher positions, such as other managers.
+											Positions position = new Positions();
+											if(position.checkPosition(staffList.get(i).getPositionID()) == false){
+												//Change Password button
+										        JButton btn_chgpwd = new JButton("Change Password");
+										        btn_chgpwd.setBounds(90, 570, 200, 40);
+										        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+										        btn_chgpwd.setFocusable(false);
+												staffDetails.add(btn_chgpwd);
+												int tID = staffList.get(i).getID();
+												String tUserName = staffList.get(i).getUsername();
+												btn_chgpwd.addActionListener(new ActionListener() {
+													@Override
+													public void actionPerformed(ActionEvent e) {
+														loadPasswordFrame(e,tID,tUserName);
+													}
+												});
+											}
 										}
 										break;
 									}
