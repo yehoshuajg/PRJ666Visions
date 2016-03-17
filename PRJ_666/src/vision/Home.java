@@ -2018,8 +2018,9 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Staff", panel_staff);
 			
 			//Supplier
-			JPanel panel_supplier = new JPanel();
-			tabbedPane.addTab("Supplier", null, panel_supplier, null);
+			Supplier s = new Supplier();
+			JPanel panel_supplier = s.getWindow();
+			tabbedPane.addTab("Supplier", panel_supplier);
 			
 			//Inventory
 			//JPanel panel_inventory = new JPanel();
