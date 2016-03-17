@@ -109,6 +109,7 @@ public class Login extends JFrame {
 						}
 					}
 				}catch(Exception e){
+					JOptionPane.showMessageDialog(null,"Failed to connect to MySql Server.");
 				}
 			}
 		});

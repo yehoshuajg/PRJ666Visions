@@ -278,858 +278,889 @@ public class Employees extends JFrame{
 					//System.out.println("1");
 				}
 				if (e.getClickCount() == 2) {
-					//JTable target = (JTable)e.getSource();
-					int row = employeeTable.getSelectedRow();
-					int column = employeeTable.getSelectedColumn();
-					if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
-						if(row > -1){
-							//Positions position = new Positions();
-							if(position.checkPosition(currentEmployee.getPositionID()) == false){
-								JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-								//System.exit(0);
-							}
-							else{
-								JPanel staffDetails = new JPanel();
-								staffDetails.setLayout(null);
-								
-								JTabbedPane tabbedPane_details = new JTabbedPane(JTabbedPane.TOP);
-						        tabbedPane_details.setBounds(85, 15, 740, 551);
-						        staffDetails.add(tabbedPane_details);
-						        
-						        JPanel panel_employeeDetails = new JPanel();
-						        tabbedPane_details.addTab("Employee details:", null, panel_employeeDetails, null);
-						        panel_employeeDetails.setLayout(null);
-						        
-						        JTextPane txtpnId_details_id = new JTextPane();
-						        txtpnId_details_id.setText("ID:");
-						        txtpnId_details_id.setBounds(6, 10, 18, 20);
-						        txtpnId_details_id.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(txtpnId_details_id);
-						        
-						        JTextPane txtpn_details_FirstName = new JTextPane();
-						        txtpn_details_FirstName.setText("First Name:");
-						        txtpn_details_FirstName.setBounds(6, 42, 72, 20);
-						        txtpn_details_FirstName.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(txtpn_details_FirstName);
-						        
-						        JTextPane txtpn_details_lastName = new JTextPane();
-						        txtpn_details_lastName.setText("Last Name:");
-						        txtpn_details_lastName.setBackground(Color.decode(defaultColor));
-						        txtpn_details_lastName.setBounds(6, 74, 72, 20);
-						        panel_employeeDetails.add(txtpn_details_lastName);
-						        
-						        JTextPane txtpn_details_Street = new JTextPane();
-						        txtpn_details_Street.setText("Street:");
-						        txtpn_details_Street.setBackground(Color.decode(defaultColor));
-						        txtpn_details_Street.setBounds(6, 106, 40, 20);
-						        panel_employeeDetails.add(txtpn_details_Street);
-						        
-						        JTextPane txtpn_details_City = new JTextPane();
-						        txtpn_details_City.setText("City:");
-						        txtpn_details_City.setBackground(Color.decode(defaultColor));
-						        txtpn_details_City.setBounds(6, 138, 29, 20);
-						        panel_employeeDetails.add(txtpn_details_City);
-						        
-						        JTextPane txtpn_details_Stateprovince = new JTextPane();
-						        txtpn_details_Stateprovince.setText("State/Province:");
-						        txtpn_details_Stateprovince.setBackground(Color.decode(defaultColor));
-						        txtpn_details_Stateprovince.setBounds(6, 170, 95, 20);
-						        panel_employeeDetails.add(txtpn_details_Stateprovince);
-						        
-						        JTextPane txtpn_details_PostalCode = new JTextPane();
-						        txtpn_details_PostalCode.setText("Postal Code:");
-						        txtpn_details_PostalCode.setBackground(Color.decode(defaultColor));
-						        txtpn_details_PostalCode.setBounds(6, 202, 78, 20);
-						        panel_employeeDetails.add(txtpn_details_PostalCode);
-						        
-						        JTextPane txtpn_details_HomePhone = new JTextPane();
-						        txtpn_details_HomePhone.setText("Home Phone:");
-						        txtpn_details_HomePhone.setBackground(Color.decode(defaultColor));
-						        txtpn_details_HomePhone.setBounds(6, 234, 83, 20);
-						        panel_employeeDetails.add(txtpn_details_HomePhone);
-						        
-						        JTextPane txtpn_details_CellPhone = new JTextPane();
-						        txtpn_details_CellPhone.setText("Cell Phone:");
-						        txtpn_details_CellPhone.setBackground(Color.decode(defaultColor));
-						        txtpn_details_CellPhone.setBounds(6, 266, 72, 20);
-						        panel_employeeDetails.add(txtpn_details_CellPhone);
-						        
-						        JTextPane txtpn_details_Email = new JTextPane();
-						        txtpn_details_Email.setText("Email:");
-						        txtpn_details_Email.setBackground(Color.decode(defaultColor));
-						        txtpn_details_Email.setBounds(6, 298, 40, 20);
-						        panel_employeeDetails.add(txtpn_details_Email);
-						        
-						        JTextPane txtpn_details_PositionId = new JTextPane();
-						        txtpn_details_PositionId.setText("Position ID:");
-						        txtpn_details_PositionId.setBackground(Color.decode(defaultColor));
-						        txtpn_details_PositionId.setBounds(6, 330, 75, 20);
-						        panel_employeeDetails.add(txtpn_details_PositionId);
-						        
-						        JTextPane txtpn_details_JobType = new JTextPane();
-						        txtpn_details_JobType.setText("Job Type:");
-						        txtpn_details_JobType.setBackground(Color.decode(defaultColor));
-						        txtpn_details_JobType.setBounds(6, 362, 58, 20);
-						        panel_employeeDetails.add(txtpn_details_JobType);
-						        
-						        JTextPane txtpn_details_Username = new JTextPane();
-						        txtpn_details_Username.setText("Username:");
-						        txtpn_details_Username.setBackground(Color.decode(defaultColor));
-						        txtpn_details_Username.setBounds(6, 394, 70, 20);
-						        panel_employeeDetails.add(txtpn_details_Username);
-						        
-						        JTextPane txtpn_details_HireDate = new JTextPane();
-						        txtpn_details_HireDate.setText("Hire Date:");
-						        txtpn_details_HireDate.setBackground(Color.decode(defaultColor));
-						        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
-						        panel_employeeDetails.add(txtpn_details_HireDate);
-						        
-						        JTextField textPane_details_id = new JTextField();
-						        textPane_details_id.setBounds(30, 10, 150, 20);
-						        textPane_details_id.setEditable(false);
-						        textPane_details_id.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_id);
-						        
-						        JTextField textPane_details_firstName = new JTextField();
-						        textPane_details_firstName.setBounds(90, 42, 150, 20);
-						        textPane_details_firstName.setEditable(false);
-						        textPane_details_firstName.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_firstName);
-						        
-						        JTextField textPane_details_lastName = new JTextField();
-						        textPane_details_lastName.setBounds(90, 74, 150, 20);
-						        textPane_details_lastName.setEditable(false);
-						        textPane_details_lastName.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_lastName);
-						        
-						        JTextField textPane_details_street = new JTextField();
-						        textPane_details_street.setBounds(58, 106, 150, 20);
-						        textPane_details_street.setEditable(false);
-						        textPane_details_street.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_street);
-						        
-						        JTextField textPane_details_city = new JTextField();
-						        textPane_details_city.setBounds(47, 138, 150, 20);
-						        textPane_details_city.setEditable(false);
-						        textPane_details_city.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_city);
-						        
-						        JTextField textPane_details_stateProvince = new JTextField();
-						        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
-						        textPane_details_stateProvince.setEditable(false);
-						        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_stateProvince);
-						        
-						        JTextField textPane_details_postalCode = new JTextField();
-						        textPane_details_postalCode.setBounds(96, 201, 150, 20);
-						        textPane_details_postalCode.setEditable(false);
-						        textPane_details_postalCode.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_postalCode);
-						        
-						        JTextField textPane_details_homePhone = new JTextField();
-						        textPane_details_homePhone.setBounds(100, 234, 150, 20);
-						        textPane_details_homePhone.setEditable(false);
-						        textPane_details_homePhone.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_homePhone);
-						        
-						        JTextField textPane_details_cellPhone = new JTextField();
-						        textPane_details_cellPhone.setBounds(90, 266, 150, 20);
-						        textPane_details_cellPhone.setEditable(false);
-						        textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_cellPhone);
-						        
-						        JTextField textPane_details_email = new JTextField();
-						        textPane_details_email.setBounds(58, 298, 150, 20);
-						        textPane_details_email.setEditable(false);
-						        textPane_details_email.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_email);
-						        
-						        JTextField textPane_positionID = new JTextField();
-						        textPane_positionID.setBounds(90, 330, 150, 20);
-						        textPane_positionID.setEditable(false);
-						        textPane_positionID.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_positionID);
-						        
-						        JTextField textPane_details_JobType = new JTextField();
-						        textPane_details_JobType.setBounds(76, 362, 150, 20);
-						        textPane_details_JobType.setEditable(false);
-						        textPane_details_JobType.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_JobType);
-						        
-						        JTextField textPane_details_username = new JTextField();
-						        textPane_details_username.setBounds(90, 394, 150, 20);
-						        textPane_details_username.setEditable(false);
-						        textPane_details_username.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_username);
-						        
-						        JTextField textPane_details_hireDate = new JTextField();
-						        textPane_details_hireDate.setBounds(90, 426, 150, 20);
-						        textPane_details_hireDate.setEditable(false);
-						        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_details_hireDate);
-						        
-						        //Error message fields
-						        JTextPane textPane_edit_error_firstName = new JTextPane();
-						        textPane_edit_error_firstName.setBounds(252, 42, 461, 20);
-						        textPane_edit_error_firstName.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_firstName);
-						        
-						        JTextPane textPane_edit_error_lastName = new JTextPane();
-						        textPane_edit_error_lastName.setBounds(252, 74, 461, 20);
-						        textPane_edit_error_lastName.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_lastName);
-						        
-						        JTextPane textPane_edit_error_street = new JTextPane();
-						        textPane_edit_error_street.setBounds(220, 106, 493, 20);
-						        textPane_edit_error_street.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_street);
-						        
-						        JTextPane textPane_edit_error_city = new JTextPane();
-						        textPane_edit_error_city.setBounds(209, 138, 504, 20);
-						        textPane_edit_error_city.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_city);
-						        
-						        JTextPane textPane_edit_error_stateProvince = new JTextPane();
-						        textPane_edit_error_stateProvince.setBounds(275, 170, 438, 20);
-						        textPane_edit_error_stateProvince.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_stateProvince);
-						        
-						        JTextPane textPane_edit_error_postalCode = new JTextPane();
-						        textPane_edit_error_postalCode.setBounds(258, 202, 455, 20);
-						        textPane_edit_error_postalCode.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_postalCode);
-						        
-						        JTextPane textPane_edit_error_homePhone = new JTextPane();
-						        textPane_edit_error_homePhone.setBounds(262, 234, 451, 20);
-						        textPane_edit_error_homePhone.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_homePhone);
-						        
-						        JTextPane textPane_error_edit_cellPhone = new JTextPane();
-						        textPane_error_edit_cellPhone.setBounds(252, 266, 461, 20);
-						        textPane_error_edit_cellPhone.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_error_edit_cellPhone);
-						        
-						        JTextPane textPane_edit_error_email = new JTextPane();
-						        textPane_edit_error_email.setBounds(220, 298, 493, 20);
-						        textPane_edit_error_email.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_email);
-						        
-						        JTextPane textPane_edit_error_positionID = new JTextPane();
-						        textPane_edit_error_positionID.setBounds(252, 330, 461, 20);
-						        textPane_edit_error_positionID.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_edit_error_positionID);
-						        
-						        JTextPane textPane_error_edit_jobType = new JTextPane();
-						        textPane_error_edit_jobType.setBounds(238, 362, 475, 20);
-						        textPane_error_edit_jobType.setBackground(Color.decode(defaultColor));
-						        panel_employeeDetails.add(textPane_error_edit_jobType);
-						        
-						        //Edit button
-						        JButton btn_edit = new JButton("Edit");
-						        
-						        //Save button initialize
-						        JButton btn_save = new JButton("Save");
-						        
-						        btn_edit.setBounds(300, 570, 150, 40);
-						        btn_edit.setFont(new Font("Tahoma", Font.PLAIN, 20));
-						        btn_edit.setFocusable(false);
-								staffDetails.add(btn_edit);
-								//Cancel button closes the window
-								btn_edit.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										//First name
-										textPane_details_firstName.setBackground(null);
-										textPane_details_firstName.setEditable(true);
-										
-										//Last name
-										textPane_details_lastName.setBackground(null);
-										textPane_details_lastName.setEditable(true);
-										
-										//Street
-										textPane_details_street.setBackground(null);
-										textPane_details_street.setEditable(true);
-										
-										//City
-										textPane_details_city.setBackground(null);
-										textPane_details_city.setEditable(true);
-	
-										//State/Province
-										textPane_details_stateProvince.setBackground(null);
-										textPane_details_stateProvince.setEditable(true);
-										
-										//Postal code
-										textPane_details_postalCode.setBackground(null);
-										textPane_details_postalCode.setEditable(true);
-										
-										//Home phone
-										textPane_details_homePhone.setBackground(null);
-										textPane_details_homePhone.setEditable(true);
-										
-										//Cell phone
-										textPane_details_cellPhone.setBackground(null);
-										textPane_details_cellPhone.setEditable(true);
-										
-										//Email
-										textPane_details_email.setBackground(null);
-										textPane_details_email.setEditable(true);
-										
-										//Position ID
-										textPane_positionID.setBackground(null);
-										textPane_positionID.setEditable(true);
-										
-										//Job Type
-										textPane_details_JobType.setBackground(null);
-										textPane_details_JobType.setEditable(true);
-										
-										//Username
-										//textPane_details_username.setBackground(null);
-										//textPane_details_username.setEditable(true);
-										
-										btn_edit.setVisible(false);
-										btn_save.setVisible(true);
-									}
-								});
-								
-						        //Save button
-						        btn_save.setBounds(300, 570, 150, 40);
-						        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
-						        btn_save.setFocusable(false);
-								staffDetails.add(btn_save);
-								//Cancel button closes the window
-								btn_save.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										//Error checking
-										boolean check = true;
-										boolean ok = true;
-										//First name
-										/*if(validateEmpty(textPane_details_firstName.getText()) == false){
-											textPane_edit_error_firstName.setText("First name cannot be Empty.");
-											check = false;
+					if(!employeeTable.isEditing()){
+						int row = employeeTable.getSelectedRow();
+						int column = employeeTable.getSelectedColumn();
+						if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
+							if(row > -1){
+								//Positions position = new Positions();
+								if(position.checkPosition(currentEmployee.getPositionID()) == false){
+									JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
+									//System.exit(0);
+								}
+								else{
+									JPanel staffDetails = new JPanel();
+									staffDetails.setLayout(null);
+									
+									JTabbedPane tabbedPane_details = new JTabbedPane(JTabbedPane.TOP);
+							        tabbedPane_details.setBounds(85, 15, 740, 551);
+							        staffDetails.add(tabbedPane_details);
+							        
+							        JPanel panel_employeeDetails = new JPanel();
+							        tabbedPane_details.addTab("Employee details:", null, panel_employeeDetails, null);
+							        panel_employeeDetails.setLayout(null);
+							        
+							        JTextPane txtpnId_details_id = new JTextPane();
+							        txtpnId_details_id.setText("ID:");
+							        txtpnId_details_id.setBounds(6, 10, 18, 20);
+							        txtpnId_details_id.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(txtpnId_details_id);
+							        
+							        JTextPane txtpn_details_FirstName = new JTextPane();
+							        txtpn_details_FirstName.setText("First Name:");
+							        txtpn_details_FirstName.setBounds(6, 42, 72, 20);
+							        txtpn_details_FirstName.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(txtpn_details_FirstName);
+							        
+							        JTextPane txtpn_details_lastName = new JTextPane();
+							        txtpn_details_lastName.setText("Last Name:");
+							        txtpn_details_lastName.setBackground(Color.decode(defaultColor));
+							        txtpn_details_lastName.setBounds(6, 74, 72, 20);
+							        panel_employeeDetails.add(txtpn_details_lastName);
+							        
+							        JTextPane txtpn_details_Street = new JTextPane();
+							        txtpn_details_Street.setText("Street:");
+							        txtpn_details_Street.setBackground(Color.decode(defaultColor));
+							        txtpn_details_Street.setBounds(6, 106, 40, 20);
+							        panel_employeeDetails.add(txtpn_details_Street);
+							        
+							        JTextPane txtpn_details_City = new JTextPane();
+							        txtpn_details_City.setText("City:");
+							        txtpn_details_City.setBackground(Color.decode(defaultColor));
+							        txtpn_details_City.setBounds(6, 138, 29, 20);
+							        panel_employeeDetails.add(txtpn_details_City);
+							        
+							        JTextPane txtpn_details_Stateprovince = new JTextPane();
+							        txtpn_details_Stateprovince.setText("State/Province:");
+							        txtpn_details_Stateprovince.setBackground(Color.decode(defaultColor));
+							        txtpn_details_Stateprovince.setBounds(6, 170, 95, 20);
+							        panel_employeeDetails.add(txtpn_details_Stateprovince);
+							        
+							        JTextPane txtpn_details_PostalCode = new JTextPane();
+							        txtpn_details_PostalCode.setText("Postal Code:");
+							        txtpn_details_PostalCode.setBackground(Color.decode(defaultColor));
+							        txtpn_details_PostalCode.setBounds(6, 202, 78, 20);
+							        panel_employeeDetails.add(txtpn_details_PostalCode);
+							        
+							        JTextPane txtpn_details_HomePhone = new JTextPane();
+							        txtpn_details_HomePhone.setText("Home Phone:");
+							        txtpn_details_HomePhone.setBackground(Color.decode(defaultColor));
+							        txtpn_details_HomePhone.setBounds(6, 234, 83, 20);
+							        panel_employeeDetails.add(txtpn_details_HomePhone);
+							        
+							        JTextPane txtpn_details_CellPhone = new JTextPane();
+							        txtpn_details_CellPhone.setText("Cell Phone:");
+							        txtpn_details_CellPhone.setBackground(Color.decode(defaultColor));
+							        txtpn_details_CellPhone.setBounds(6, 266, 72, 20);
+							        panel_employeeDetails.add(txtpn_details_CellPhone);
+							        
+							        JTextPane txtpn_details_Email = new JTextPane();
+							        txtpn_details_Email.setText("Email:");
+							        txtpn_details_Email.setBackground(Color.decode(defaultColor));
+							        txtpn_details_Email.setBounds(6, 298, 40, 20);
+							        panel_employeeDetails.add(txtpn_details_Email);
+							        
+							        JTextPane txtpn_details_PositionId = new JTextPane();
+							        txtpn_details_PositionId.setText("Position ID:");
+							        txtpn_details_PositionId.setBackground(Color.decode(defaultColor));
+							        txtpn_details_PositionId.setBounds(6, 330, 75, 20);
+							        panel_employeeDetails.add(txtpn_details_PositionId);
+							        
+							        JTextPane txtpn_details_JobType = new JTextPane();
+							        txtpn_details_JobType.setText("Job Type:");
+							        txtpn_details_JobType.setBackground(Color.decode(defaultColor));
+							        txtpn_details_JobType.setBounds(6, 362, 58, 20);
+							        panel_employeeDetails.add(txtpn_details_JobType);
+							        
+							        JTextPane txtpn_details_Username = new JTextPane();
+							        txtpn_details_Username.setText("Username:");
+							        txtpn_details_Username.setBackground(Color.decode(defaultColor));
+							        txtpn_details_Username.setBounds(6, 394, 70, 20);
+							        panel_employeeDetails.add(txtpn_details_Username);
+							        
+							        JTextPane txtpn_details_HireDate = new JTextPane();
+							        txtpn_details_HireDate.setText("Hire Date:");
+							        txtpn_details_HireDate.setBackground(Color.decode(defaultColor));
+							        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
+							        panel_employeeDetails.add(txtpn_details_HireDate);
+							        
+							        JTextField textPane_details_id = new JTextField();
+							        textPane_details_id.setBounds(30, 10, 150, 20);
+							        textPane_details_id.setEditable(false);
+							        textPane_details_id.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_id);
+							        
+							        JTextField textPane_details_firstName = new JTextField();
+							        textPane_details_firstName.setBounds(90, 42, 150, 20);
+							        textPane_details_firstName.setEditable(false);
+							        textPane_details_firstName.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_firstName);
+							        
+							        JTextField textPane_details_lastName = new JTextField();
+							        textPane_details_lastName.setBounds(90, 74, 150, 20);
+							        textPane_details_lastName.setEditable(false);
+							        textPane_details_lastName.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_lastName);
+							        
+							        JTextField textPane_details_street = new JTextField();
+							        textPane_details_street.setBounds(58, 106, 150, 20);
+							        textPane_details_street.setEditable(false);
+							        textPane_details_street.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_street);
+							        
+							        JTextField textPane_details_city = new JTextField();
+							        textPane_details_city.setBounds(47, 138, 150, 20);
+							        textPane_details_city.setEditable(false);
+							        textPane_details_city.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_city);
+							        
+							        JTextField textPane_details_stateProvince = new JTextField();
+							        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
+							        textPane_details_stateProvince.setEditable(false);
+							        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_stateProvince);
+							        
+							        JTextField textPane_details_postalCode = new JTextField();
+							        textPane_details_postalCode.setBounds(96, 201, 150, 20);
+							        textPane_details_postalCode.setEditable(false);
+							        textPane_details_postalCode.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_postalCode);
+							        
+							        JTextField textPane_details_homePhone = new JTextField();
+							        textPane_details_homePhone.setBounds(100, 234, 150, 20);
+							        textPane_details_homePhone.setEditable(false);
+							        textPane_details_homePhone.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_homePhone);
+							        
+							        JTextField textPane_details_cellPhone = new JTextField();
+							        textPane_details_cellPhone.setBounds(90, 266, 150, 20);
+							        textPane_details_cellPhone.setEditable(false);
+							        textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_cellPhone);
+							        
+							        JTextField textPane_details_email = new JTextField();
+							        textPane_details_email.setBounds(58, 298, 150, 20);
+							        textPane_details_email.setEditable(false);
+							        textPane_details_email.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_email);
+							        
+							        JTextField textPane_positionID = new JTextField();
+							        textPane_positionID.setBounds(90, 330, 150, 20);
+							        textPane_positionID.setEditable(false);
+							        textPane_positionID.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_positionID);
+							        
+							        JTextField textPane_details_JobType = new JTextField();
+							        textPane_details_JobType.setBounds(76, 362, 150, 20);
+							        textPane_details_JobType.setEditable(false);
+							        textPane_details_JobType.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_JobType);
+							        
+							        JTextField textPane_details_username = new JTextField();
+							        textPane_details_username.setBounds(90, 394, 150, 20);
+							        textPane_details_username.setEditable(false);
+							        textPane_details_username.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_username);
+							        
+							        JTextField textPane_details_hireDate = new JTextField();
+							        textPane_details_hireDate.setBounds(90, 426, 150, 20);
+							        textPane_details_hireDate.setEditable(false);
+							        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_hireDate);
+							        
+							        //Error message fields
+							        JTextPane textPane_edit_error_firstName = new JTextPane();
+							        textPane_edit_error_firstName.setBounds(252, 42, 461, 20);
+							        textPane_edit_error_firstName.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_firstName);
+							        
+							        JTextPane textPane_edit_error_lastName = new JTextPane();
+							        textPane_edit_error_lastName.setBounds(252, 74, 461, 20);
+							        textPane_edit_error_lastName.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_lastName);
+							        
+							        JTextPane textPane_edit_error_street = new JTextPane();
+							        textPane_edit_error_street.setBounds(220, 106, 493, 20);
+							        textPane_edit_error_street.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_street);
+							        
+							        JTextPane textPane_edit_error_city = new JTextPane();
+							        textPane_edit_error_city.setBounds(209, 138, 504, 20);
+							        textPane_edit_error_city.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_city);
+							        
+							        JTextPane textPane_edit_error_stateProvince = new JTextPane();
+							        textPane_edit_error_stateProvince.setBounds(275, 170, 438, 20);
+							        textPane_edit_error_stateProvince.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_stateProvince);
+							        
+							        JTextPane textPane_edit_error_postalCode = new JTextPane();
+							        textPane_edit_error_postalCode.setBounds(258, 202, 455, 20);
+							        textPane_edit_error_postalCode.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_postalCode);
+							        
+							        JTextPane textPane_edit_error_homePhone = new JTextPane();
+							        textPane_edit_error_homePhone.setBounds(262, 234, 451, 20);
+							        textPane_edit_error_homePhone.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_homePhone);
+							        
+							        JTextPane textPane_error_edit_cellPhone = new JTextPane();
+							        textPane_error_edit_cellPhone.setBounds(252, 266, 461, 20);
+							        textPane_error_edit_cellPhone.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_error_edit_cellPhone);
+							        
+							        JTextPane textPane_edit_error_email = new JTextPane();
+							        textPane_edit_error_email.setBounds(220, 298, 493, 20);
+							        textPane_edit_error_email.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_email);
+							        
+							        JTextPane textPane_edit_error_positionID = new JTextPane();
+							        textPane_edit_error_positionID.setBounds(252, 330, 461, 20);
+							        textPane_edit_error_positionID.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_edit_error_positionID);
+							        
+							        JTextPane textPane_error_edit_jobType = new JTextPane();
+							        textPane_error_edit_jobType.setBounds(238, 362, 475, 20);
+							        textPane_error_edit_jobType.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_error_edit_jobType);
+							        
+							        //Edit button
+							        JButton btn_edit = new JButton("Edit");
+							        
+							        //Save button initialize
+							        JButton btn_save = new JButton("Save");
+							        
+							        btn_edit.setBounds(300, 570, 150, 40);
+							        btn_edit.setFont(new Font("Tahoma", Font.PLAIN, 20));
+							        btn_edit.setFocusable(false);
+									staffDetails.add(btn_edit);
+									//Cancel button closes the window
+									btn_edit.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											//First name
+											textPane_details_firstName.setBackground(null);
+											textPane_details_firstName.setEditable(true);
+											
+											//Last name
+											textPane_details_lastName.setBackground(null);
+											textPane_details_lastName.setEditable(true);
+											
+											//Street
+											textPane_details_street.setBackground(null);
+											textPane_details_street.setEditable(true);
+											
+											//City
+											textPane_details_city.setBackground(null);
+											textPane_details_city.setEditable(true);
+		
+											//State/Province
+											textPane_details_stateProvince.setBackground(null);
+											textPane_details_stateProvince.setEditable(true);
+											
+											//Postal code
+											textPane_details_postalCode.setBackground(null);
+											textPane_details_postalCode.setEditable(true);
+											
+											//Home phone
+											textPane_details_homePhone.setBackground(null);
+											textPane_details_homePhone.setEditable(true);
+											
+											//Cell phone
+											textPane_details_cellPhone.setBackground(null);
+											textPane_details_cellPhone.setEditable(true);
+											
+											//Email
+											textPane_details_email.setBackground(null);
+											textPane_details_email.setEditable(true);
+											
+											//Position ID
+											textPane_positionID.setBackground(null);
+											textPane_positionID.setEditable(true);
+											
+											//Job Type
+											textPane_details_JobType.setBackground(null);
+											textPane_details_JobType.setEditable(true);
+											
+											//Username
+											//textPane_details_username.setBackground(null);
+											//textPane_details_username.setEditable(true);
+											
+											btn_edit.setVisible(false);
+											btn_save.setVisible(true);
 										}
-										else if(checkForAlphabets(textPane_details_firstName.getText()) == false){
-											textPane_edit_error_firstName.setText("First name must contain alphabets only.");
-											ok = false;
-										}
-										else{
-											textPane_edit_error_firstName.setText(null);
-										}
-										
-										//Last name
-										if(validateEmpty(textPane_details_lastName.getText()) == false){
-											textPane_edit_error_lastName.setText("Last name cannot be Empty.");
-											check = false;
-										}
-										else if(checkForAlphabets(textPane_details_lastName.getText()) == false){
-											textPane_edit_error_lastName.setText("Last name must contain alphabets only.");
-											ok = false;
-										}
-										else{
-											textPane_edit_error_lastName.setText(null);
-										}
-										
-										//Street
-										if(validateEmpty(textPane_details_street.getText()) == false){
-											textPane_edit_error_street.setText("Street field cannot be Empty.");
-											check = false;
-										}
-										else{
-											if(textPane_details_street.getText().trim().matches("^['#A-Za-z0-9 ]*$")){
-												textPane_edit_error_street.setText(null);
-											}
-											else{
-												textPane_edit_error_street.setText("Street can only contain alphabets, numbers, '#', '''.");
-												ok = false;
-											}
-										}
-										
-										//City
-										if(validateEmpty(textPane_details_city.getText()) == false){
-											textPane_edit_error_city.setText("City field cannot be Empty.");
-											check = false;
-										}
-										else if(checkForAlphabets(textPane_details_city.getText()) == false){
-											textPane_edit_error_city.setText("City field must contain alphabets only.");
-											ok = false;
-										}
-										else{
-											textPane_edit_error_city.setText(null);
-										}
-										
-										//Province
-										if(validateEmpty(textPane_details_stateProvince.getText()) == false){
-											textPane_edit_error_stateProvince.setText("State/Province field cannot be Empty.");
-											check = false;
-										}
-										else if(checkForAlphabets(textPane_details_stateProvince.getText()) == false){
-											textPane_edit_error_stateProvince.setText("State/Province field must contain alphabets only.");
-											ok = false;
-										}
-										else{
-											textPane_edit_error_stateProvince.setText(null);
-										}
-										
-										//Postal code
-										if(validateEmpty(textPane_details_postalCode.getText()) == false){
-											textPane_edit_error_postalCode.setText("Postal Code cannot be Empty.");
-											check = false;
-										}
-										else{
-											if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
-												textPane_edit_error_postalCode.setText(null);
-											}
-											else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[ ]{1}([0-9][A-Za-z][0-9])$")){ //A1B 2C3
-												textPane_edit_error_postalCode.setText(null);
-											}
-											else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[-]{1}([0-9][A-Za-z][0-9])$")){ //A1B-2C3
-												textPane_edit_error_postalCode.setText(null);
-											}
-											else{
-												textPane_edit_error_postalCode.setText("Postal code does not have a valid code pattern.");
-												ok = false;
-											}
-										}
-										
-										//Home phone
-										if(validateEmpty(textPane_details_homePhone.getText()) == false){
-											textPane_edit_error_homePhone.setText("Home phone cannot be Empty.");
-											check = false;
-										}
-										else{
-											if(textPane_details_homePhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
-												textPane_edit_error_homePhone.setText(null);
-											}
-											else if(textPane_details_homePhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
-												textPane_edit_error_homePhone.setText(null);
-											}
-											else if(textPane_details_homePhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
-												textPane_edit_error_homePhone.setText(null);
-											}
-											else if(textPane_details_homePhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
-												textPane_edit_error_homePhone.setText(null);
-											}
-											else{
-												textPane_edit_error_homePhone.setText("Home phone does not have a valid phone pattern.");
+									});
+									
+							        //Save button
+							        btn_save.setBounds(300, 570, 150, 40);
+							        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
+							        btn_save.setFocusable(false);
+									staffDetails.add(btn_save);
+									//Cancel button closes the window
+									btn_save.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											//Error checking
+											boolean check = true;
+											boolean ok = true;
+											//First name
+											/*if(validateEmpty(textPane_details_firstName.getText()) == false){
+												textPane_edit_error_firstName.setText("First name cannot be Empty.");
 												check = false;
 											}
-										}
-										
-										//Cell phone
-										if(validateEmpty(textPane_details_cellPhone.getText()) == false){
-											textPane_error_edit_cellPhone.setText("Cell phone cannot be Empty.");
-											check = false;
-										}
-										else{
-											if(textPane_details_cellPhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
-												textPane_error_edit_cellPhone.setText(null);
-											}
-											else if(textPane_details_cellPhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
-												textPane_error_edit_cellPhone.setText(null);
-											}
-											else if(textPane_details_cellPhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
-												textPane_error_edit_cellPhone.setText(null);
-											}
-											else if(textPane_details_cellPhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
-												textPane_error_edit_cellPhone.setText(null);
-											}
-											else{
-												textPane_error_edit_cellPhone.setText("Cell phone does not have a valid phone pattern.");
+											else if(checkForAlphabets(textPane_details_firstName.getText()) == false){
+												textPane_edit_error_firstName.setText("First name must contain alphabets only.");
 												ok = false;
 											}
-										}
-										
-										//Email
-										if(validateEmpty(textPane_details_email.getText()) == false){
-											textPane_edit_error_email.setText("Email cannot be Empty.");
-											check = false;
-										}
-										else{
-											if(textPane_details_email.getText().trim().matches("^[A-Za-z0-9+_.-]+@(.+)$")){
-												textPane_edit_error_email.setText(null);
-											}
 											else{
-												textPane_edit_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-'.");
+												textPane_edit_error_firstName.setText(null);
+											}
+											
+											//Last name
+											if(validateEmpty(textPane_details_lastName.getText()) == false){
+												textPane_edit_error_lastName.setText("Last name cannot be Empty.");
+												check = false;
+											}
+											else if(checkForAlphabets(textPane_details_lastName.getText()) == false){
+												textPane_edit_error_lastName.setText("Last name must contain alphabets only.");
 												ok = false;
 											}
-										}
-										
-										//Position
-										if(validateEmpty(textPane_positionID.getText()) == false){
-											textPane_edit_error_positionID.setText("Position ID cannot be Empty.");
-											check = false;
-										}
-										//show positions, which will go to db and get position # for u
-										else if(checkForNumbers(textPane_positionID.getText()) == false){
-											textPane_edit_error_positionID.setText("Position ID must contain numbers only.");
-											check = false;
-										}
-										else{
-											textPane_edit_error_positionID.setText(null);
-										}
-										
-										//Job type
-										if(validateEmpty(textPane_details_JobType.getText()) == false){
-											textPane_error_edit_jobType.setText("Job Type cannot be Empty.");
-											check = false;
-										}
-										else if(checkForAlphabets(textPane_details_JobType.getText()) == false){
-											textPane_error_edit_jobType.setText("Job Type must contain alphabets only.");
-											check = false;
-										}
-										else{
-											textPane_error_edit_jobType.setText(null);
-										}
-										*/
-										if(position.checkPosition(currentEmployee.getPositionID()) == false){
-											JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-											//System.exit(0);
-										}
-										else{
-											if(check && ok){
-												boolean go = false;
-												do{
-													JPanel panel = new JPanel();
-													JLabel label = new JLabel("Enter a password:");
-													JPasswordField pass = new JPasswordField(10);
-													panel.add(label);
-													panel.add(pass);
-													String[] options = new String[]{"OK", "Cancel"};
-													int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
-													                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-													                         null, options, options[0]);
-													if(option == 0) // pressing OK button
-													{
-													    char[] password = pass.getPassword();
-													    String passwordInput = new String(password);
-													    
-													    Employees tempEmployee = new Employees(currentEmployee.getUsername());
-														if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
-															//First name
-															textPane_details_firstName.setBackground(Color.decode(defaultColor));
-															textPane_details_firstName.setEditable(false);
-															
-															//Last name
-															textPane_details_lastName.setBackground(Color.decode(defaultColor));
-															textPane_details_lastName.setEditable(false);
-															
-															//Street
-															textPane_details_street.setBackground(Color.decode(defaultColor));
-															textPane_details_street.setEditable(false);
-															
-															//City
-															textPane_details_city.setBackground(Color.decode(defaultColor));
-															textPane_details_city.setEditable(false);
-					
-															//State/Province
-															textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-															textPane_details_stateProvince.setEditable(false);
-															
-															//Postal code
-															textPane_details_postalCode.setBackground(Color.decode(defaultColor));
-															textPane_details_postalCode.setEditable(false);
-															
-															//Home phone
-															textPane_details_homePhone.setBackground(Color.decode(defaultColor));
-															textPane_details_homePhone.setEditable(false);
-															
-															//Cell phone
-															textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
-															textPane_details_cellPhone.setEditable(false);
-															
-															//Email
-															textPane_details_email.setBackground(Color.decode(defaultColor));
-															textPane_details_email.setEditable(false);
-															
-															//Position ID
-															textPane_positionID.setBackground(Color.decode(defaultColor));
-															textPane_positionID.setEditable(false);
-															
-															//Job Type
-															textPane_details_JobType.setBackground(Color.decode(defaultColor));
-															textPane_details_JobType.setEditable(false);
-															
-															//Username
-															//textPane_details_username.setBackground(Color.decode(defaultColor));
-															//textPane_details_username.setEditable(false);
-															
-															btn_save.setVisible(false);
-															btn_edit.setVisible(true);
-															
-															//Write to DB
-															Connect connect = new Connect();
-															try {
-																Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-																String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
-																PreparedStatement ps = con.prepareStatement(sql);
-																ps.setString(1, textPane_details_firstName.getText().trim());
-																ps.setString(2, textPane_details_lastName.getText().trim());
-																ps.setString(3, textPane_details_street.getText().trim());
-																ps.setString(4, textPane_details_city.getText().trim());
-																ps.setString(5, textPane_details_stateProvince.getText().trim());
-																ps.setString(6, textPane_details_postalCode.getText().trim());
-																ps.setString(7, textPane_details_homePhone.getText().trim());
-																ps.setString(8, textPane_details_cellPhone.getText().trim());
-																ps.setString(9, textPane_details_email.getText().trim());
-																ps.setString(10, textPane_positionID.getText().trim());
-																ps.setString(11, textPane_details_JobType.getText().trim());
-																ps.setString(12, textPane_details_id.getText().trim());
-															    ps.executeUpdate();
-																
-																//Clean-up environment
-																con.close();
-															} catch (SQLException e2) {
-																// TODO Auto-generated catch block
-																e2.printStackTrace();
-															}
-															
-															//removing vector elements
-															if(staffList != null){
-																staffList.clear();
-															}
-															
-															//remove previous rows
-															for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
-																employeeModel.removeRow(i);
-															}
-															//Refreshing main staff table and getting new values
-															getStaffList();
-															if(staffList.size() > 0){
-																for(int i = 0; i < staffList.size(); i++){
-																	employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
-																}
-															}
-															else{
-																JOptionPane.showMessageDialog(null,"No staff was found in the database.");
-															}
-															//Update current employee
-															updateCurrentEmployee();
-															go = true;
-														}
-														else{
-															JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
-														}
-													}
-													else{
-														go = true;
-													}
-												}while(go == false);
-												if(position.checkPosition(currentEmployee.getPositionID()) == false){
-													JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
-													//System.exit(0);
-												}
+											else{
+												textPane_edit_error_lastName.setText(null);
 											}
-										}
-									}
-								});
-						        
-								//Print button
-						        JButton btn_print = new JButton("Print");
-						        btn_print.setBounds(485, 570, 150, 40);
-						        btn_print.setFont(new Font("Tahoma", Font.PLAIN, 20));
-						        btn_print.setFocusable(false);
-								staffDetails.add(btn_print);
-								btn_print.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										// TODO Auto-generated method stub
-										
-									}
-								});
-						        
-								//Cancel button
-						        JButton btn_cancel = new JButton("Cancel");
-						        btn_cancel.setBounds(670, 570, 150, 40);
-						        btn_cancel.setFont(new Font("Tahoma", Font.PLAIN, 20));
-						        btn_cancel.setFocusable(false);
-								staffDetails.add(btn_cancel);
-								btn_cancel.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										// TODO Auto-generated method stub
-										d1.dispose();
-									}
-								});
-								
-								if(currentEmployee != null){
-									int tempID = (Integer) employeeModel.getValueAt(row, 0);
-									String tempUsername = (String) employeeModel.getValueAt(row,5);
-									for(int i = 0; i < staffList.size(); i++){
-										//Checking if user double clicked / being viewed is in vector, to get more details
-										if(tempID == staffList.get(i).getID() && tempUsername.equals(staffList.get(i).getUsername())){
-											//Check if the current user is the one being viewed
-											if(currentEmployee.getID() == staffList.get(i).getID() && currentEmployee.getUsername().equals(staffList.get(i).getUsername())){
-												//Check if the user is a manager, cashier, etc. Only managers (higher employee's) are allowed to change passwords.
-												//Cashiers must change password using/requesting a manager account.
-												//Positions position = new Positions();
-												if(position.checkPosition(staffList.get(i).getPositionID()) == true){
-													//Change Password button
-											        JButton btn_chgpwd = new JButton("Change Password");
-											        btn_chgpwd.setBounds(90, 570, 200, 40);
-											        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
-											        btn_chgpwd.setFocusable(false);
-													staffDetails.add(btn_chgpwd);
-													int tID = staffList.get(i).getID();
-													String tUserName = staffList.get(i).getUsername();
-													btn_chgpwd.addActionListener(new ActionListener() {
-														@Override
-														public void actionPerformed(ActionEvent e) {
-															loadPasswordFrame(e,tID,tUserName);
-														}
-													});
-												}
+											
+											//Street
+											if(validateEmpty(textPane_details_street.getText()) == false){
+												textPane_edit_error_street.setText("Street field cannot be Empty.");
+												check = false;
 											}
 											else{
-												//Check if the manager account is allowed to edit only cashier, etc positions.
-												//Not higher positions, such as other managers.
-												//Positions position = new Positions();
-												if(position.checkPosition(staffList.get(i).getPositionID()) == false){
-													//Change Password button
-											        JButton btn_chgpwd = new JButton("Change Password");
-											        btn_chgpwd.setBounds(90, 570, 200, 40);
-											        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
-											        btn_chgpwd.setFocusable(false);
-													staffDetails.add(btn_chgpwd);
-													int tID = staffList.get(i).getID();
-													String tUserName = staffList.get(i).getUsername();
-													btn_chgpwd.addActionListener(new ActionListener() {
-														@Override
-														public void actionPerformed(ActionEvent e) {
-															loadPasswordFrame(e,tID,tUserName);
-														}
-													});
+												if(textPane_details_street.getText().trim().matches("^['#A-Za-z0-9 ]*$")){
+													textPane_edit_error_street.setText(null);
 												}
 												else{
-													//Forgot Password for managers
-													JButton btn_forgot = new JButton("Forgot password?");
-													btn_forgot.setBounds(90, 570, 200, 40);
-													btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
-													btn_forgot.setFocusable(false);
-													staffDetails.add(btn_forgot);
-													tempResetUserEmail = staffList.get(i).getEmail();
-													btn_forgot.addActionListener(new ActionListener() {
-														@Override
-														public void actionPerformed(ActionEvent e) {
-															if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
-																Object[] options = {"Cancel","Enter Code","Send Email"};
-																int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
-																	JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+													textPane_edit_error_street.setText("Street can only contain alphabets, numbers, '#', '''.");
+													ok = false;
+												}
+											}
+											
+											//City
+											if(validateEmpty(textPane_details_city.getText()) == false){
+												textPane_edit_error_city.setText("City field cannot be Empty.");
+												check = false;
+											}
+											else if(checkForAlphabets(textPane_details_city.getText()) == false){
+												textPane_edit_error_city.setText("City field must contain alphabets only.");
+												ok = false;
+											}
+											else{
+												textPane_edit_error_city.setText(null);
+											}
+											
+											//Province
+											if(validateEmpty(textPane_details_stateProvince.getText()) == false){
+												textPane_edit_error_stateProvince.setText("State/Province field cannot be Empty.");
+												check = false;
+											}
+											else if(checkForAlphabets(textPane_details_stateProvince.getText()) == false){
+												textPane_edit_error_stateProvince.setText("State/Province field must contain alphabets only.");
+												ok = false;
+											}
+											else{
+												textPane_edit_error_stateProvince.setText(null);
+											}
+											
+											//Postal code
+											if(validateEmpty(textPane_details_postalCode.getText()) == false){
+												textPane_edit_error_postalCode.setText("Postal Code cannot be Empty.");
+												check = false;
+											}
+											else{
+												if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[ ]{1}([0-9][A-Za-z][0-9])$")){ //A1B 2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[-]{1}([0-9][A-Za-z][0-9])$")){ //A1B-2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else{
+													textPane_edit_error_postalCode.setText("Postal code does not have a valid code pattern.");
+													ok = false;
+												}
+											}
+											
+											//Home phone
+											if(validateEmpty(textPane_details_homePhone.getText()) == false){
+												textPane_edit_error_homePhone.setText("Home phone cannot be Empty.");
+												check = false;
+											}
+											else{
+												if(textPane_details_homePhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
+													textPane_edit_error_homePhone.setText(null);
+												}
+												else if(textPane_details_homePhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
+													textPane_edit_error_homePhone.setText(null);
+												}
+												else if(textPane_details_homePhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
+													textPane_edit_error_homePhone.setText(null);
+												}
+												else if(textPane_details_homePhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
+													textPane_edit_error_homePhone.setText(null);
+												}
+												else{
+													textPane_edit_error_homePhone.setText("Home phone does not have a valid phone pattern.");
+													check = false;
+												}
+											}
+											
+											//Cell phone
+											if(validateEmpty(textPane_details_cellPhone.getText()) == false){
+												textPane_error_edit_cellPhone.setText("Cell phone cannot be Empty.");
+												check = false;
+											}
+											else{
+												if(textPane_details_cellPhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
+													textPane_error_edit_cellPhone.setText(null);
+												}
+												else if(textPane_details_cellPhone.getText().trim().matches("^([0-9]{3})[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //999 999 9999 
+													textPane_error_edit_cellPhone.setText(null);
+												}
+												else if(textPane_details_cellPhone.getText().trim().matches("^([0-9]{10})$")){ //9999999999 
+													textPane_error_edit_cellPhone.setText(null);
+												}
+												else if(textPane_details_cellPhone.getText().trim().matches("^[(]{1}([0-9]{3})[)]{1}[ ]{1}([0-9]{3})[ ]{1}([0-9]{4})$")){ //(999) 999 9999
+													textPane_error_edit_cellPhone.setText(null);
+												}
+												else{
+													textPane_error_edit_cellPhone.setText("Cell phone does not have a valid phone pattern.");
+													ok = false;
+												}
+											}
+											
+											//Email
+											if(validateEmpty(textPane_details_email.getText()) == false){
+												textPane_edit_error_email.setText("Email cannot be Empty.");
+												check = false;
+											}
+											else{
+												if(textPane_details_email.getText().trim().matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+													textPane_edit_error_email.setText(null);
+												}
+												else{
+													textPane_edit_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-'.");
+													ok = false;
+												}
+											}
+											
+											//Position
+											if(validateEmpty(textPane_positionID.getText()) == false){
+												textPane_edit_error_positionID.setText("Position ID cannot be Empty.");
+												check = false;
+											}
+											//show positions, which will go to db and get position # for u
+											else if(checkForNumbers(textPane_positionID.getText()) == false){
+												textPane_edit_error_positionID.setText("Position ID must contain numbers only.");
+												check = false;
+											}
+											else{
+												textPane_edit_error_positionID.setText(null);
+											}
+											
+											//Job type
+											if(validateEmpty(textPane_details_JobType.getText()) == false){
+												textPane_error_edit_jobType.setText("Job Type cannot be Empty.");
+												check = false;
+											}
+											else if(checkForAlphabets(textPane_details_JobType.getText()) == false){
+												textPane_error_edit_jobType.setText("Job Type must contain alphabets only.");
+												check = false;
+											}
+											else{
+												textPane_error_edit_jobType.setText(null);
+											}
+											*/
+											if(position.checkPosition(currentEmployee.getPositionID()) == false){
+												JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
+												//System.exit(0);
+											}
+											else{
+												if(check && ok){
+													boolean go = false;
+													do{
+														JPanel panel = new JPanel();
+														JLabel label = new JLabel("Enter a password:");
+														JPasswordField pass = new JPasswordField(10);
+														panel.add(label);
+														panel.add(pass);
+														String[] options = new String[]{"OK", "Cancel"};
+														int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+														                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+														                         null, options, options[0]);
+														if(option == 0) // pressing OK button
+														{
+														    char[] password = pass.getPassword();
+														    String passwordInput = new String(password);
+														    
+														    Employees tempEmployee = new Employees(currentEmployee.getUsername());
+															if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
+																//First name
+																textPane_details_firstName.setBackground(Color.decode(defaultColor));
+																textPane_details_firstName.setEditable(false);
+																
+																//Last name
+																textPane_details_lastName.setBackground(Color.decode(defaultColor));
+																textPane_details_lastName.setEditable(false);
+																
+																//Street
+																textPane_details_street.setBackground(Color.decode(defaultColor));
+																textPane_details_street.setEditable(false);
+																
+																//City
+																textPane_details_city.setBackground(Color.decode(defaultColor));
+																textPane_details_city.setEditable(false);
+						
+																//State/Province
+																textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+																textPane_details_stateProvince.setEditable(false);
+																
+																//Postal code
+																textPane_details_postalCode.setBackground(Color.decode(defaultColor));
+																textPane_details_postalCode.setEditable(false);
+																
+																//Home phone
+																textPane_details_homePhone.setBackground(Color.decode(defaultColor));
+																textPane_details_homePhone.setEditable(false);
+																
+																//Cell phone
+																textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
+																textPane_details_cellPhone.setEditable(false);
+																
+																//Email
+																textPane_details_email.setBackground(Color.decode(defaultColor));
+																textPane_details_email.setEditable(false);
+																
+																//Position ID
+																textPane_positionID.setBackground(Color.decode(defaultColor));
+																textPane_positionID.setEditable(false);
+																
+																//Job Type
+																textPane_details_JobType.setBackground(Color.decode(defaultColor));
+																textPane_details_JobType.setEditable(false);
+																
+																//Username
+																//textPane_details_username.setBackground(Color.decode(defaultColor));
+																//textPane_details_username.setEditable(false);
+																
+																btn_save.setVisible(false);
+																btn_edit.setVisible(true);
+																
+																//Write to DB
+																Connect connect = new Connect();
+																try {
+																	Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+																	String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
+																	PreparedStatement ps = con.prepareStatement(sql);
+																	ps.setString(1, textPane_details_firstName.getText().trim());
+																	ps.setString(2, textPane_details_lastName.getText().trim());
+																	ps.setString(3, textPane_details_street.getText().trim());
+																	ps.setString(4, textPane_details_city.getText().trim());
+																	ps.setString(5, textPane_details_stateProvince.getText().trim());
+																	ps.setString(6, textPane_details_postalCode.getText().trim());
+																	ps.setString(7, textPane_details_homePhone.getText().trim());
+																	ps.setString(8, textPane_details_cellPhone.getText().trim());
+																	ps.setString(9, textPane_details_email.getText().trim());
+																	ps.setString(10, textPane_positionID.getText().trim());
+																	ps.setString(11, textPane_details_JobType.getText().trim());
+																	ps.setString(12, textPane_details_id.getText().trim());
+																    ps.executeUpdate();
 																	
-																//Cancel
-																if(selection == JOptionPane.YES_OPTION){
-																	
+																	//Clean-up environment
+																	con.close();
+																} catch (SQLException e2) {
+																	// TODO Auto-generated catch block
+																	e2.printStackTrace();
 																}
-																//Enter Code
-																else if(selection == JOptionPane.NO_OPTION){
-																	
+																
+																//removing vector elements
+																if(staffList != null){
+																	staffList.clear();
 																}
-																//Send Email
-																else if(selection == JOptionPane.CANCEL_OPTION){
-																	Random random = new Random();
-																	//random.nextInt(max - min + 1) + min
-																	int value = random.nextInt(9999 - 1000 + 1) + 1000;
-																	String sValue = String.valueOf(value);
-																	if(!sValue.isEmpty() && sValue.length() == 4){
-																		//Send Generated code to Email
-																		resetUserEmail.put(tempResetUserEmail, sValue);
-																		//System.out.println("Size: " + resetUserEmail.size());
-																		// Recipient's email ID needs to be mentioned.
-																	    //String to = tempResetUserEmail;
-																		String to = "nitish111@hotmail.com";
-																		
-																	    // Sender's email ID needs to be mentioned
-																	    //Change to senders email (current signed in employee), or zenit
-																	    String from = "nsbajaj@myseneca.com";
-																	    
-																	    // Assuming you are sending email from localhost
-																	    //Change localhost to host
-																	    String host = "localhost";
-																	    
-																	    // Get system properties
-																	    Properties properties = System.getProperties();
-																	    
-																	    // Setup mail server
-																	    properties.setProperty("mail.smtp.host", host);
-
-																	    // Get the default Session object.
-																	    Session session = Session.getDefaultInstance(properties);
-																		
-																	    try{
-																	         // Create a default MimeMessage object.
-																	         MimeMessage message = new MimeMessage(session);
-
-																	         // Set From: header field of the header.
-																	         message.setFrom(new InternetAddress(from));
-
-																	         // Set To: header field of the header.
-																	         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-
-																	         // Set Subject: header field
-																	         message.setSubject("This is the Subject Line!");
-
-																	         // Now set the actual message
-																	         message.setText("This is actual message");
-
-																	         // Send message
-																	         Transport.send(message);
-																	         System.out.println("Sent message successfully....");
-																	      }catch (MessagingException mex) {
-																	         mex.printStackTrace();
-																	      }
-																		
-																		//Reset to null, just to be safe
-																		tempResetUserEmail = null;
+																
+																//remove previous rows
+																for (int i = employeeModel.getRowCount()-1; i >= 0; --i) {
+																	employeeModel.removeRow(i);
+																}
+																//Refreshing main staff table and getting new values
+																getStaffList();
+																if(staffList.size() > 0){
+																	for(int i = 0; i < staffList.size(); i++){
+																		employeeModel.addRow(new Object[]{staffList.get(i).getID(),staffList.get(i).getFirstName() + " " + staffList.get(i).getLastName(),staffList.get(i).getCellPhone(),staffList.get(i).getEmail(),staffList.get(i).getJobType(),staffList.get(i).getUsername(),staffList.get(i).getHireDate()});
+																	}
+																}
+																else{
+																	JOptionPane.showMessageDialog(null,"No staff was found in the database.");
+																}
+																//Update current employee
+																updateCurrentEmployee();
+																go = true;
+															}
+															else{
+																JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+															}
+														}
+														else{
+															go = true;
+														}
+													}while(go == false);
+													if(position.checkPosition(currentEmployee.getPositionID()) == false){
+														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
+														//System.exit(0);
+													}
+												}
+											}
+										}
+									});
+							        
+									//Print button
+							        JButton btn_print = new JButton("Print");
+							        btn_print.setBounds(485, 570, 150, 40);
+							        btn_print.setFont(new Font("Tahoma", Font.PLAIN, 20));
+							        btn_print.setFocusable(false);
+									staffDetails.add(btn_print);
+									btn_print.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+												JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+											}
+										}
+									});
+							        
+									//Cancel button
+							        JButton btn_cancel = new JButton("Cancel");
+							        btn_cancel.setBounds(670, 570, 150, 40);
+							        btn_cancel.setFont(new Font("Tahoma", Font.PLAIN, 20));
+							        btn_cancel.setFocusable(false);
+									staffDetails.add(btn_cancel);
+									btn_cancel.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+												//JOptionPane.showMessageDialog(null,"Edit mode is enabled. Are you sure you want to cancel?");
+												Object[] options = {"Yes","No"};
+												int selection = JOptionPane.showOptionDialog(null,"Edit mode is enabled. Are you sure you want to cancel?","Warning",
+													JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+													
+												if(selection == JOptionPane.YES_OPTION){
+													d1.dispose();
+												}
+												else if(selection == JOptionPane.NO_OPTION){
+													
+												}
+											}
+										}
+									});
+									
+									if(currentEmployee != null){
+										int tempID = (Integer) employeeModel.getValueAt(row, 0);
+										String tempUsername = (String) employeeModel.getValueAt(row,5);
+										for(int i = 0; i < staffList.size(); i++){
+											//Checking if user double clicked / being viewed is in vector, to get more details
+											if(tempID == staffList.get(i).getID() && tempUsername.equals(staffList.get(i).getUsername())){
+												//Check if the current user is the one being viewed
+												if(currentEmployee.getID() == staffList.get(i).getID() && currentEmployee.getUsername().equals(staffList.get(i).getUsername())){
+													//Check if the user is a manager, cashier, etc. Only managers (higher employee's) are allowed to change passwords.
+													//Cashiers must change password using/requesting a manager account.
+													//Positions position = new Positions();
+													if(position.checkPosition(staffList.get(i).getPositionID()) == true){
+														//Change Password button
+												        JButton btn_chgpwd = new JButton("Change Password");
+												        btn_chgpwd.setBounds(90, 570, 200, 40);
+												        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+												        btn_chgpwd.setFocusable(false);
+														staffDetails.add(btn_chgpwd);
+														int tID = staffList.get(i).getID();
+														String tUserName = staffList.get(i).getUsername();
+														btn_chgpwd.addActionListener(new ActionListener() {
+															@Override
+															public void actionPerformed(ActionEvent e) {
+																if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																}
+																else{
+																	loadPasswordFrame(e,tID,tUserName);
+																}
+															}
+														});
+													}
+												}
+												else{
+													//Check if the manager account is allowed to edit only cashier, etc positions.
+													//Not higher positions, such as other managers.
+													//Positions position = new Positions();
+													if(position.checkPosition(staffList.get(i).getPositionID()) == false){
+														//Change Password button
+												        JButton btn_chgpwd = new JButton("Change Password");
+												        btn_chgpwd.setBounds(90, 570, 200, 40);
+												        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+												        btn_chgpwd.setFocusable(false);
+														staffDetails.add(btn_chgpwd);
+														int tID = staffList.get(i).getID();
+														String tUserName = staffList.get(i).getUsername();
+														btn_chgpwd.addActionListener(new ActionListener() {
+															@Override
+															public void actionPerformed(ActionEvent e) {
+																if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																}
+																else{
+																	loadPasswordFrame(e,tID,tUserName);
+																}
+															}
+														});
+													}
+													else{
+														//Forgot Password for managers
+														JButton btn_forgot = new JButton("Forgot password?");
+														btn_forgot.setBounds(90, 570, 200, 40);
+														btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
+														btn_forgot.setFocusable(false);
+														staffDetails.add(btn_forgot);
+														tempResetUserEmail = staffList.get(i).getEmail();
+														btn_forgot.addActionListener(new ActionListener() {
+															@Override
+															public void actionPerformed(ActionEvent e) {
+																if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																}
+																else{
+																	if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
+																		Object[] options = {"Cancel","Enter Code","Send Email"};
+																		int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
+																			JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+																			
+																		//Cancel
+																		if(selection == JOptionPane.YES_OPTION){
+																			
+																		}
+																		//Enter Code
+																		else if(selection == JOptionPane.NO_OPTION){
+																			
+																		}
+																		//Send Email
+																		else if(selection == JOptionPane.CANCEL_OPTION){
+																			Random random = new Random();
+																			//random.nextInt(max - min + 1) + min
+																			int value = random.nextInt(9999 - 1000 + 1) + 1000;
+																			String sValue = String.valueOf(value);
+																			if(!sValue.isEmpty() && sValue.length() == 4){
+																				//Send Generated code to Email
+																				resetUserEmail.put(tempResetUserEmail, sValue);
+																				//System.out.println("Size: " + resetUserEmail.size());
+																				// Recipient's email ID needs to be mentioned.
+																			    //String to = tempResetUserEmail;
+																				String to = "nitish111@hotmail.com";
+																				
+																			    // Sender's email ID needs to be mentioned
+																			    //Change to senders email (current signed in employee), or zenit
+																			    String from = "nsbajaj@myseneca.com";
+																			    
+																			    // Assuming you are sending email from localhost
+																			    //Change localhost to host
+																			    String host = "localhost";
+																			    
+																			    // Get system properties
+																			    Properties properties = System.getProperties();
+																			    
+																			    // Setup mail server
+																			    properties.setProperty("mail.smtp.host", host);
+		
+																			    // Get the default Session object.
+																			    Session session = Session.getDefaultInstance(properties);
+																				
+																			    try{
+																			         // Create a default MimeMessage object.
+																			         MimeMessage message = new MimeMessage(session);
+		
+																			         // Set From: header field of the header.
+																			         message.setFrom(new InternetAddress(from));
+		
+																			         // Set To: header field of the header.
+																			         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+		
+																			         // Set Subject: header field
+																			         message.setSubject("This is the Subject Line!");
+		
+																			         // Now set the actual message
+																			         message.setText("This is actual message");
+		
+																			         // Send message
+																			         Transport.send(message);
+																			         System.out.println("Sent message successfully....");
+																			      }catch (MessagingException mex) {
+																			         mex.printStackTrace();
+																			      }
+																				
+																				//Reset to null, just to be safe
+																				tempResetUserEmail = null;
+																			}
+																		}
+																	}
+																	else{
+																		JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
 																	}
 																}
 															}
-															else{
-																JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
-															}
-														}
-													});
+														});
+													}
 												}
+												break;
 											}
-											break;
 										}
 									}
-								}
-						        
-						        //Filling fields
-						        if(staffList.size() > 0){
-							        for(int i = 0; i < staffList.size(); i++){
-							        	String tempID = String.valueOf(employeeModel.getValueAt(row, 0));
-							        	if(tempID.equals(String.valueOf(staffList.get(i).getID()))){
-							        		textPane_details_id.setText(String.valueOf(staffList.get(i).getID()));
-							        		textPane_details_firstName.setText(staffList.get(i).getFirstName());
-							        		textPane_details_lastName.setText(staffList.get(i).getLastName());
-							        		textPane_details_street.setText(staffList.get(i).getStreet());
-							        		textPane_details_city.setText(staffList.get(i).getCity());
-							        		textPane_details_stateProvince.setText(staffList.get(i).getStateProvince());
-							        		textPane_details_postalCode.setText(staffList.get(i).getPostalCode());
-							        		textPane_details_homePhone.setText(staffList.get(i).getHomePhone());
-							        		textPane_details_cellPhone.setText(staffList.get(i).getCellPhone());
-							        		textPane_details_email.setText(staffList.get(i).getEmail());
-							        		textPane_positionID.setText(String.valueOf(staffList.get(i).getPositionID()));
-							        		textPane_details_JobType.setText(staffList.get(i).getJobType());
-							        		textPane_details_username.setText(staffList.get(i).getUsername());
-							        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
-							        		break;
-							        	}
+							        
+							        //Filling fields
+							        if(staffList.size() > 0){
+								        for(int i = 0; i < staffList.size(); i++){
+								        	String tempID = String.valueOf(employeeModel.getValueAt(row, 0));
+								        	if(tempID.equals(String.valueOf(staffList.get(i).getID()))){
+								        		textPane_details_id.setText(String.valueOf(staffList.get(i).getID()));
+								        		textPane_details_firstName.setText(staffList.get(i).getFirstName());
+								        		textPane_details_lastName.setText(staffList.get(i).getLastName());
+								        		textPane_details_street.setText(staffList.get(i).getStreet());
+								        		textPane_details_city.setText(staffList.get(i).getCity());
+								        		textPane_details_stateProvince.setText(staffList.get(i).getStateProvince());
+								        		textPane_details_postalCode.setText(staffList.get(i).getPostalCode());
+								        		textPane_details_homePhone.setText(staffList.get(i).getHomePhone());
+								        		textPane_details_cellPhone.setText(staffList.get(i).getCellPhone());
+								        		textPane_details_email.setText(staffList.get(i).getEmail());
+								        		textPane_positionID.setText(String.valueOf(staffList.get(i).getPositionID()));
+								        		textPane_details_JobType.setText(staffList.get(i).getJobType());
+								        		textPane_details_username.setText(staffList.get(i).getUsername());
+								        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
+								        		break;
+								        	}
+								        }
 							        }
-						        }
-						        
-						        Component component = (Component) e.getSource();
-								JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
-								d1 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
-								d1.getContentPane().add(staffDetails);
-								d1.setSize(900, 650);
-								d1.setLocationRelativeTo(null);
-								d1.getRootPane().setDefaultButton(btn_cancel);
-								d1.setVisible(true);
+							        
+							        Component component = (Component) e.getSource();
+									JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
+									d1 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+									d1.getContentPane().add(staffDetails);
+									d1.setSize(900, 650);
+									d1.setLocationRelativeTo(null);
+									d1.getRootPane().setDefaultButton(btn_cancel);
+									d1.setVisible(true);
+									}
 								}
 							}
 						}
-					}			
+						else{
+							JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
+						}
+					}
 				}
 			}
 		});
