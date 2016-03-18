@@ -16,9 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -387,7 +384,7 @@ public class Supplier extends JFrame implements AutoCloseable {
                     
                     s = c.prepareStatement(sql);
                     int dump = s.executeUpdate();
-                   
+                    
                     sql = "select s.Name, s.Street as 'Address', s.City, s.PhoneNumber as 'Phone Number', "
                         + " 'View Details' as '' from Supplier s";
                     
@@ -404,7 +401,7 @@ public class Supplier extends JFrame implements AutoCloseable {
                     }
                     
                 } catch (Exception e){
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
                 } finally {
                     try {
                         if(s != null) s.close();
@@ -891,7 +888,7 @@ public class Supplier extends JFrame implements AutoCloseable {
             
             if(supplierID != 0){
                 query = "Select FirstName as 'First Name', LastName as 'Last Name', PhoneNumber as 'Phone Number', "
-                        + " Email from Contact where SupplierID = " + supplierID;
+                        + " Email, Department from Contact where SupplierID = " + supplierID;
                 rs = stmt.executeQuery(query);
                 
                 if(rs.next()) {
@@ -924,11 +921,13 @@ public class Supplier extends JFrame implements AutoCloseable {
         JLabel jLabel3 = new JLabel();
         JLabel jLabel4 = new JLabel();
         JLabel jLabel5 = new JLabel();
+        JLabel jLabel6 = new JLabel();
         JLabel error = new JLabel();
         JTextField first_name = new JTextField();
         JTextField last_name = new JTextField();
         JTextField phone_number = new JTextField();
         JTextField email = new JTextField();
+        JTextField department = new JTextField();
         JButton btn_addContact = new JButton();
         JButton btn_cancel = new JButton();
         
@@ -945,6 +944,8 @@ public class Supplier extends JFrame implements AutoCloseable {
 
         jLabel5.setText("Email:");
         
+        jLabel6.setText("Department:");
+        
         error.setForeground(new java.awt.Color(255, 0, 0));
         
         btn_addContact.setText("Add Contact");
@@ -953,6 +954,7 @@ public class Supplier extends JFrame implements AutoCloseable {
             String lname = last_name.getText().trim();
             String phonenumber = phone_number.getText().trim();
             String Email = email.getText().trim();
+            String departmentt = department.getText().trim();
             boolean keep = true;
             
             if(fname.equals("")){
@@ -967,22 +969,25 @@ public class Supplier extends JFrame implements AutoCloseable {
             } else if((Email.equals("") || !Email.contains("@") || !Email.contains(".")) && keep){
                 error.setText("Error: Email field is invalid.");
                 keep = false;
-            }
+            } else if(departmentt.equals("") && keep){
+                error.setText("Please enter department the person assist in most.");
+                keep = false;
+            } 
             
             if(keep) {
                 PreparedStatement s = null;
                 ResultSet rs = null;
                 
                 try {
-                    String sql = "insert into Contact (FirstName, LastName, PhoneNumber, Email, SupplierID)"
+                    String sql = "insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID)"
                             + " values ('" + fname + "', '" + lname + "', '" + phonenumber + "', '" + Email 
-                            + "', " + supplierID + ")";
+                            + "', '" + departmentt + "', " + supplierID + ")";
                     
                     s = c.prepareStatement(sql);
                     int r = s.executeUpdate();
                     
                     sql = "Select FirstName as 'First Name', LastName as 'Last Name', PhoneNumber as 'Phone Number', "
-                        + " Email from Contact where SupplierID = " + supplierID;
+                        + " Email, Department from Contact where SupplierID = " + supplierID;
                     rs = s.executeQuery(sql);
 
                     if(rs.next()) {
@@ -1013,6 +1018,7 @@ public class Supplier extends JFrame implements AutoCloseable {
         btn_cancel.addActionListener((ActionEvent evt) -> {
             fr.dispose();
         });
+        
         GroupLayout panel_addContactLayout = new GroupLayout(panel_addContact);
         panel_addContact.setLayout(panel_addContactLayout);
         panel_addContactLayout.setHorizontalGroup(
@@ -1021,26 +1027,27 @@ public class Supplier extends JFrame implements AutoCloseable {
                 .addContainerGap()
                 .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
+                    .addGroup(panel_addContactLayout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(btn_addContact, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btn_cancel, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
                     .addComponent(error)
-                    .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(GroupLayout.Alignment.LEADING, panel_addContactLayout.createSequentialGroup()
-                            .addGap(30, 30, 30)
-                            .addComponent(btn_addContact, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(btn_cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(GroupLayout.Alignment.LEADING, panel_addContactLayout.createSequentialGroup()
-                            .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel5))
-                            .addGap(21, 21, 21)
-                            .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(phone_number)
-                                .addComponent(last_name, GroupLayout.Alignment.LEADING)
-                                .addComponent(email)
-                                .addComponent(first_name, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(135, Short.MAX_VALUE))
+                    .addGroup(panel_addContactLayout.createSequentialGroup()
+                        .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
+                        .addGap(21, 21, 21)
+                        .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(phone_number)
+                            .addComponent(last_name, GroupLayout.Alignment.LEADING)
+                            .addComponent(email)
+                            .addComponent(first_name, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                            .addComponent(department))))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
         panel_addContactLayout.setVerticalGroup(
             panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -1056,16 +1063,20 @@ public class Supplier extends JFrame implements AutoCloseable {
                     .addComponent(jLabel3)
                     .addComponent(last_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(phone_number, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(phone_number, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(email, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(department, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(error)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(panel_addContactLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_addContact)
                     .addComponent(btn_cancel))

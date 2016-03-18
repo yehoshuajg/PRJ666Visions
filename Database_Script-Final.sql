@@ -45,6 +45,7 @@ create table Contact
 	LastName		varchar(15)		not null,
 	PhoneNumber		varchar(15)		not null,
 	Email			varchar(50),
+    Department		varchar(20)		not null,
 	SupplierID		int				not null,
 
 	PRIMARY KEY(ID),
@@ -286,8 +287,8 @@ create table OrderDetail
 	OrderID				int			not null,
 	ProductID			int(8) 		not null,
 	OrderedQuantity		int 		not null,
-	ReceivedQuantity	int,
-	Cost				double,
+	ReceivedQuantity	int			DEFAULT 0,
+	Cost				double		DEFAULT 0,
 	
 	PRIMARY KEY(OrderID, ProductID),
 	FOREIGN KEY (OrderID) REFERENCES `Order`(ID),
@@ -371,24 +372,29 @@ update storedb.supplier
 set DeliveryCost = ROUND((MinimumOrderCost * 0.2));
 
 /*-------------------------- CONTACT -----------------------------*/
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (1,"Kyle","Suarez","1-404-990-1890","neque.pellentesque.massa@Curae.net",1);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (2,"Whilemina","Harrell","1-935-584-3889","orci.tincidunt.adipiscing@Integerin.com",12);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (3,"Jorden","Hebert","1-469-234-6519","rhoncus.Donec.est@morbi.ca",3);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (4,"Baxter","Stark","1-729-860-4675","Integer@auctorvelit.co.uk",15);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (5,"Christian","Cotton","1-201-925-5715","ornare.placerat.orci@accumsanlaoreetipsum.org",15);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (6,"Demetria","Cervantes","1-167-685-6629","Nunc.sed@diamatpretium.com",13);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (7,"Lunea","Cantu","1-552-501-5624","Cras@etrutrum.edu",13);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (8,"Marny","Hess","1-447-121-5893","Nunc.pulvinar@viverra.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (9,"Elliott","Floyd","1-327-257-2761","nascetur.ridiculus@nunc.com",4);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (10,"Preston","Mccall","1-813-388-0610","libero.Integer@eget.org",4);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (11,"Bernard","Lara","1-981-450-4017","Class@interdumenimnon.ca",11);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (12,"Haley","Fox","1-261-450-5355","ut.nulla.Cras@Nullam.com",7);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (13,"Chelsea","Blake","1-226-549-2210","ultricies@quamCurabitur.edu",12);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (14,"Tyler","Mcintyre","1-789-890-1458","at.velit@velvenenatisvel.ca",9);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (15,"Genevieve","Butler","1-195-311-1140","Lorem@non.org",6);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (16,"Fulton","Buchanan","1-479-734-8332","Aliquam.nisl.Nulla@eliteratvitae.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (17,"Jenna","Randolph","1-267-129-8724","vehicula.et@aaliquet.co.uk",14);
-INSERT INTO Contact (ID,FirstName,LastName,PhoneNumber,Email,SupplierID) VALUES (18,"Amena","Stark","1-170-910-5565","venenatis@euodio.edu",14);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Janice', 'Ferguson', '2-173-026-7699', null, 'Internal Auditor', 15);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Billy', 'Morrison', '6-462-527-3077', null, 'Internal Auditor', 5);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Emily', 'Ford', '4-811-090-0090', 'eford2@geocities.jp', 'Pharmacist', 12);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Sara', 'Lopez', '9-706-218-9941', 'slopez3@chicagotribune.com', 'Statistician III', 16);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Chris', 'Bennett', '2-278-404-8771', 'cbennett4@thetimes.co.uk', 'Marketing Manager', 16);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Kelly', 'Barnes', '8-523-878-4344', 'kbarnes5@baidu.com', 'Product Engineer', 6);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Diana', 'Stanley', '3-080-047-1672', 'dstanley6@si.edu', 'Automation Specialist III', 3);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Gerald', 'Johnston', '8-273-279-0912', null, 'Financial Advisor', 9);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Deborah', 'Freeman', '4-370-595-4322', 'dfreeman8@comcast.net', 'Assistant Manager', 4);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Roger', 'Hansen', '3-849-034-5404', null, 'Senior Financial Analyst', 15);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Louise', 'Smith', '6-670-315-2868', 'lsmitha@typepad.com', 'Tax Accountant', 5);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Ralph', 'Carpenter', '6-778-810-3753', null, 'Sales Representative', 11);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Sharon', 'Freeman', '1-812-295-1134', 'sfreemanc@freewebs.com', 'Human Resources Manager', 2);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Kenneth', 'Barnes', '7-935-009-2334', 'kbarnesd@acquirethisname.com', 'VP Sales', 14);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Kathleen', 'Hawkins', '7-272-624-5684', 'khawkinse@blinklist.com', 'Analyst Programmer', 15);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Brian', 'Porter', '1-637-923-6231', 'bporterf@google.com', 'Senior Financial Analyst', 4);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Bruce', 'Carroll', '0-217-417-6182', null, 'Recruiter', 8);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Terry', 'Hunt', '1-853-529-0258', 'thunth@amazon.co.jp', 'Human Resources Assistant I', 15);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Dennis', 'Roberts', '0-313-252-0730', 'drobertsi@trellian.com', 'Registered Nurse', 8);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Stephen', 'Hawkins', '4-467-322-6689', 'shawkinsj@rakuten.co.jp', 'Food Chemist', 10);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Jesse', 'Stephens', '4-578-312-6573', 'jstephensk@eepurl.com', 'Accounting Assistant IV', 4);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Antonio', 'Anderson', '4-540-878-1253', 'aandersonl@huffingtonpost.com', 'Research Associate', 5);
+insert into Contact (FirstName, LastName, PhoneNumber, Email, Department, SupplierID) values ('Joe', 'Rodriguez', '1-461-700-0906', null, 'Financial Analyst', 11);
 
 /*-------------------------- PRODUCTS/INVENTORY -----------------------------*/
 insert into Product (id, `Name`, Description, CategoryID, SubCategoryID, SalePrice, Notes) values (10000001, 'Pollens - Trees, Ash, White Fraxinus americana', 'Jubilant HollisterStier LLC', 18, 19, 248.13, 'Path fx tibia fibula');
