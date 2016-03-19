@@ -28,6 +28,9 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
+import org.omg.Messaging.SyncScopeHelper;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -224,6 +227,8 @@ public class Home extends JFrame implements KeyListener{
 	//Date
 	String dateDelimiter = "/";
 	
+	//Find by name
+	JTextPane txtpnsearch_2;
 	
 	
 	/**
@@ -983,7 +988,7 @@ public class Home extends JFrame implements KeyListener{
 						panel_searchDetail.add(txtpnsearch_1);
 									
 						//Messages
-						JTextPane txtpnsearch_2 = new JTextPane();
+						txtpnsearch_2 = new JTextPane();
 						txtpnsearch_2.setBackground(Color.decode(defaultColor));
 						txtpnsearch_2.setBounds(10, 80, 370, 120);
 						panel_searchDetail.add(txtpnsearch_2);
@@ -1116,7 +1121,7 @@ public class Home extends JFrame implements KeyListener{
 						
 						//Button listener
 						product_search_button.addActionListener(new ActionListener() {
-							
+						
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								// TODO Auto-generated method stub
@@ -1138,28 +1143,28 @@ public class Home extends JFrame implements KeyListener{
 									if(productByLike.size() > 0){
 										txtpnsearch_2.setText("");
 										for(int i = 0; i < productByLike.size(); i++){
-											//If sale table is not empty
 											if(productBySearch.size() > 0){
 												for(int j = 0; j < productBySearch.size(); j++){
-													if(String.valueOf(productByLike.get(i).getID()).equals(String.valueOf(productBySearch.get(j).getID()))){
-														model_search.addRow(new Object[]{i+1,productBySearch.get(j).getName(),productBySearch.get(j).getDescription(),productBySearch.get(j).getQuantity(),productBySearch.get(j).getSalePrice(),productBySearch.get(j).getNotes()});
-														break;
+													if(productByLike.get(i).getID() == productBySearch.get(j).getID()){
+														productByLike.get(i).setQuantity(productBySearch.get(j).getQuantity());
 													}
 													else{
-														model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
-														break;
+														//No match
 													}
 												}
 											}
-											//if sale table is empty
 											else{
-												model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+												//Printing it in the outside loop, the value doesn't alter here, values that alter will and will print them outside
 											}
 										}
 									}
-									//No product found
 									else{
-										txtpnsearch_2.setText("Product '" + productNameInput + "' was not found.");
+										txtpnsearch_2.setText("No product was found in inventory.");
+									}
+									if(productByLike.size() > 0){
+										for(int k = 0; k < productByLike.size(); k++){
+											model_search.addRow(new Object[]{k+1,productByLike.get(k).getName(),productByLike.get(k).getDescription(),productByLike.get(k).getQuantity(),productByLike.get(k).getSalePrice(),productByLike.get(k).getNotes()});
+										}
 									}
 								}
 							}
@@ -3905,15 +3910,38 @@ public class Home extends JFrame implements KeyListener{
 		for (int i = model_search.getRowCount()-1; i >= 0; --i) {
 			model_search.removeRow(i);
 		}
-		
 		//Getting all products
 		cashierAllProductsByName.getAllProductsByName(productByLike);
 		if(productByLike.size() > 0){
 			for(int i = 0; i < productByLike.size(); i++){
-				model_search.addRow(new Object[]{i+1,productByLike.get(i).getName(),
-				productByLike.get(i).getDescription(),productByLike.get(i).getQuantity(),
-				productByLike.get(i).getSalePrice(),productByLike.get(i).getNotes()});
+				if(productBySearch.size() > 0){
+					for(int j = 0; j < productBySearch.size(); j++){
+						if(productByLike.get(i).getID() == productBySearch.get(j).getID()){
+							productByLike.get(i).setQuantity(productBySearch.get(j).getQuantity());
+						}
+						else{
+							//No match
+						}
+					}
+				}
+				else{
+					//Printing it in the outside loop, the value doesn't alter here, values that alter will and will print them outside
+				}
 			}
+		}
+		else{
+			txtpnsearch_2.setText("No product was found in inventory.");
+		}
+		if(productByLike.size() > 0){
+			for(int k = 0; k < productByLike.size(); k++){
+				model_search.addRow(new Object[]{k+1,productByLike.get(k).getName(),productByLike.get(k).getDescription(),productByLike.get(k).getQuantity(),productByLike.get(k).getSalePrice(),productByLike.get(k).getNotes()});
+			}
+		}
+	}
+	public void removeTableRows(DefaultTableModel model){
+		//Remove rows from table
+		for (int i = model.getRowCount()-1; i >= 0; --i) {
+			model.removeRow(i);
 		}
 	}
 }
