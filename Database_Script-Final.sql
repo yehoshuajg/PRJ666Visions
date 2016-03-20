@@ -625,10 +625,10 @@ insert into Positions (`Name`, Description) values ('Owner', 'Person who owns st
 insert into Positions (`Name`, Description) values ('Accountant', 'Manages stores account related work, ex: taxes');
 
 /*-------------------------- EMPLOYEE -----------------------------*/
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jean', 'Ross', '5 West Trail', 'Hamilton', 'Ontario', 'y9E 6h6', '8-658-082-9509', '2-714-792-6349', null, '4', 'Casual ', 'jross0', 'r', '2014-11-23', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jean', 'Ross', '5 West Trail', 'Hamilton', 'Ontario', 'y9E 6h6', '8-658-082-9509', '2-714-792-6349', null, ‘4’, 'Casual ', 'jross0', 'r', '2014-11-23', null);
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Wayne', 'Chavez', '439 Almo Pass', 'Hamilton', 'Ontario', 'd0F 7V2', '3-827-631-4796', '7-597-451-9742', null, '5', 'Part Time ', 'wchavez1', 'c', '2014-10-01', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Diane', 'Ward', '6516 Hallows Junction', 'Hamilton', 'Ontario', 'P6q 5I6', '7-241-553-3824', '5-147-251-3652', 'dward2@mysql.com', '5', 'Casual ', 'dward2', 'P', '2015-07-25', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Melissa', 'Patterson', '783 Warbler Lane', 'Hamilton', 'Ontario', 'w0t 7D2', null, '4-514-116-6313', 'mpatterson3@histats.com', '5', 'Casual ', 'mpatterson3', 'V', '2015-03-01', '2015-12-30');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Diane', 'Ward', '6516 Hallows Junction', 'Hamilton', 'Ontario', 'P6q 5I6', '7-241-553-3824', '5-147-251-3652', 'dward2@mysql.com', ‘3’, 'Casual ', 'dward2', 'P', '2015-07-25', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Melissa', 'Patterson', '783 Warbler Lane', 'Hamilton', 'Ontario', 'w0t 7D2', null, '4-514-116-6313', 'mpatterson3@histats.com', ‘2’, 'Casual ', 'mpatterson3', ’s’, '2015-03-01', '2015-12-30');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Andrew', 'Shaw', '87142 Maryland Avenue', 'Ajax', 'Ontario', 'H1a 2w5', null, '1-098-060-1922', 'ashaw4@devhub.com', '5', 'Casual ', 'ashaw4', 'A', '2015-12-26', null);
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Adam', 'Bowman', '140 Meadow Ridge Place', 'Hamilton', 'Ontario', 's4U 7u2', null, '6-123-162-8681', null, '3', 'Casual ', 'abowman5', 'Z', '2015-12-14', '2015-11-04');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Eugene', 'Ruiz', '7 Superior Way', 'Hamilton', 'Ontario', 'U8B 2s5', '4-947-463-1407', '8-914-743-6033', null, '5', 'Part Time ', 'eruiz6', 't', '2014-11-21', null);
@@ -1134,6 +1134,15 @@ update `Order` SET InvoiceID = 23 where ID = 45;
 ALTER Table Employee Add Salt VARCHAR(50);
 update Employee Set Salt = '[B@3d4eac69' Where ID = 1;
 UPDATE Employee Set Password='765ee7dc269c81d36a6a19893def309f24fe1ef9eabdd9a1de6d2e54714c2bd6156488630cc69f5434d9e2a4dd6ffc944f4f57228359554fa37781729da54106' WHERE ID = 1;
+
+update Employee Set Salt = '[B@4e389b15' Where ID = 2;
+UPDATE Employee Set Password='5c16c954293bd8269e1bad0bce95a61d775f817705fe24a88cca7e017c7aa3186b9f4fef2708e5beaaaba576510cdf39a3ba35f6834a4a8dbe3ce28565fdf0d3' WHERE ID = 2;
+
+update Employee Set Salt = '[B@74f16efa' Where ID = 3;
+UPDATE Employee Set Password='d46ca4a80f845fb86a17016fbf4a0d336caa8a86a47350c614934d90374f3b258fcac1d90483496d678ea66bb1ae626bd4afbbdcc4431c39a97c0c6b217925de' WHERE ID = 3;
+
+update Employee Set Salt = '[B@52c5aa4c' Where ID = 4;
+UPDATE Employee Set Password='3b414f30fbac8a5db429c10ea165d729e51cfb31c74678bb4ca9b083d796527ba8964e2737546aebaec005fc21cb08c5c0c8b2294160a02811e9e5ff24a8e462' WHERE ID = 4;
 
 /* Adding a UnitCost column in product table that will be average cost from product from multiple supplier. */
 alter table Product
