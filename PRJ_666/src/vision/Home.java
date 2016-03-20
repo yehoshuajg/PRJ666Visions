@@ -137,10 +137,15 @@ public class Home extends JFrame implements KeyListener{
 	
 	//Discount
 	private Vector<Discount> discount;
-	private JTextPane textField_discount;
+	//private JTextPane textField_discount;
+	private int detail_discountID;
+	private String detail_discountType;
 	private boolean oneTimeDiscountCheck = false;
 	private JTextField discount_option;
 	private JFrame frame_discount;
+	private JButton btnDiscountDetails;
+	private JButton button_discount;
+	private double detail_discountValue;
     
 	private JButton keypad_0;
 	private JButton keypad_1;
@@ -177,6 +182,7 @@ public class Home extends JFrame implements KeyListener{
 	private JDialog d5;
 	private JDialog d6;
 	private JDialog d7;
+	private JDialog d8;
 	private JTextField textField_transaction_input;
 	
 	//Refund
@@ -936,7 +942,10 @@ public class Home extends JFrame implements KeyListener{
 		btnCancelItem.setBounds(6, 7, 120, 40);
 		cashier_commands.add(btnCancelItem);
 		
-		JButton button_discount = new JButton("Discount");
+		btnDiscountDetails = new JButton("Discount Details");
+		btnDiscountDetails.setVisible(false);
+		
+		button_discount = new JButton("Discount");
 		button_discount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(oneTimeDiscountCheck == true){
@@ -960,12 +969,122 @@ public class Home extends JFrame implements KeyListener{
 		button_discount.setBounds(6, 58, 120, 40);
 		cashier_commands.add(button_discount);
 		
-		textField_discount = new JTextPane();
-		textField_discount.setEditable(false);
-		textField_discount.setBounds(130, 59, 120, 38);
-		textField_discount.setBackground(Color.decode(defaultColor));
-		cashier_commands.add(textField_discount);
-		//textField_discount.setColumns(10);
+		//Discount details
+		//Initializing Discount details button
+		btnDiscountDetails.setBounds(6, 58, 120, 40);
+		cashier_commands.add(btnDiscountDetails);
+		btnDiscountDetails.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPanel panel_discount2 = new JPanel();
+				panel_discount2.setLayout(null);
+				
+				//Discount details
+				JTabbedPane tabbedPane_discount = new JTabbedPane(JTabbedPane.TOP);
+				tabbedPane_discount.setBounds(60, 10, 400, 300);
+				panel_discount2.add(tabbedPane_discount);
+							
+				JPanel panel_discount_details = new JPanel();
+				tabbedPane_discount.addTab("Discount details:", null, panel_discount_details, null);
+				panel_discount_details.setLayout(null);
+							
+				//Text
+				JTextPane discount_message1 = new JTextPane();
+				discount_message1.setText("Discount ID: ");
+				discount_message1.setEditable(false);
+				discount_message1.setBounds(10, 13, 83, 20);
+				discount_message1.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(discount_message1);
+				
+				JTextPane detail_discountID_message2 = new JTextPane();
+				detail_discountID_message2.setText(String.valueOf(detail_discountID));
+				detail_discountID_message2.setEditable(false);
+				detail_discountID_message2.setBounds(100, 13, 250, 20);
+				detail_discountID_message2.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(detail_discountID_message2);
+				
+				JTextPane discount_message3 = new JTextPane();
+				discount_message3.setText("Discount Type: ");
+				discount_message3.setEditable(false);
+				discount_message3.setBounds(10, 45, 100, 20);
+				discount_message3.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(discount_message3);
+				
+				JTextPane detail_discounttype_message4 = new JTextPane();
+				detail_discounttype_message4.setText(detail_discountType);
+				detail_discounttype_message4.setEditable(false);
+				detail_discounttype_message4.setBounds(110, 45, 250, 20);
+				detail_discounttype_message4.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(detail_discounttype_message4);
+				
+				JTextPane discount_message5 = new JTextPane();
+				discount_message5.setText("Discount Value: ");
+				discount_message5.setEditable(false);
+				discount_message5.setBounds(10, 80, 105, 20);
+				discount_message5.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(discount_message5);
+				
+				JTextPane detail_discountValue_message6 = new JTextPane();
+				detail_discountValue_message6.setText("$" + String.valueOf(detail_discountValue));
+				detail_discountValue_message6.setEditable(false);
+				detail_discountValue_message6.setBounds(115, 80, 230, 20);
+				detail_discountValue_message6.setBackground(Color.decode(defaultColor));
+				panel_discount_details.add(detail_discountValue_message6);
+				
+				JButton discountdetail_remove = new JButton("Remove Discount");
+				discountdetail_remove.setBounds(7, 120, 185, 29);
+				panel_discount_details.add(discountdetail_remove);
+				discountdetail_remove.requestFocusInWindow();
+				discountdetail_remove.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						d8.dispose();
+						btnDiscountDetails.setVisible(false);
+						button_discount.setVisible(true);
+						oneTimeDiscountCheck = false;
+						
+						subTotal = (subTotal + detail_discountValue);
+						detail_discountValue = 0;
+						
+						subTotal = Math.round(subTotal * 100.0) / 100.0;
+						subtotal_textField.setText("Subtotal: $" + subTotal);
+
+						tax = subTotal * 0.13;
+						tax = Math.round(tax * 100.0) / 100.0;
+						tax_textField.setText("Tax: $" + tax);
+								
+						total = subTotal + tax;
+						total = Math.round(total * 100.0) / 100.0;
+						total_textField.setText("Total: $" + total);
+					}
+				});
+				
+				//Cancel button
+				JButton discountdetail_btnCancel = new JButton("Cancel");
+				discountdetail_btnCancel.setBounds(190, 120, 185, 29);
+				panel_discount_details.add(discountdetail_btnCancel);
+				discountdetail_btnCancel.requestFocusInWindow();
+				discountdetail_btnCancel.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						d8.dispose();
+						textField_productID_input.requestFocusInWindow();
+					}
+				});
+
+				
+				
+				
+				Component component = (Component) e.getSource();
+		        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
+				d8 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
+				d8.getContentPane().add(panel_discount2);
+				d8.setBounds(0, 0, 500, 650);
+				d8.setLocationRelativeTo(null);
+				//d8.getRootPane().setDefaultButton(discountOption_btnEnter);
+				d8.setVisible(true);
+			}
+		});
 		
 		JSeparator separator_3 = new JSeparator();
 		separator_3.setBounds(0, 100, 329, 20);
@@ -2266,7 +2385,11 @@ public class Home extends JFrame implements KeyListener{
 			total_textField.setText("Total: $" + total);
 					
 			if(subTotal < previous){
-				textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
+				//textField_discount.setText("Discount: " + oneTimeDiscount.getType() + ": $" + ((previous - subTotal) * 100.0) / 100.0);
+				detail_discountID = oneTimeDiscount.getID();
+				detail_discountType = oneTimeDiscount.getType();
+				detail_discountValue = 0;
+				detail_discountValue = (((previous - subTotal) * 100.0) / 100.0);
 				if(oneTimeDiscount.getID() > 0){
 					promotionID = oneTimeDiscount.getID();
 				}
@@ -2276,6 +2399,8 @@ public class Home extends JFrame implements KeyListener{
 				oneTimeDiscountCheck = true;
 				d3.dispose();
 				textField_productID_input.requestFocusInWindow();
+				button_discount.setVisible(false);
+				btnDiscountDetails.setVisible(true);
 			}
 		}
 		else{
