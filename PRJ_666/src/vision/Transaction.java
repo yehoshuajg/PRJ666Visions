@@ -152,17 +152,8 @@ public class Transaction extends JFrame {
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			String sql;
-			//PromotionID causing foreign key relationship error
-			/*sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
-					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+promotionID+"','"+employeeID+"')";
-			*/
-			//New
-			/*sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
-					+ "VALUE ('"+dateString+"','"+subTotal+"','"+tax+"',"+total+",'"+transactionType+"','"+transactionMethod+"','"+employeeID+"')";
-			*/
-			
-			sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
-					+ "VALUE (?,?,?,?,?,?,?)";
+			sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
+					+ "VALUE (?,?,?,?,?,?,?,?)";
 			PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, dateString);
 			ps.setDouble(2, subTotal);
@@ -170,7 +161,8 @@ public class Transaction extends JFrame {
 			ps.setDouble(4, total);
 			ps.setString(5, transactionType);
 			ps.setString(6, transactionMethod);
-			ps.setInt(7, employeeID);
+			ps.setInt(7, promotionID);
+			ps.setInt(8, employeeID);
 			ps.execute();
 			 
 			//assigns generatedKey as transaction #, which will be used to write into transactionRecord

@@ -602,20 +602,20 @@ public class Home extends JFrame implements KeyListener{
 							JOptionPane.showMessageDialog(null,"Please make sure the table is not in edit mode.");
 							textField_productID_input.requestFocusInWindow();
 						}
-						else if(validateEmpty(tempInput) == false){
+						/*else if(validateEmpty(tempInput) == false){
 							//JOptionPane.showMessageDialog(null,"Product ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
 							textField_name_input.setText(null);
 							textField_description_input.setText(null);		
 							textField_quantity_input.setText(null);
-						}
-						else if(containsSpace(tempInput) == true){
+						}*/
+						/*else if(containsSpace(tempInput) == true){
 							JOptionPane.showMessageDialog(null,"Product ID cannot have space(s).","Error",JOptionPane.ERROR_MESSAGE);
 							textField_productID_input.requestFocusInWindow();
 							textField_name_input.setText(null);
 							textField_description_input.setText(null);		
 							textField_quantity_input.setText(null);
-						}
-						else if(checkForNumbers(tempInput) == false){
+						}*/
+						/*else if(checkForNumbers(tempInput) == false){
 							JOptionPane.showMessageDialog(null,"Product ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
 							textField_productID_input.requestFocusInWindow();
 							textField_name_input.setText(null);
@@ -632,8 +632,8 @@ public class Home extends JFrame implements KeyListener{
 							textField_name_input.setText(null);
 							textField_description_input.setText(null);		
 							textField_quantity_input.setText(null);
-						}
-						else if(tempInput.length() == idLength){
+						}*/
+						else if(tempInput.trim().matches("^([0-9]{"+idLength+"})$")){
 							int tempInt = Integer.parseInt(tempInput);
 							Cashier cashierProductByID = new Cashier();
 							tempProductSearch = cashierProductByID.findProductID(tempInt);
@@ -643,6 +643,7 @@ public class Home extends JFrame implements KeyListener{
 								public void run() {
 									if(!table.isEditing()){
 										if(tempProductSearch != null){
+											textPane_productID_notFound.setText("");
 											if(tempProductSearch.getQuantity() <= 0){
 												JOptionPane.showMessageDialog(null,"" + '"'+ tempProductSearch.getName() + '"' + ", is currently out of stock.");
 												textField_name_input.setText(tempProductSearch.getName());
@@ -788,6 +789,9 @@ public class Home extends JFrame implements KeyListener{
 							};
 							SwingUtilities.invokeLater(doHighlight);
 						}
+						/*else if(tempInput.length() == idLength){
+							
+						}*/
 					}
 				});
 			}
@@ -795,6 +799,7 @@ public class Home extends JFrame implements KeyListener{
 		t1.start();
 		
 		textField_name_input = new JTextPane();
+		textField_name_input.setEditable(false);
 		textField_name_input.setBounds(105, 52, 607, 20);
 		textField_name_input.setBackground(Color.decode(defaultColor));
 		item_info.add(textField_name_input);
@@ -802,18 +807,21 @@ public class Home extends JFrame implements KeyListener{
 		textField_name_input.setEditable(false);
 	
 		textField_description_input = new JTextPane();
+		textField_description_input.setEditable(false);
 		textField_description_input.setBounds(142, 90, 579, 20);
 		textField_description_input.setBackground(Color.decode(defaultColor));
 		textField_description_input.setEditable(false);
 		item_info.add(textField_description_input);
 		
 		textField_quantity_input = new JTextPane();
+		textField_quantity_input.setEditable(false);
 		textField_quantity_input.setBounds(142, 129, 579, 20);
 		textField_quantity_input.setBackground(Color.decode(defaultColor));
 		textField_quantity_input.setEditable(false);
 		item_info.add(textField_quantity_input);
 		
 		textPane_productID_notFound = new JTextPane();
+		textPane_productID_notFound.setEditable(false);
 		textPane_productID_notFound.setBounds(238, 11, 483, 20);
 		textPane_productID_notFound.setBackground(Color.decode(defaultColor));
 		item_info.add(textPane_productID_notFound);
@@ -953,6 +961,7 @@ public class Home extends JFrame implements KeyListener{
 		cashier_commands.add(button_discount);
 		
 		textField_discount = new JTextPane();
+		textField_discount.setEditable(false);
 		textField_discount.setBounds(130, 59, 120, 38);
 		textField_discount.setBackground(Color.decode(defaultColor));
 		cashier_commands.add(textField_discount);
@@ -1621,6 +1630,7 @@ public class Home extends JFrame implements KeyListener{
 		panel_1.setLayout(null);
 		
 		JTextPane txtpnTransactionId = new JTextPane();
+		txtpnTransactionId.setEditable(false);
 		txtpnTransactionId.setText("Transaction ID:");
 		txtpnTransactionId.setBounds(10, 11, 96, 16);
 		txtpnTransactionId.setBackground(Color.decode(defaultColor));
@@ -2009,13 +2019,21 @@ public class Home extends JFrame implements KeyListener{
 		employee = e;
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
 	
+		//if(position.checkPosition(employee.getPositionID()) == true){
 		Positions position = new Positions();
-		if(position.checkPosition(employee.getPositionID()) == true){
+		position.checkPosition(employee.getPositionID());
+		if(position.getId() == 1){
+			
+		}
+		else if(position.getId() == 2){
+			//Move Home and Cashier soon
+		}
+		else if(position.getId() == 3){
 			//Report
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
 			tabbedPane.addTab("Reports",panel_reports);
-			
+				
 			//Staff
 			Employees staff = new Employees();
 			JPanel panel_staff = staff.getWindow();
@@ -2026,14 +2044,14 @@ public class Home extends JFrame implements KeyListener{
 			Supplier s = new Supplier();
 			JPanel panel_supplier = s.getWindow();
 			tabbedPane.addTab("Supplier", panel_supplier);
-			
+				
 			//Inventory
 			//JPanel panel_inventory = new JPanel();
 			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.refreshInventoryTable();
-			
+				
 			//Payments
 			JPanel panel_payments = new JPanel();
 			tabbedPane.addTab("Payments", null, panel_payments, null);
@@ -2042,6 +2060,67 @@ public class Home extends JFrame implements KeyListener{
 			JPanel panel_getHelp = new JPanel();
 			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
+		else if(position.getId() == 4){
+			//Report
+			Reports report_sec = new Reports(); 
+			JPanel panel_reports = report_sec.getWindow();
+			tabbedPane.addTab("Reports",panel_reports);
+				
+			//Staff
+			Employees staff = new Employees();
+			JPanel panel_staff = staff.getWindow();
+			staff.setCurrentEmployee(employee);
+			tabbedPane.addTab("Staff", panel_staff);
+			
+			//Supplier
+			Supplier s = new Supplier();
+			JPanel panel_supplier = s.getWindow();
+			tabbedPane.addTab("Supplier", panel_supplier);
+				
+			//Inventory
+			//JPanel panel_inventory = new JPanel();
+			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
+			Inventory inv = new Inventory();
+			tabbedPane.addTab("Inventory",inv);
+			inv.refreshInventoryTable();
+				
+			//Payments
+			JPanel panel_payments = new JPanel();
+			tabbedPane.addTab("Payments", null, panel_payments, null);
+			
+			//Get Help
+			JPanel panel_getHelp = new JPanel();
+			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+		}
+		else if(position.getId() == 5){
+			//Report
+			Reports report_sec = new Reports(); 
+			JPanel panel_reports = report_sec.getWindow();
+			tabbedPane.addTab("Reports",panel_reports);
+				
+			//Staff
+			Employees staff = new Employees();
+			JPanel panel_staff = staff.getWindow();
+			staff.setCurrentEmployee(employee);
+			tabbedPane.addTab("Staff", panel_staff);
+			
+			//Supplier
+			Supplier s = new Supplier();
+			JPanel panel_supplier = s.getWindow();
+			tabbedPane.addTab("Supplier", panel_supplier);
+				
+			//Inventory
+			//JPanel panel_inventory = new JPanel();
+			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
+			Inventory inv = new Inventory();
+			tabbedPane.addTab("Inventory",inv);
+			inv.refreshInventoryTable();
+				
+			//Payments
+			JPanel panel_payments = new JPanel();
+			tabbedPane.addTab("Payments", null, panel_payments, null);	
+		}
+			
 		setBackupRestorePath();
 	}
 	
@@ -2088,27 +2167,20 @@ public class Home extends JFrame implements KeyListener{
         }
 	}
 	
-	/*public void calculateSalePrice(int row, Object objID){
-		int id = (int) objID;
-		for(int i = 0; i < productBySearch.size(); i++){
-			if(id == productBySearch.get(i).getID()){
-				double t = (double) model.getValueAt(row, productQuantityAndPrice_column);
-				productBySearch.get(i).setSalePrice(t);
-				break;
-			}
-		}
-	}*/
-	
 	public void calculateCashCheckout(){
 		String cashTenderInput = checkout_amount_tender_input.getText();
-		
-		if (checkForNumbers(cashTenderInput) == false){
+		if(validateEmpty(cashTenderInput) == false){
+			JOptionPane.showMessageDialog(null,"Cash field cannot be Empty","Error",JOptionPane.ERROR_MESSAGE);
+			checkout_amount_tender_input.setFocusable(true);
+		}
+		else if(!cashTenderInput.trim().matches("^[0-9.]*$")){
 			String invalidInput = "Please enter numbers only.";
 			JOptionPane.showMessageDialog(null,invalidInput,"Cash Tender Error",JOptionPane.ERROR_MESSAGE);
 			checkout_amount_tender_input.setFocusable(true);
 		}
-		else if(validateEmpty(cashTenderInput) == false){
-			JOptionPane.showMessageDialog(null,"Cash field cannot be Empty","Error",JOptionPane.ERROR_MESSAGE);
+		else if(cashTenderInput.charAt(0) == '.'){
+			String invalidInput = "Invalid input. Please enter numbers.";
+			JOptionPane.showMessageDialog(null,invalidInput,"Cash Tender Error",JOptionPane.ERROR_MESSAGE);
 			checkout_amount_tender_input.setFocusable(true);
 		}
 		else{
@@ -2141,7 +2213,7 @@ public class Home extends JFrame implements KeyListener{
 				Date date = new Date();
 				String dateString = dateFormat.format(date);
 				//change employeeid
-				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, 1);
+				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, employee.getID());
 				
 				TransactionRecord transactionRecord = new TransactionRecord();
 				for(int i = 0; i < productBySearch.size(); i++){
@@ -2158,18 +2230,16 @@ public class Home extends JFrame implements KeyListener{
 					}
 					//Product quantity stored in table
 					int productNewQuantity = Integer.parseInt(qs);
-					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productNewQuantity,productBySearch.get(i).getSalePrice(),1);
+					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productNewQuantity,productBySearch.get(i).getSalePrice(),employee.getID());
 					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
 				}
 				d4.dispose();
 				textField_productID_input.requestFocusInWindow();
 			}
-			//frame_cashCheckout.dispose();
 		}
 	}
 	
 	public void calculateOneTimeDiscount(){
-		boolean check = false;
 		String discountInput = discount_option.getText();
 		
 		if(oneTimeDiscountCheck == true){
@@ -2179,7 +2249,7 @@ public class Home extends JFrame implements KeyListener{
 			JOptionPane.showMessageDialog(null,"Promotion input entered cannot be Empty","Error",JOptionPane.ERROR_MESSAGE);
 			//discount_option.setFocusable(true);
 		}
-		else{
+		else if(discountInput.trim().matches("^[0-9$%.]*$")){
 			Discount oneTimeDiscount = new Discount();
 			double previous = subTotal;
 			subTotal = oneTimeDiscount.calculateDiscount(subTotal,discountInput,discount);
@@ -2208,7 +2278,10 @@ public class Home extends JFrame implements KeyListener{
 				textField_productID_input.requestFocusInWindow();
 			}
 		}
-		
+		else{
+			JOptionPane.showMessageDialog(null,"Please enter valid input, such as option number, the value or the percentage.");
+			discount_option.requestFocus();
+		}
 	}
 	
 	public boolean checkForNumbers(String input){
@@ -3269,12 +3342,14 @@ public class Home extends JFrame implements KeyListener{
 		panel_transactionDetail.setLayout(null);
 		
 		JTextPane txtpnTransactionId_1 = new JTextPane();
+		txtpnTransactionId_1.setEditable(false);
 		txtpnTransactionId_1.setText("Transaction ID:");
 		txtpnTransactionId_1.setBackground(Color.decode(defaultColor));
 		txtpnTransactionId_1.setBounds(6, 10, 96, 18);
 		panel_transactionDetail.add(txtpnTransactionId_1);
 		
 		JTextPane txtpnCreateDate = new JTextPane();
+		txtpnCreateDate.setEditable(false);
 		txtpnCreateDate.setText("Create Date:");
 		txtpnCreateDate.setBackground(Color.decode(defaultColor));
 		txtpnCreateDate.setBounds(6, 48, 80, 18);
@@ -3302,18 +3377,21 @@ public class Home extends JFrame implements KeyListener{
 		
 		JTextPane txtpnSubtotal = new JTextPane();
 		txtpnSubtotal.setText("Subtotal:");
+		txtpnSubtotal.setEditable(false);
 		txtpnSubtotal.setBounds(6, 90, 61, 18);
 		txtpnSubtotal.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnSubtotal);
 		
 		JTextPane txtpnTax = new JTextPane();
 		txtpnTax.setText("Tax:");
+		txtpnTax.setEditable(false);
 		txtpnTax.setBounds(6, 123, 32, 18);
 		txtpnTax.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnTax);
 		
 		JTextPane txtpnTotal = new JTextPane();
 		txtpnTotal.setText("Total:");
+		txtpnTotal.setEditable(false);
 		txtpnTotal.setBounds(6, 165, 41, 18);
 		txtpnTotal.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnTotal);
@@ -3342,6 +3420,7 @@ public class Home extends JFrame implements KeyListener{
 		
 		JTextPane txtpnTransactionType = new JTextPane();
 		txtpnTransactionType.setText("Transaction Type:");
+		txtpnTransactionType.setEditable(false);
 		txtpnTransactionType.setBounds(6, 203, 112, 18);
 		txtpnTransactionType.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnTransactionType);
@@ -3354,6 +3433,7 @@ public class Home extends JFrame implements KeyListener{
 		
 		JTextPane txtpnMethod = new JTextPane();
 		txtpnMethod.setText("Method:");
+		txtpnMethod.setEditable(false);
 		txtpnMethod.setBounds(6, 247, 51, 18);
 		txtpnMethod.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnMethod);
@@ -3366,6 +3446,7 @@ public class Home extends JFrame implements KeyListener{
 		
 		JTextPane txtpnPromotionId = new JTextPane();
 		txtpnPromotionId.setText("Promotion ID:");
+		txtpnPromotionId.setEditable(false);
 		txtpnPromotionId.setBounds(6, 288, 87, 18);
 		txtpnPromotionId.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnPromotionId);
@@ -3378,6 +3459,7 @@ public class Home extends JFrame implements KeyListener{
 		
 		JTextPane txtpnEmployeeId = new JTextPane();
 		txtpnEmployeeId.setText("Employee ID:");
+		txtpnEmployeeId.setEditable(false);
 		txtpnEmployeeId.setBounds(6, 328, 85, 18);
 		txtpnEmployeeId.setBackground(Color.decode(defaultColor));
 		panel_transactionDetail.add(txtpnEmployeeId);

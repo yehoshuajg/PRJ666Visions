@@ -206,10 +206,8 @@ public class TransactionRecord {
 		Connection con = null;
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			//same product from multiple supplier?
 			double productUnitCost = getProductUnitCost(productID);
 			
-			//PromotionID causing foreign key relationship error
 			String sql = "INSERT INTO `TransactionRecord`(TransactionID,ProductID,QuantitySold,UnitPrice,EmployeeID,UnitCost) "
 			+ "VALUE (?,?,?,?,?,?)";
 			

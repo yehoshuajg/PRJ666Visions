@@ -302,84 +302,98 @@ public class Employees extends JFrame{
 							        
 							        JTextPane txtpnId_details_id = new JTextPane();
 							        txtpnId_details_id.setText("ID:");
+							        txtpnId_details_id.setEditable(false);
 							        txtpnId_details_id.setBounds(6, 10, 18, 20);
 							        txtpnId_details_id.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(txtpnId_details_id);
 							        
 							        JTextPane txtpn_details_FirstName = new JTextPane();
 							        txtpn_details_FirstName.setText("First Name:");
+							        txtpn_details_FirstName.setEditable(false);
 							        txtpn_details_FirstName.setBounds(6, 42, 72, 20);
 							        txtpn_details_FirstName.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(txtpn_details_FirstName);
 							        
 							        JTextPane txtpn_details_lastName = new JTextPane();
 							        txtpn_details_lastName.setText("Last Name:");
+							        txtpn_details_lastName.setEditable(false);
 							        txtpn_details_lastName.setBackground(Color.decode(defaultColor));
 							        txtpn_details_lastName.setBounds(6, 74, 72, 20);
 							        panel_employeeDetails.add(txtpn_details_lastName);
 							        
 							        JTextPane txtpn_details_Street = new JTextPane();
 							        txtpn_details_Street.setText("Street:");
+							        txtpn_details_Street.setEditable(false);
 							        txtpn_details_Street.setBackground(Color.decode(defaultColor));
 							        txtpn_details_Street.setBounds(6, 106, 40, 20);
 							        panel_employeeDetails.add(txtpn_details_Street);
 							        
 							        JTextPane txtpn_details_City = new JTextPane();
 							        txtpn_details_City.setText("City:");
+							        txtpn_details_City.setEditable(false);
 							        txtpn_details_City.setBackground(Color.decode(defaultColor));
 							        txtpn_details_City.setBounds(6, 138, 29, 20);
 							        panel_employeeDetails.add(txtpn_details_City);
 							        
 							        JTextPane txtpn_details_Stateprovince = new JTextPane();
 							        txtpn_details_Stateprovince.setText("State/Province:");
+							        txtpn_details_Stateprovince.setEditable(false);
 							        txtpn_details_Stateprovince.setBackground(Color.decode(defaultColor));
 							        txtpn_details_Stateprovince.setBounds(6, 170, 95, 20);
 							        panel_employeeDetails.add(txtpn_details_Stateprovince);
 							        
 							        JTextPane txtpn_details_PostalCode = new JTextPane();
 							        txtpn_details_PostalCode.setText("Postal Code:");
+							        txtpn_details_PostalCode.setEditable(false);
 							        txtpn_details_PostalCode.setBackground(Color.decode(defaultColor));
 							        txtpn_details_PostalCode.setBounds(6, 202, 78, 20);
 							        panel_employeeDetails.add(txtpn_details_PostalCode);
 							        
 							        JTextPane txtpn_details_HomePhone = new JTextPane();
 							        txtpn_details_HomePhone.setText("Home Phone:");
+							        txtpn_details_HomePhone.setEditable(false);
 							        txtpn_details_HomePhone.setBackground(Color.decode(defaultColor));
 							        txtpn_details_HomePhone.setBounds(6, 234, 83, 20);
 							        panel_employeeDetails.add(txtpn_details_HomePhone);
 							        
 							        JTextPane txtpn_details_CellPhone = new JTextPane();
 							        txtpn_details_CellPhone.setText("Cell Phone:");
+							        txtpn_details_CellPhone.setEditable(false);
 							        txtpn_details_CellPhone.setBackground(Color.decode(defaultColor));
 							        txtpn_details_CellPhone.setBounds(6, 266, 72, 20);
 							        panel_employeeDetails.add(txtpn_details_CellPhone);
 							        
 							        JTextPane txtpn_details_Email = new JTextPane();
 							        txtpn_details_Email.setText("Email:");
+							        txtpn_details_Email.setEditable(false);
 							        txtpn_details_Email.setBackground(Color.decode(defaultColor));
 							        txtpn_details_Email.setBounds(6, 298, 40, 20);
 							        panel_employeeDetails.add(txtpn_details_Email);
 							        
 							        JTextPane txtpn_details_PositionId = new JTextPane();
 							        txtpn_details_PositionId.setText("Position ID:");
+							        txtpn_details_PositionId.setEditable(false);
 							        txtpn_details_PositionId.setBackground(Color.decode(defaultColor));
 							        txtpn_details_PositionId.setBounds(6, 330, 75, 20);
 							        panel_employeeDetails.add(txtpn_details_PositionId);
 							        
 							        JTextPane txtpn_details_JobType = new JTextPane();
 							        txtpn_details_JobType.setText("Job Type:");
+							        txtpn_details_JobType.setEditable(false);
 							        txtpn_details_JobType.setBackground(Color.decode(defaultColor));
 							        txtpn_details_JobType.setBounds(6, 362, 58, 20);
 							        panel_employeeDetails.add(txtpn_details_JobType);
 							        
 							        JTextPane txtpn_details_Username = new JTextPane();
 							        txtpn_details_Username.setText("Username:");
+							        txtpn_details_Username.setEditable(false);
 							        txtpn_details_Username.setBackground(Color.decode(defaultColor));
 							        txtpn_details_Username.setBounds(6, 394, 70, 20);
 							        panel_employeeDetails.add(txtpn_details_Username);
 							        
 							        JTextPane txtpn_details_HireDate = new JTextPane();
 							        txtpn_details_HireDate.setText("Hire Date:");
+							        txtpn_details_HireDate.setEditable(false);
 							        txtpn_details_HireDate.setBackground(Color.decode(defaultColor));
 							        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
 							        panel_employeeDetails.add(txtpn_details_HireDate);
@@ -470,56 +484,67 @@ public class Employees extends JFrame{
 							        
 							        //Error message fields
 							        JTextPane textPane_edit_error_firstName = new JTextPane();
+							        textPane_edit_error_firstName.setEditable(false);
 							        textPane_edit_error_firstName.setBounds(252, 42, 461, 20);
 							        textPane_edit_error_firstName.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_firstName);
 							        
 							        JTextPane textPane_edit_error_lastName = new JTextPane();
+							        textPane_edit_error_lastName.setEditable(false);
 							        textPane_edit_error_lastName.setBounds(252, 74, 461, 20);
 							        textPane_edit_error_lastName.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_lastName);
 							        
 							        JTextPane textPane_edit_error_street = new JTextPane();
+							        textPane_edit_error_street.setEditable(false);
 							        textPane_edit_error_street.setBounds(220, 106, 493, 20);
 							        textPane_edit_error_street.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_street);
 							        
 							        JTextPane textPane_edit_error_city = new JTextPane();
+							        textPane_edit_error_city.setEditable(false);
 							        textPane_edit_error_city.setBounds(209, 138, 504, 20);
 							        textPane_edit_error_city.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_city);
 							        
 							        JTextPane textPane_edit_error_stateProvince = new JTextPane();
+							        textPane_edit_error_stateProvince.setEditable(false);
 							        textPane_edit_error_stateProvince.setBounds(275, 170, 438, 20);
 							        textPane_edit_error_stateProvince.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_stateProvince);
 							        
 							        JTextPane textPane_edit_error_postalCode = new JTextPane();
+							        textPane_edit_error_postalCode.setEditable(false);
 							        textPane_edit_error_postalCode.setBounds(258, 202, 455, 20);
 							        textPane_edit_error_postalCode.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_postalCode);
 							        
 							        JTextPane textPane_edit_error_homePhone = new JTextPane();
+							        textPane_edit_error_homePhone.setEditable(false);
 							        textPane_edit_error_homePhone.setBounds(262, 234, 451, 20);
 							        textPane_edit_error_homePhone.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_homePhone);
 							        
 							        JTextPane textPane_error_edit_cellPhone = new JTextPane();
+							        textPane_error_edit_cellPhone.setEditable(false);
 							        textPane_error_edit_cellPhone.setBounds(252, 266, 461, 20);
 							        textPane_error_edit_cellPhone.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_error_edit_cellPhone);
 							        
 							        JTextPane textPane_edit_error_email = new JTextPane();
+							        textPane_edit_error_email.setEditable(false);
 							        textPane_edit_error_email.setBounds(220, 298, 493, 20);
 							        textPane_edit_error_email.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_email);
 							        
 							        JTextPane textPane_edit_error_positionID = new JTextPane();
+							        textPane_edit_error_positionID.setEditable(false);
 							        textPane_edit_error_positionID.setBounds(252, 330, 461, 20);
 							        textPane_edit_error_positionID.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_edit_error_positionID);
 							        
 							        JTextPane textPane_error_edit_jobType = new JTextPane();
+							        textPane_error_edit_jobType.setEditable(false);
 							        textPane_error_edit_jobType.setBounds(238, 362, 475, 20);
 							        textPane_error_edit_jobType.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_error_edit_jobType);
@@ -960,6 +985,9 @@ public class Employees extends JFrame{
 													
 												}
 											}
+											else{
+												d1.dispose();
+											}
 										}
 									});
 									
@@ -1051,6 +1079,7 @@ public class Employees extends JFrame{
 																		}
 																		//Send Email
 																		else if(selection == JOptionPane.CANCEL_OPTION){
+																			/*
 																			Random random = new Random();
 																			//random.nextInt(max - min + 1) + min
 																			int value = random.nextInt(9999 - 1000 + 1) + 1000;
@@ -1106,7 +1135,7 @@ public class Employees extends JFrame{
 																				//Reset to null, just to be safe
 																				tempResetUserEmail = null;
 																			}
-																		}
+																		*/}
 																	}
 																	else{
 																		JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
@@ -1178,24 +1207,28 @@ public class Employees extends JFrame{
         panel_add_employee.setLayout(null);
         
         JTextPane textPane_firstName = new JTextPane();
+        textPane_firstName.setEditable(false);
         textPane_firstName.setBounds(10, 10, 72, 20);
         panel_add_employee.add(textPane_firstName);
         textPane_firstName.setText("First Name:");
         textPane_firstName.setBackground(Color.decode(defaultColor));
         
         JTextPane txtpnLastName = new JTextPane();
+        txtpnLastName.setEditable(false);
         txtpnLastName.setText("Last Name:");
         txtpnLastName.setBounds(10, 40, 72, 20);
         txtpnLastName.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnLastName);
         
         JTextPane txtpnStreet = new JTextPane();
+        txtpnStreet.setEditable(false);
         txtpnStreet.setText("Street:");
         txtpnStreet.setBounds(10, 72, 40, 20);
         txtpnStreet.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnStreet);
         
         JTextPane txtpnCity = new JTextPane();
+        txtpnCity.setEditable(false);
         txtpnCity.setText("City:");
         txtpnCity.setBounds(10, 104, 29, 20);
         txtpnCity.setBackground(Color.decode(defaultColor));
@@ -1203,23 +1236,27 @@ public class Employees extends JFrame{
         
         JTextPane txtpnState_Province = new JTextPane();
         txtpnState_Province.setText("State/Province:");
+        txtpnState_Province.setEditable(false);
         txtpnState_Province.setBounds(10, 136, 100, 20);
         txtpnState_Province.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnState_Province);
         
         JTextPane txtpnPostalCode = new JTextPane();
         txtpnPostalCode.setText("Postal Code:");
+        txtpnPostalCode.setEditable(false);
         txtpnPostalCode.setBounds(10, 168, 78, 20);
         txtpnPostalCode.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnPostalCode);
         
         JTextPane txtpnHomePhone = new JTextPane();
         txtpnHomePhone.setText("Home Phone:");
+        txtpnHomePhone.setEditable(false);
         txtpnHomePhone.setBounds(10, 200, 83, 20);
         txtpnHomePhone.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnHomePhone);
         
         JTextPane txtpnCellPhone = new JTextPane();
+        txtpnCellPhone.setEditable(false);
         txtpnCellPhone.setText("Cell Phone:");
         txtpnCellPhone.setBounds(10, 232, 72, 20);
         txtpnCellPhone.setBackground(Color.decode(defaultColor));
@@ -1227,36 +1264,42 @@ public class Employees extends JFrame{
         
         JTextPane txtpnEmail = new JTextPane();
         txtpnEmail.setText("Email:");
+        txtpnEmail.setEditable(false);
         txtpnEmail.setBounds(10, 264, 40, 20);
         txtpnEmail.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnEmail);
         
         JTextPane txtpnPositionId = new JTextPane();
         txtpnPositionId.setText("Position ID:");
+        txtpnPositionId.setEditable(false);
         txtpnPositionId.setBounds(10, 296, 78, 20);
         txtpnPositionId.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnPositionId);
         
         JTextPane txtpnJobType = new JTextPane();
         txtpnJobType.setText("Job Type:");
+        txtpnJobType.setEditable(false);
         txtpnJobType.setBounds(10, 328, 60, 20);
         txtpnJobType.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnJobType);
         
         JTextPane txtpnUsername = new JTextPane();
         txtpnUsername.setText("Username:");
+        txtpnUsername.setEditable(false);
         txtpnUsername.setBounds(10, 360, 70, 20);
         txtpnUsername.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnUsername);
         
         JTextPane txtpnPassword = new JTextPane();
         txtpnPassword.setText("Password:");
+        txtpnPassword.setEditable(false);
         txtpnPassword.setBounds(10, 392, 63, 20);
         txtpnPassword.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnPassword);
         
         JTextPane txtpnHireDate = new JTextPane();
         txtpnHireDate.setText("Hire Date:");
+        txtpnHireDate.setEditable(false);
         txtpnHireDate.setBounds(10, 424, 68, 20);
         txtpnHireDate.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(txtpnHireDate);
@@ -1373,71 +1416,85 @@ public class Employees extends JFrame{
         panel_add_employee.add(btnClear);
         
         textPane_error_firstName = new JTextPane();
+        textPane_error_firstName.setEditable(false);
         textPane_error_firstName.setBounds(247, 7, 489, 20);
         textPane_error_firstName.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_firstName);
         
         textPane_error_lastName = new JTextPane();
+        textPane_error_lastName.setEditable(false);
         textPane_error_lastName.setBounds(247, 37, 489, 20);
         textPane_error_lastName.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_lastName);
         
         textPane_error_street = new JTextPane();
+        textPane_error_street.setEditable(false);
         textPane_error_street.setBounds(267, 68, 469, 20);
         textPane_error_street.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_street);
         
         textPane_error_city = new JTextPane();
+        textPane_error_city.setEditable(false);
         textPane_error_city.setBounds(207, 100, 529, 20);
         textPane_error_city.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_city);
         
         textPane_error_stateProvince = new JTextPane();
+        textPane_error_stateProvince.setEditable(false);
         textPane_error_stateProvince.setBounds(272, 132, 464, 20);
         textPane_error_stateProvince.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_stateProvince);
         
         textPane_error_postalCode = new JTextPane();
+        textPane_error_postalCode.setEditable(false);
         textPane_error_postalCode.setBounds(254, 165, 482, 20);
         textPane_error_postalCode.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_postalCode);
         
         textPane_error_homePhone = new JTextPane();
+        textPane_error_homePhone.setEditable(false);
         textPane_error_homePhone.setBounds(262, 196, 474, 20);
         textPane_error_homePhone.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_homePhone);
         
         textPane_error_cellPhone = new JTextPane();
+        textPane_error_cellPhone.setEditable(false);
         textPane_error_cellPhone.setBounds(247, 229, 489, 20);
         textPane_error_cellPhone.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_cellPhone);
         
         textPane_error_email = new JTextPane();
+        textPane_error_email.setEditable(false);
         textPane_error_email.setBounds(215, 261, 521, 20);
         textPane_error_email.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_email);
         
         textPane_error_positionID = new JTextPane();
+        textPane_error_positionID.setEditable(false);
         textPane_error_positionID.setBounds(254, 294, 482, 20);
         textPane_error_positionID.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_positionID);
         
         textPane_error_jobType = new JTextPane();
+        textPane_error_jobType.setEditable(false);
         textPane_error_jobType.setBounds(235, 325, 501, 20);
         textPane_error_jobType.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_jobType);
         
         textPane_error_username = new JTextPane();
+        textPane_error_username.setEditable(false);
         textPane_error_username.setBounds(234, 355, 502, 20);
         textPane_error_username.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_username);
         
         textPane_error_password = new JTextPane();
+        textPane_error_password.setEditable(false);
         textPane_error_password.setBounds(240, 387, 496, 20);
         textPane_error_password.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_password);
         
         textPane_error_hireDate = new JTextPane();
+        textPane_error_hireDate.setEditable(false);
         textPane_error_hireDate.setBounds(240, 420, 496, 20);
         textPane_error_hireDate.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_hireDate);
