@@ -481,14 +481,16 @@ public class Home extends JFrame implements KeyListener{
 		btnChangeBackupAnd.setBounds(430, 397, 320, 29);
 		panel_home.add(btnChangeBackupAnd);
 		
-		JPanel panel_cashier = new JPanel();
-		tabbedPane.addTab("Cashier", null, panel_cashier, null);
-		panel_cashier.setLayout(null);
-		
 		//Staff
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
+		
+	}
+	public void loadCashier(){
+		JPanel panel_cashier = new JPanel();
+		tabbedPane.addTab("Cashier", null, panel_cashier, null);
+		panel_cashier.setLayout(null);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.setBounds(0, 0, 1260, 650); //cashier tab
@@ -1716,12 +1718,7 @@ public class Home extends JFrame implements KeyListener{
 				}
 		   }
 		});
-		// spinner values
-        /*spinValues = new String[(int) MAX_SPIN_VALUE];
-        for (int i = 0; i < 99; i++) {
-                spinValues[i] = new String(Integer.toString(i));
-        }*/
-        
+		
 		tabbedPane_7 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_7.setBounds(961, 0, 279, 416);
 		cashier_submenu.add(tabbedPane_7);
@@ -2142,12 +2139,17 @@ public class Home extends JFrame implements KeyListener{
 		Positions position = new Positions();
 		position.checkPosition(employee.getPositionID());
 		if(position.getId() == 1){
-			
+			//Loads Cashier panel
+			loadCashier();
 		}
 		else if(position.getId() == 2){
-			//Move Home and Cashier soon
+			//Loads Cashier panel
+			loadCashier();
 		}
 		else if(position.getId() == 3){
+			//Loads Cashier panel
+			loadCashier();
+			
 			//Report
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
@@ -2180,6 +2182,9 @@ public class Home extends JFrame implements KeyListener{
 			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
 		else if(position.getId() == 4){
+			//Loads Cashier panel
+			loadCashier();
+			
 			//Report
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
@@ -2480,7 +2485,7 @@ public class Home extends JFrame implements KeyListener{
 		//Text
 		JTextPane discount_message1 = new JTextPane();
 		discount_message1.setFocusable(false);
-		
+		discount_message1.setEditable(false);
 		discount_message1.setBounds(10, 13, 350, 96);
 		discount_message1.setBackground(Color.decode(defaultColor));
 		panel_discount_details.add(discount_message1);
@@ -2762,6 +2767,7 @@ public class Home extends JFrame implements KeyListener{
 			String message = sb.toString();
 			checkout_message1.setText(message);
 			checkout_message1.setFocusable(false);
+			checkout_message1.setEditable(false);
 			
 			checkout_message1.setBounds(10, 13, 350, 50);
 			checkout_message1.setBackground(Color.decode(defaultColor));

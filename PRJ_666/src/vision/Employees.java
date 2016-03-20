@@ -1396,6 +1396,8 @@ public class Employees extends JFrame{
         		if(checkFields() == true){
         			//System.out.println("Valid");
         			createEmployee();
+        			//clearFields();
+        			//textField_firstName.requestFocus();
         		}
         		else{
         			//System.out.println("Invalid");
@@ -2342,8 +2344,8 @@ public class Employees extends JFrame{
 			salt = hash.getSalt();
 			String hashedPassword = hash.get_SHA_512_SecurePassword(textField_password.getText().trim(), salt);
 			Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-			String sql = "INSERT INTO `Employee`(FirstName,LastName,Street,City,State_Province,PostalCode,HomePhone,CellPhone,Email,PositionID,JobType,UserName,Password,HireDate,Salt) "
-					+ "VALUE (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			String sql = "INSERT INTO `Employee`(FirstName,LastName,Street,City,State_Province,PostalCode,HomePhone,CellPhone,Email,PositionID,JobType,UserName,Password,HireDate,Salt,CreatedBy) "
+					+ "VALUE (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setString(1, textField_firstName.getText().trim());
 			ps.setString(2, textField_lastName.getText().trim());
@@ -2363,6 +2365,7 @@ public class Employees extends JFrame{
 			String dateString = dateFormat.format(date);
 			ps.setString(14, dateString);
 			ps.setString(15, salt);
+			ps.setString(16, currentEmployee.getUsername());
 			ps.execute();
 		
 			//Clean-up environment
@@ -2710,154 +2713,7 @@ public class Employees extends JFrame{
 		textField_hireDate.setText(null);
 	}
 	private void CreateWindow(){
-        /*jPanel1 = new javax.swing.JPanel();
-        jPanel1.setBounds(17, 5, 1517, 677);
-        btn_StaffList = new javax.swing.JButton();
-        btn_Add = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        jScrollPane1 = new javax.swing.JScrollPane();
         
-        jTable1 = new JTable(){
-            @Override
-            public boolean isCellEditable(int row, int column){
-                return false;
-            }
-        };
-        jTable1.setRowHeight(30);
-        jTable1.setBackground(Color.WHITE);
-        jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        
-        jLabel1 = new javax.swing.JLabel();
-        btn_Edit = new javax.swing.JButton();
-        btn_Details = new javax.swing.JButton();
-        btn_Filter = new javax.swing.JButton();
-        
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        btn_StaffList.setText("Staff List");
-        btn_StaffList.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                query = "select ID as 'ID', FirstName |" + " " + "| LastName as 'Name',"
-                        + " JobType as 'Role', PositionID as 'Position',"
-                        + " HomePhone as 'Phone', Email as 'Email'";
-                        
-                active = "revenue";
-                
-                table_headings.clear();
-                table_headings.add("`ID`");
-                table_headings.add("`Name`");
-                table_headings.add("`Role`");
-                table_headings.add("`Position`");
-                table_headings.add("`Phone`");
-                table_headings.add("`Email`");
-                
-                order = " ";
-                //updateReport();    
-            }
-        });
-        
-        btn_Add.setText("Add");
-        btn_Add.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            }
-        });
-        
-        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
-
-        jTable1.getTableHeader().setFont(new java.awt.Font("Tahoma", Font.BOLD, 12));
-        jScrollPane1.setViewportView(jTable1);
-        
-        jTable1.getTableHeader().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int col = jTable1.columnAtPoint(e.getPoint());
-                
-                order = " order by " + table_headings.get(col);
-            }
-        });
-
-        btn_Edit.setText("Edit");
-        btn_Edit.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            }
-        });
-        
-        btn_Details.setText("Details");
-        btn_Details.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            }
-        });
-        
-        btn_Filter.setText("Filter");
-        btn_Filter.setPreferredSize(new java.awt.Dimension(75, 23));
-        
-        btn_Filter.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1Layout.setHorizontalGroup(
-        	jPanel1Layout.createParallelGroup(Alignment.LEADING)
-        		.addGroup(jPanel1Layout.createSequentialGroup()
-        			.addContainerGap()
-        			.addGroup(jPanel1Layout.createParallelGroup(Alignment.CENTER)
-        				.addComponent(btn_Details, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(btn_Edit, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-        				.addComponent(btn_Add, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-        				.addComponent(btn_StaffList, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE))
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 12, GroupLayout.PREFERRED_SIZE)
-        			.addGap(6)
-        			.addGroup(jPanel1Layout.createParallelGroup(Alignment.LEADING)
-        				.addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 1186, GroupLayout.PREFERRED_SIZE)
-        				.addComponent(btn_Filter, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE))
-        			.addGap(177))
-        );
-        jPanel1Layout.setVerticalGroup(
-        	jPanel1Layout.createParallelGroup(Alignment.LEADING)
-        		.addGroup(jPanel1Layout.createSequentialGroup()
-        			.addGroup(jPanel1Layout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(jPanel1Layout.createSequentialGroup()
-        					.addGap(67)
-        					.addComponent(btn_StaffList)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(btn_Add)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(btn_Edit)
-        					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(btn_Details))
-        				.addGroup(jPanel1Layout.createSequentialGroup()
-        					.addGap(29)
-        					.addComponent(btn_Filter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 558, GroupLayout.PREFERRED_SIZE)))
-        			.addContainerGap(55, Short.MAX_VALUE))
-        		.addComponent(jSeparator1, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        );
-        jPanel1.setLayout(jPanel1Layout);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        pack();
-        */
     }
 	
 	public JPanel getWindow() {
