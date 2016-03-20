@@ -1155,3 +1155,8 @@ create table ProductReturned (
     FOREIGN KEY (ProductID) References Product(ID),
     CONSTRAINT ProductsReturn_returned_qty CHECK (ReturnedQTY > 0)
 );
+
+/*Adding column’s in Employee, keeping track of who created the account, terminated or altered the employee record.*/
+ALTER TABLE Employee ADD CreatedBy VARCHAR(30);
+ALTER TABLE Employee ADD TerminatedBy VARCHAR(30);
+ALTER TABLE Employee ADD AlteredBy VARCHAR(30);
