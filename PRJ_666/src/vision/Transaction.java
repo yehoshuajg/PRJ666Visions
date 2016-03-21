@@ -149,26 +149,48 @@ public class Transaction extends JFrame {
 		Connect connect = new Connect();
 		Connection con = null;
 		int generatedKey = 0;
+		ResultSet rs;
 		try {
 			con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 			String sql;
-			sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
-					+ "VALUE (?,?,?,?,?,?,?,?)";
-			PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, dateString);
-			ps.setDouble(2, subTotal);
-			ps.setDouble(3, tax);
-			ps.setDouble(4, total);
-			ps.setString(5, transactionType);
-			ps.setString(6, transactionMethod);
-			ps.setInt(7, promotionID);
-			ps.setInt(8, employeeID);
-			ps.execute();
-			 
-			//assigns generatedKey as transaction #, which will be used to write into transactionRecord
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()) {
-			    generatedKey = rs.getInt(1);
+			if(promotionID == 0){
+				sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,EmployeeID) "
+						+ "VALUE (?,?,?,?,?,?,?)";
+				PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, dateString);
+				ps.setDouble(2, subTotal);
+				ps.setDouble(3, tax);
+				ps.setDouble(4, total);
+				ps.setString(5, transactionType);
+				ps.setString(6, transactionMethod);
+				ps.setInt(7, employeeID);
+				ps.execute();
+				 
+				//assigns generatedKey as transaction #, which will be used to write into transactionRecord
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+				    generatedKey = rs.getInt(1);
+				}
+			}
+			else{
+				sql = "INSERT INTO `Transaction`(CreateDate,SubTotal,Tax,Total,TransactionType,Method,PromotionID,EmployeeID) "
+						+ "VALUE (?,?,?,?,?,?,?,?)";
+				PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, dateString);
+				ps.setDouble(2, subTotal);
+				ps.setDouble(3, tax);
+				ps.setDouble(4, total);
+				ps.setString(5, transactionType);
+				ps.setString(6, transactionMethod);
+				ps.setInt(7, promotionID);
+				ps.setInt(8, employeeID);
+				ps.execute();
+				 
+				//assigns generatedKey as transaction #, which will be used to write into transactionRecord
+				rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+				    generatedKey = rs.getInt(1);
+				}
 			}
 			//System.out.println("Inserted record's ID: " + generatedKey);
 			

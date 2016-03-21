@@ -414,6 +414,13 @@ public class Employees extends JFrame{
 							        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
 							        panel_employeeDetails.add(txtpn_details_HireDate);
 							        
+							        JTextPane txtpn_details_TerminateDate = new JTextPane();
+							        txtpn_details_TerminateDate.setText("Terminate Date:");
+							        txtpn_details_TerminateDate.setEditable(false);
+							        txtpn_details_TerminateDate.setBackground(Color.decode(defaultColor));
+							        txtpn_details_TerminateDate.setBounds(6, 455, 100, 20);
+							        panel_employeeDetails.add(txtpn_details_TerminateDate);
+							        
 							        JTextField textPane_details_id = new JTextField();
 							        textPane_details_id.setBounds(30, 10, 150, 20);
 							        textPane_details_id.setEditable(false);
@@ -443,13 +450,7 @@ public class Employees extends JFrame{
 							        textPane_details_city.setEditable(false);
 							        textPane_details_city.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_city);
-							       /* 
-							        JTextField textPane_details_stateProvince = new JTextField();
-							        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
-							        textPane_details_stateProvince.setEditable(false);
-							        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-							        panel_employeeDetails.add(textPane_details_stateProvince);
-							        */
+							       
 							        JComboBox comboBox_detail_province = new JComboBox(provinces);
 							        comboBox_detail_province.setBounds(113, 170, 150, 20);
 							        panel_employeeDetails.add(comboBox_detail_province);
@@ -489,18 +490,6 @@ public class Employees extends JFrame{
 							        panel_employeeDetails.add(comboBox_detail_jobtypes);
 							        comboBox_detail_jobtypes.setEnabled(false);
 							        
-							        /*JTextField textPane_positionID = new JTextField();
-							        textPane_positionID.setBounds(90, 330, 150, 20);
-							        textPane_positionID.setEditable(false);
-							        textPane_positionID.setBackground(Color.decode(defaultColor));
-							        panel_employeeDetails.add(textPane_positionID);
-							        
-							        JTextField textPane_details_JobType = new JTextField();
-							        textPane_details_JobType.setBounds(76, 362, 150, 20);
-							        textPane_details_JobType.setEditable(false);
-							        textPane_details_JobType.setBackground(Color.decode(defaultColor));
-							        panel_employeeDetails.add(textPane_details_JobType);
-							        */
 							        JTextField textPane_details_username = new JTextField();
 							        textPane_details_username.setBounds(90, 394, 150, 20);
 							        textPane_details_username.setEditable(false);
@@ -512,6 +501,12 @@ public class Employees extends JFrame{
 							        textPane_details_hireDate.setEditable(false);
 							        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_hireDate);
+							        
+							        JTextField textPane_details_terminateDate = new JTextField();
+							        textPane_details_terminateDate.setBounds(110, 455, 160, 20);
+							        textPane_details_terminateDate.setEditable(false);
+							        textPane_details_terminateDate.setBackground(Color.decode(defaultColor));
+							        panel_employeeDetails.add(textPane_details_terminateDate);
 							        
 							        //Error message fields
 							        JTextPane textPane_edit_error_firstName = new JTextPane();
@@ -594,60 +589,58 @@ public class Employees extends JFrame{
 									btn_edit.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
-											//First name
-											textPane_details_firstName.setBackground(null);
-											textPane_details_firstName.setEditable(true);
-											
-											//Last name
-											textPane_details_lastName.setBackground(null);
-											textPane_details_lastName.setEditable(true);
-											
-											//Street
-											textPane_details_street.setBackground(null);
-											textPane_details_street.setEditable(true);
-											
-											//City
-											textPane_details_city.setBackground(null);
-											textPane_details_city.setEditable(true);
-		
-											//State/Province
-											//textPane_details_stateProvince.setBackground(null);
-											//textPane_details_stateProvince.setEditable(true);
-											comboBox_detail_province.setEnabled(true);
-											
-											//Postal code
-											//textPane_details_postalCode.setBackground(null);
-											//textPane_details_postalCode.setEditable(true);
-											
-											//Home phone
-											textPane_details_homePhone.setBackground(null);
-											textPane_details_homePhone.setEditable(true);
-											
-											//Cell phone
-											textPane_details_cellPhone.setBackground(null);
-											textPane_details_cellPhone.setEditable(true);
-											
-											//Email
-											textPane_details_email.setBackground(null);
-											textPane_details_email.setEditable(true);
-											
-											
-											if(currentEmployee.getPositionID() == 4){
-												//Position ID
-												//textPane_positionID.setBackground(null);
-												//comboBox_detail_positions.setEditable(true);
-												comboBox_detail_positions.setEnabled(true);
+											if(currentEmployee.getPositionID() == 5){
+												JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
 											}
-											//Job Type
-											//textPane_details_JobType.setBackground(null);
-											comboBox_detail_jobtypes.setEnabled(true);
-											
-											//Username
-											//textPane_details_username.setBackground(null);
-											//textPane_details_username.setEditable(true);
-											
-											btn_edit.setVisible(false);
-											btn_save.setVisible(true);
+											else{
+												//First name
+												textPane_details_firstName.setBackground(null);
+												textPane_details_firstName.setEditable(true);
+												
+												//Last name
+												textPane_details_lastName.setBackground(null);
+												textPane_details_lastName.setEditable(true);
+												
+												//Street
+												textPane_details_street.setBackground(null);
+												textPane_details_street.setEditable(true);
+												
+												//City
+												textPane_details_city.setBackground(null);
+												textPane_details_city.setEditable(true);
+			
+												//State/Province
+												comboBox_detail_province.setEnabled(true);
+												
+												//Postal code
+												textPane_details_postalCode.setBackground(null);
+												textPane_details_postalCode.setEditable(true);
+												
+												//Home phone
+												textPane_details_homePhone.setBackground(null);
+												textPane_details_homePhone.setEditable(true);
+												
+												//Cell phone
+												textPane_details_cellPhone.setBackground(null);
+												textPane_details_cellPhone.setEditable(true);
+												
+												//Email
+												textPane_details_email.setBackground(null);
+												textPane_details_email.setEditable(true);
+												
+												if(currentEmployee.getPositionID() == 4){
+													//Position ID
+													//textPane_positionID.setBackground(null);
+													//comboBox_detail_positions.setEditable(true);
+													comboBox_detail_positions.setEnabled(true);
+												}
+												//Job Type
+												//textPane_details_JobType.setBackground(null);
+												comboBox_detail_jobtypes.setEnabled(true);
+												
+												btn_edit.setVisible(false);
+												btn_save.setVisible(true);
+											}
 										}
 									});
 									
@@ -655,6 +648,7 @@ public class Employees extends JFrame{
 							        btn_save.setBounds(300, 570, 150, 40);
 							        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
 							        btn_save.setFocusable(false);
+							        btn_save.setVisible(false);
 									staffDetails.add(btn_save);
 									//Save button 
 									btn_save.addActionListener(new ActionListener() {
@@ -861,21 +855,44 @@ public class Employees extends JFrame{
 																Connect connect = new Connect();
 																try {
 																	Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-																	String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ? where ID = ?";
-																	PreparedStatement ps = con.prepareStatement(sql);
-																	ps.setString(1, textPane_details_firstName.getText().trim());
-																	ps.setString(2, textPane_details_lastName.getText().trim());
-																	ps.setString(3, textPane_details_street.getText().trim());
-																	ps.setString(4, textPane_details_city.getText().trim());
-																	ps.setString(5, provinces[comboBox_detail_province.getSelectedIndex()]);
-																	ps.setString(6, textPane_details_postalCode.getText().trim());
-																	ps.setString(7, textPane_details_homePhone.getText().trim());
-																	ps.setString(8, textPane_details_cellPhone.getText().trim());
-																	ps.setString(9, textPane_details_email.getText().trim());
-																	ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
-																	ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
-																	ps.setString(12, textPane_details_id.getText().trim());
-																    ps.executeUpdate();
+																	
+																	if(textPane_details_terminateDate.getText().trim().isEmpty()){
+																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, AlteredBy = ? where ID = ?";
+																		PreparedStatement ps = con.prepareStatement(sql);
+																		ps.setString(1, textPane_details_firstName.getText().trim());
+																		ps.setString(2, textPane_details_lastName.getText().trim());
+																		ps.setString(3, textPane_details_street.getText().trim());
+																		ps.setString(4, textPane_details_city.getText().trim());
+																		ps.setString(5, provinces[comboBox_detail_province.getSelectedIndex()]);
+																		ps.setString(6, textPane_details_postalCode.getText().trim());
+																		ps.setString(7, textPane_details_homePhone.getText().trim());
+																		ps.setString(8, textPane_details_cellPhone.getText().trim());
+																		ps.setString(9, textPane_details_email.getText().trim());
+																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
+																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
+																		ps.setString(12, textPane_details_id.getText().trim());
+																		ps.setString(13, currentEmployee.getUsername().trim());
+																		ps.executeUpdate();
+																	}
+																	else if(!textPane_details_terminateDate.getText().trim().isEmpty()){
+																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, AlteredBy = ?, TerminatedBy = ? where ID = ?";
+																		PreparedStatement ps = con.prepareStatement(sql);
+																		ps.setString(1, textPane_details_firstName.getText().trim());
+																		ps.setString(2, textPane_details_lastName.getText().trim());
+																		ps.setString(3, textPane_details_street.getText().trim());
+																		ps.setString(4, textPane_details_city.getText().trim());
+																		ps.setString(5, provinces[comboBox_detail_province.getSelectedIndex()]);
+																		ps.setString(6, textPane_details_postalCode.getText().trim());
+																		ps.setString(7, textPane_details_homePhone.getText().trim());
+																		ps.setString(8, textPane_details_cellPhone.getText().trim());
+																		ps.setString(9, textPane_details_email.getText().trim());
+																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
+																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
+																		ps.setString(12, textPane_details_id.getText().trim());
+																		ps.setString(13, currentEmployee.getUsername().trim());
+																	    ps.setString(14, textPane_details_terminateDate.getText().trim());
+																	    ps.executeUpdate();
+																	}
 																	
 																	//Clean-up environment
 																	con.close();
@@ -1005,120 +1022,130 @@ public class Employees extends JFrame{
 													//Not higher positions, such as other managers.
 													//Positions position = new Positions();
 													if(position.checkPosition(staffList.get(i).getPositionID()) == false){
-														//Change Password button
-												        JButton btn_chgpwd = new JButton("Change Password");
-												        btn_chgpwd.setBounds(90, 570, 200, 40);
-												        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
-												        btn_chgpwd.setFocusable(false);
-														staffDetails.add(btn_chgpwd);
-														int tID = staffList.get(i).getID();
-														String tUserName = staffList.get(i).getUsername();
-														btn_chgpwd.addActionListener(new ActionListener() {
-															@Override
-															public void actionPerformed(ActionEvent e) {
-																if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
-																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
-																}
-																else{
-																	loadPasswordFrame(e,tID,tUserName);
-																}
-															}
-														});
-													}
-													else{
-														//Forgot Password for managers
-														JButton btn_forgot = new JButton("Forgot password?");
-														btn_forgot.setBounds(90, 570, 200, 40);
-														btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
-														btn_forgot.setFocusable(false);
-														staffDetails.add(btn_forgot);
-														tempResetUserEmail = staffList.get(i).getEmail();
-														btn_forgot.addActionListener(new ActionListener() {
-															@Override
-															public void actionPerformed(ActionEvent e) {
-																if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
-																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
-																}
-																else{
-																	if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
-																		Object[] options = {"Cancel","Enter Code","Send Email"};
-																		int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
-																			JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-																			
-																		//Cancel
-																		if(selection == JOptionPane.YES_OPTION){
-																			
-																		}
-																		//Enter Code
-																		else if(selection == JOptionPane.NO_OPTION){
-																			
-																		}
-																		//Send Email
-																		else if(selection == JOptionPane.CANCEL_OPTION){
-																			/*
-																			Random random = new Random();
-																			//random.nextInt(max - min + 1) + min
-																			int value = random.nextInt(9999 - 1000 + 1) + 1000;
-																			String sValue = String.valueOf(value);
-																			if(!sValue.isEmpty() && sValue.length() == 4){
-																				//Send Generated code to Email
-																				resetUserEmail.put(tempResetUserEmail, sValue);
-																				//System.out.println("Size: " + resetUserEmail.size());
-																				// Recipient's email ID needs to be mentioned.
-																			    //String to = tempResetUserEmail;
-																				String to = "nitish111@hotmail.com";
-																				
-																			    // Sender's email ID needs to be mentioned
-																			    //Change to senders email (current signed in employee), or zenit
-																			    String from = "nsbajaj@myseneca.com";
-																			    
-																			    // Assuming you are sending email from localhost
-																			    //Change localhost to host
-																			    String host = "localhost";
-																			    
-																			    // Get system properties
-																			    Properties properties = System.getProperties();
-																			    
-																			    // Setup mail server
-																			    properties.setProperty("mail.smtp.host", host);
-		
-																			    // Get the default Session object.
-																			    Session session = Session.getDefaultInstance(properties);
-																				
-																			    try{
-																			         // Create a default MimeMessage object.
-																			         MimeMessage message = new MimeMessage(session);
-		
-																			         // Set From: header field of the header.
-																			         message.setFrom(new InternetAddress(from));
-		
-																			         // Set To: header field of the header.
-																			         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-		
-																			         // Set Subject: header field
-																			         message.setSubject("This is the Subject Line!");
-		
-																			         // Now set the actual message
-																			         message.setText("This is actual message");
-		
-																			         // Send message
-																			         Transport.send(message);
-																			         System.out.println("Sent message successfully....");
-																			      }catch (MessagingException mex) {
-																			         mex.printStackTrace();
-																			      }
-																				
-																				//Reset to null, just to be safe
-																				tempResetUserEmail = null;
-																			}
-																		*/}
+														if(currentEmployee.getPositionID() == 5){
+															//JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
+														}
+														else{
+															//Change Password button
+													        JButton btn_chgpwd = new JButton("Reset Password");
+													        btn_chgpwd.setBounds(90, 570, 200, 40);
+													        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+													        btn_chgpwd.setFocusable(false);
+															staffDetails.add(btn_chgpwd);
+															int tID = staffList.get(i).getID();
+															String tUserName = staffList.get(i).getUsername();
+															btn_chgpwd.addActionListener(new ActionListener() {
+																@Override
+																public void actionPerformed(ActionEvent e) {
+																	if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																		JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
 																	}
 																	else{
-																		JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
+																		loadResetPasswordFrame(e,tID,tUserName);
 																	}
 																}
-															}
-														});
+															});
+														}
+													}
+													else{
+														if(currentEmployee.getPositionID() == 5){
+															//JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
+														}
+														else{
+															//Forgot Password for managers
+															JButton btn_forgot = new JButton("Forgot password?");
+															btn_forgot.setBounds(90, 570, 200, 40);
+															btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
+															btn_forgot.setFocusable(false);
+															staffDetails.add(btn_forgot);
+															tempResetUserEmail = staffList.get(i).getEmail();
+															btn_forgot.addActionListener(new ActionListener() {
+																@Override
+																public void actionPerformed(ActionEvent e) {
+																	if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																		JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																	}
+																	else{
+																		if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
+																			Object[] options = {"Cancel","Enter Code","Send Email"};
+																			int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
+																				JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+																				
+																			//Cancel
+																			if(selection == JOptionPane.YES_OPTION){
+																				
+																			}
+																			//Enter Code
+																			else if(selection == JOptionPane.NO_OPTION){
+																				
+																			}
+																			//Send Email
+																			else if(selection == JOptionPane.CANCEL_OPTION){
+																				/*
+																				Random random = new Random();
+																				//random.nextInt(max - min + 1) + min
+																				int value = random.nextInt(9999 - 1000 + 1) + 1000;
+																				String sValue = String.valueOf(value);
+																				if(!sValue.isEmpty() && sValue.length() == 4){
+																					//Send Generated code to Email
+																					resetUserEmail.put(tempResetUserEmail, sValue);
+																					//System.out.println("Size: " + resetUserEmail.size());
+																					// Recipient's email ID needs to be mentioned.
+																				    //String to = tempResetUserEmail;
+																					String to = "nitish111@hotmail.com";
+																					
+																				    // Sender's email ID needs to be mentioned
+																				    //Change to senders email (current signed in employee), or zenit
+																				    String from = "nsbajaj@myseneca.com";
+																				    
+																				    // Assuming you are sending email from localhost
+																				    //Change localhost to host
+																				    String host = "localhost";
+																				    
+																				    // Get system properties
+																				    Properties properties = System.getProperties();
+																				    
+																				    // Setup mail server
+																				    properties.setProperty("mail.smtp.host", host);
+			
+																				    // Get the default Session object.
+																				    Session session = Session.getDefaultInstance(properties);
+																					
+																				    try{
+																				         // Create a default MimeMessage object.
+																				         MimeMessage message = new MimeMessage(session);
+			
+																				         // Set From: header field of the header.
+																				         message.setFrom(new InternetAddress(from));
+			
+																				         // Set To: header field of the header.
+																				         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+			
+																				         // Set Subject: header field
+																				         message.setSubject("This is the Subject Line!");
+			
+																				         // Now set the actual message
+																				         message.setText("This is actual message");
+			
+																				         // Send message
+																				         Transport.send(message);
+																				         System.out.println("Sent message successfully....");
+																				      }catch (MessagingException mex) {
+																				         mex.printStackTrace();
+																				      }
+																					
+																					//Reset to null, just to be safe
+																					tempResetUserEmail = null;
+																				}
+																			*/}
+																		}
+																		else{
+																			JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
+																		}
+																	}
+																}
+															});
+														}
 													}
 												}
 												break;
@@ -1142,11 +1169,32 @@ public class Employees extends JFrame{
 								        				comboBox_detail_province.setSelectedIndex(j);
 								        			}
 								        		}
+								        		
 								        		textPane_details_postalCode.setText(staffList.get(i).getPostalCode());
 								        		textPane_details_homePhone.setText(staffList.get(i).getHomePhone());
 								        		textPane_details_cellPhone.setText(staffList.get(i).getCellPhone());
 								        		textPane_details_email.setText(staffList.get(i).getEmail());
 								        		comboBox_detail_positions.setSelectedIndex(staffList.get(i).getPositionID()-1);
+								        		//Manager and Cashier
+								        		if(currentEmployee.getPositionID() == 3 && staffList.get(i).getPositionID() <= 2){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(true);
+												}
+								        		//Owner and Manager <=
+								        		else if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() <= 3 && btn_save.isVisible()){
+								        			textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(true);
+								        		}
+								        		//Owner and accountant
+								        		else if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() <= 5){
+								        			textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(true);
+								        		}
+								        		//Manager and Cashier <=
+								        		if(currentEmployee.getPositionID() == 3 && staffList.get(i).getPositionID() <= 2){
+								        			comboBox_detail_jobtypes.setEnabled(false);	
+								        		}
+								        		
 								        		for(int j = 0; j < jobtypes.length; j++){
 								        			//System.out.println(staffList.get(i).getJobType());
 								        			if(staffList.get(i).getJobType().trim().equals("Full Time")){
@@ -1158,9 +1206,18 @@ public class Employees extends JFrame{
 								        			else if(staffList.get(i).getJobType().trim().equals("Casual")){
 								        				comboBox_detail_jobtypes.setSelectedIndex(2);
 								        			}
+								        			else{
+								        				System.out.println("Else");
+								        			}
 								        		}
 								        		textPane_details_username.setText(staffList.get(i).getUsername());
 								        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
+								        		if(staffList.get(i).getTerminationDate() != null){
+								        			textPane_details_terminateDate.setText(parseDate(staffList.get(i).getTerminationDate()));
+								        		}
+								        		else{
+								        			textPane_details_terminateDate.setText(staffList.get(i).getTerminationDate());
+								        		}
 								        		break;
 								        	}
 								        }
@@ -1837,6 +1894,204 @@ public class Employees extends JFrame{
 	}
 	public void setResetUserEmail(HashMap resetUserEmail) {
 		this.resetUserEmail = resetUserEmail;
+	}
+	private void loadResetPasswordFrame(ActionEvent e, int employeeID, String username){
+		JPanel chgpwd_panel = new JPanel();
+		chgpwd_panel.setLayout(null);
+					
+		JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane_chgpwd.setBounds(55, 25, 790, 220);
+        chgpwd_panel.add(tabbedPane_chgpwd);
+        
+        JPanel panel_chgpwd = new JPanel();
+        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
+        panel_chgpwd.setLayout(null);
+        /*
+        JTextPane txtpnCurrentPassword = new JTextPane();
+        txtpnCurrentPassword.setText("Current Password:");
+        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
+        txtpnCurrentPassword.setEditable(false);
+        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
+        panel_chgpwd.add(txtpnCurrentPassword);
+        */
+        JTextPane txtpnNewPassword = new JTextPane();
+        txtpnNewPassword.setText("New Password:");
+        txtpnNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnNewPassword.setEditable(false);
+        txtpnNewPassword.setBounds(10, 45, 94, 20);
+        panel_chgpwd.add(txtpnNewPassword);
+        
+        JTextPane txtpnConfirmNewPassword = new JTextPane();
+        txtpnConfirmNewPassword.setText("Confirm New Password:");
+        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
+        txtpnConfirmNewPassword.setEditable(false);
+        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
+        panel_chgpwd.add(txtpnConfirmNewPassword);
+        /*
+        textField_input_currentPassword = new JPasswordField();
+        textField_input_currentPassword.setBounds(130, 4, 150, 26);
+        panel_chgpwd.add(textField_input_currentPassword);
+        textField_input_currentPassword.setColumns(10);
+        */
+        textField_input_newPassword = new JPasswordField();
+        textField_input_newPassword.setBounds(110, 38, 150, 26);
+        panel_chgpwd.add(textField_input_newPassword);
+        textField_input_newPassword.setColumns(10);
+        
+        textField_input_confirmNewPassword = new JPasswordField();
+        textField_input_confirmNewPassword.setBounds(165, 73, 150, 26);
+        panel_chgpwd.add(textField_input_confirmNewPassword);
+        textField_input_confirmNewPassword.setColumns(10);
+        /*
+        JTextPane textPane_error_currentPassword = new JTextPane();
+        textPane_error_currentPassword.setBounds(290, 10, 465, 20);
+        textPane_error_currentPassword.setEditable(false);
+        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textPane_error_currentPassword);
+        */
+        textField_error_newPassword = new JTextPane();
+        textField_error_newPassword.setBounds(270, 42, 489, 26);
+        textField_error_newPassword.setEditable(false);
+        textField_error_newPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_newPassword);
+        
+        textField_error_confirmNewPassword = new JTextPane();
+        textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
+        textField_error_confirmNewPassword.setEditable(false);
+        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
+        panel_chgpwd.add(textField_error_confirmNewPassword);
+        
+        JButton btnChgPassword = new JButton("Change Password");
+        btnChgPassword.setBounds(10, 120, 350, 38);
+        panel_chgpwd.add(btnChgPassword);
+        btnChgPassword.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean check = true;
+				boolean ok = true;
+				//New Password
+				char[] npassword = textField_input_newPassword.getPassword();
+				String newPass = new String(npassword);
+				if(validateEmpty(newPass) == false){
+					textField_error_newPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_newPassword.setText(null);
+					}
+					else{
+						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				//Confirm New Password
+				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
+				String cnewPass = new String(cnpassword);
+				if(validateEmpty(cnewPass) == false){
+					textField_error_confirmNewPassword.setText("Password cannot be Empty.");
+					check = false;
+				}
+				else{
+					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+						textField_error_confirmNewPassword.setText(null);
+					}
+					else{
+						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						ok = false;
+					}
+				}
+				
+				boolean go = false;
+				do{
+					JPanel panel = new JPanel();
+					JLabel label = new JLabel("Enter a password:");
+					JPasswordField pass = new JPasswordField(10);
+					panel.add(label);
+					panel.add(pass);
+					String[] options1 = new String[]{"OK", "Cancel"};
+					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
+					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+					                         null, options1, options1[0]);
+					// pressing OK button
+					if(option == 0) {
+					    char[] password = pass.getPassword();
+					    String passwordInput = new String(password);
+
+						Employees tempEmployee = new Employees(currentEmployee.getUsername());
+						if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
+							ok = true;
+							go = true;
+						}
+						else{
+							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
+							ok = false;
+						}
+					}
+					else{
+						go = true;
+					}
+				}while(go == false);
+				
+				if(check && ok){
+					if(newPass.equals(cnewPass)){
+						Hashing hash = new Hashing();
+						String salt;
+						try {
+							salt = hash.getSalt();
+							String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
+							Connect connect = new Connect();
+							try {
+								Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+								String sql = "UPDATE `Employee` SET Password = ?, Salt = ? where ID = ? AND UserName = ?";
+								PreparedStatement ps = con.prepareStatement(sql);
+								ps.setString(1, hashedPassword);
+								ps.setString(2, salt);
+								ps.setInt(3, employeeID);
+								ps.setString(4, username);
+							    ps.executeUpdate();
+								
+								//Clean-up environment
+								con.close();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						} catch (NoSuchAlgorithmException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						JOptionPane.showMessageDialog(null,"Password successfully changed for Employee '" + username + "'.");
+						d2.dispose();
+					}
+					else{
+						textField_error_newPassword.setText("Password entered does not match confirm password.");
+						textField_error_confirmNewPassword.setText("Confirm password entered does not match new password.");
+					}
+				}
+			}
+		});
+        
+        JButton btnCancel_chgpwd = new JButton("Cancel");
+        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
+        panel_chgpwd.add(btnCancel_chgpwd);
+        btnCancel_chgpwd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				d2.dispose();
+			}
+		});
+        
+		Component component = (Component) e.getSource();
+		//Call parent jframe/jdialog
+		JFrame topFrame2 = (JFrame)(d1.getParent());
+		d2 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
+		d2.getContentPane().add(chgpwd_panel);
+		d2.setSize(900, 300);
+		d2.setLocationRelativeTo(null);
+		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
+		d2.setVisible(true);
 	}
 	private void loadPasswordFrame(ActionEvent e, int employeeID, String username) {
 		JPanel chgpwd_panel = new JPanel();
