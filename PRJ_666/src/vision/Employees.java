@@ -589,11 +589,7 @@ public class Employees extends JFrame{
 									btn_edit.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
-											if(currentEmployee.getPositionID() == 5){
-												JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
-											}
-											else{
-												//First name
+											//First name
 												textPane_details_firstName.setBackground(null);
 												textPane_details_firstName.setEditable(true);
 												
@@ -633,14 +629,14 @@ public class Employees extends JFrame{
 													//textPane_positionID.setBackground(null);
 													//comboBox_detail_positions.setEditable(true);
 													comboBox_detail_positions.setEnabled(true);
-												}
+												
 												//Job Type
 												//textPane_details_JobType.setBackground(null);
 												comboBox_detail_jobtypes.setEnabled(true);
 												
 												btn_edit.setVisible(false);
 												btn_save.setVisible(true);
-											}
+												}
 										}
 									});
 									
@@ -1023,9 +1019,10 @@ public class Employees extends JFrame{
 													//Positions position = new Positions();
 													if(position.checkPosition(staffList.get(i).getPositionID()) == false){
 														if(currentEmployee.getPositionID() == 5){
+															btn_edit.setVisible(false);
 															//JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
 														}
-														else{
+														if(currentEmployee.getPositionID() != 5){
 															//Change Password button
 													        JButton btn_chgpwd = new JButton("Reset Password");
 													        btn_chgpwd.setBounds(90, 570, 200, 40);
@@ -1048,12 +1045,18 @@ public class Employees extends JFrame{
 														}
 													}
 													else{
+														JButton btn_forgot = new JButton("Forgot password?");
+														//For manager
 														if(currentEmployee.getPositionID() == 5){
+															btn_edit.setVisible(false);
 															//JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
+														}
+														else if(currentEmployee.getPositionID() == 3 &&  staffList.get(i).getPositionID() == 4){
+															btn_edit.setVisible(false);
+															btn_forgot.setVisible(false);
 														}
 														else{
 															//Forgot Password for managers
-															JButton btn_forgot = new JButton("Forgot password?");
 															btn_forgot.setBounds(90, 570, 200, 40);
 															btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
 															btn_forgot.setFocusable(false);
