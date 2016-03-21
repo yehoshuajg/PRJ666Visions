@@ -31,6 +31,16 @@ import javax.swing.table.TableRowSorter;
 
 import org.omg.Messaging.SyncScopeHelper;
 
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperPrintManager;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JRDesignQuery;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -48,11 +58,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
@@ -2337,8 +2351,7 @@ public class Home extends JFrame implements KeyListener{
 				Date date = new Date();
 				String dateString = dateFormat.format(date);
 				//change employeeid
-				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, employee.getID());
-				
+				int transactionID = transaction.writeTransactionCash(dateString, subTotal, tax, total, transactionType, transactionMethod,promotionID, employee.getID());				
 				TransactionRecord transactionRecord = new TransactionRecord();
 				for(int i = 0; i < productBySearch.size(); i++){
 					//change employeeid
@@ -2357,6 +2370,29 @@ public class Home extends JFrame implements KeyListener{
 					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productNewQuantity,productBySearch.get(i).getSalePrice(),employee.getID());
 					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
 				}
+				
+				try {
+					Connect connect = new Connect();
+					Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+					
+					JasperDesign jd = JRXmlLoader.load("recipt.jrxml");
+					String sql = "SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, tr.ProductID, p.Name, "
+							+ " tr. QuantitySold, tr.UnitPrice, (tr.QuantitySold * tr.UnitPrice) as PTotal FROM StoreDB.Transaction t,"
+							+ " StoreDB.TransactionRecord tr, StoreDB.Product p WHERE t.ID = tr.TransactionID AND tr.ProductID = p.ID AND t.ID = " + transactionID;
+					JRDesignQuery jdq = new JRDesignQuery();
+					jdq.setText(sql);
+					jd.setQuery(jdq);
+				
+					JasperReport jr = JasperCompileManager.compileReport(jd);
+					JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+					
+					JasperPrintManager.printReport(jp, true);
+					
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
+							"Error with printing", JOptionPane.ERROR_MESSAGE);
+				}
+				
 				d4.dispose();
 				textField_productID_input.requestFocusInWindow();
 			}

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-03-19T19:03:25 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e14338ef-b68c-4b30-88c9-6fac6997d162">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL"/>
+	<queryString>
+		<![CDATA[SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, tr.ProductID, p.Name, tr. QuantitySold, tr.UnitPrice, (tr.QuantitySold * tr.UnitPrice) as PTotal
+FROM StoreDB.Transaction t, StoreDB.TransactionRecord tr, StoreDB.Product p
+WHERE t.ID = tr.TransactionID AND tr.ProductID = p.ID AND t.ID = 4]]>
+	</queryString>
+	<field name="ID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CreateDate" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="SubTotal" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Tax" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Total" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="EmployeeID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ProductID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Name" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="QuantitySold" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="UnitPrice" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="PTotal" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement x="110" y="0" width="230" height="30" uuid="93407ff4-0192-4540-ab7e-c70dbc94c5b4"/>
+				<textElement>
+					<font fontName="Arial Black" size="16"/>
+				</textElement>
+				<text><![CDATA[One Stop Dollarama]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="54" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="120" height="20" uuid="c891de85-de18-4cb2-983a-1b657c264aa7"/>
+				<textElement textAlignment="Left">
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Transaction ID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="120" height="20" uuid="a3138c23-138f-4651-add4-32ff8f7875fa"/>
+				<textElement textAlignment="Left">
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Employee ID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="20" width="60" height="20" uuid="c6dcbce0-342f-4d3f-87e7-c37d2f3e4a87"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="0" width="100" height="20" uuid="5107fab5-8992-40d8-9ed4-24e1da0dd194"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="20" width="120" height="20" uuid="285965ca-88e1-43e9-97e1-f6f5696bbb0c"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EmployeeID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="20" width="120" height="20" uuid="e5ac3c85-3634-4c2d-89cd-f2f4699b991b"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CreateDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="111" height="30" uuid="5408004c-dbd7-46b4-b7f3-6751c40b217c"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[ProductID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="0" width="159" height="30" uuid="44e818f6-6b9c-4051-8965-73a12dbd3b87"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="0" width="63" height="30" uuid="0743ea76-c06f-4403-8f86-de9b1be6bd4c"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="0" width="97" height="30" uuid="200161c2-f10c-4881-b9c0-823d9b271730"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Unit Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="430" y="0" width="125" height="30" uuid="88327a7f-3c1c-4c3d-b5c6-f52ebb5de20b"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="111" height="30" uuid="5f1d4153-1f39-4dea-b9aa-701a555c993e"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ProductID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="0" width="169" height="30" uuid="0640ba92-94f0-4cf4-8585-0d4a6144993c"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="53" height="30" uuid="bb1fb3dd-5592-413b-9c0e-9a0953ccafb7"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QuantitySold}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="333" y="0" width="97" height="30" uuid="dab05130-cc34-4f6f-a4b5-6c3e8524c19a"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UnitPrice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="431" y="0" width="124" height="30" uuid="daa1a920-1a6b-4674-ad91-ba5d09a80f6c"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PTotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="216" splitType="Stretch">
+			<staticText>
+				<reportElement x="330" y="0" width="100" height="30" uuid="2b3771a9-939f-4413-ab62-5a4cc6621e16"/>
+				<textElement textAlignment="Right">
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[SubTotal:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="430" y="0" width="125" height="30" uuid="ee3f14dd-35a0-448b-a3f7-a274596b6ce7"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SubTotal}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="30" width="100" height="30" uuid="719595eb-dcf3-4a03-b8a5-08df0578312f"/>
+				<textElement textAlignment="Right">
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Tax:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="431" y="30" width="124" height="30" uuid="a93aa37c-a3f5-4ac5-bd8b-9581175eb6c9"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tax}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="430" y="60" width="125" height="30" uuid="604e2f3a-9819-47c2-9aa5-4dd3d1599357"/>
+				<textElement>
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="331" y="60" width="100" height="30" uuid="a5cfa72d-c45f-4e7b-b4c3-07edbd817982"/>
+				<textElement textAlignment="Right">
+					<font fontName="Monospaced" size="12"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="106" width="555" height="110" uuid="0ac23c65-82ac-4d4b-9c8b-4bc949c9b553"/>
+				<textElement>
+					<font fontName="Monospaced"/>
+				</textElement>
+				<text><![CDATA[We want you to be completely satisfied with every item you purchase from one stop dollarama. If for any reason you are not satisfied with your purchase, you may return eligible items within 30 days of the shipping date. Refer to the Return Policy below to determine if your purchase is eligible for a refund. We will gladly refund or exchange, within 30 days of the shipping date, all unwashed, unworn and fully tagged merchandise in its original condition, when accompanied by the original packing slip. The following items are FINAL SALE when purchased online and cannot be returned, unless the item is found to be defective or was shipped in error.]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="9" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="12" splitType="Stretch"/>
+	</summary>
+</jasperReport>
