@@ -17,6 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -32,6 +33,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -43,6 +45,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -63,6 +66,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.ActionEvent;
 
 public class Employees extends JFrame{
@@ -173,6 +177,18 @@ public class Employees extends JFrame{
 	private JTextPane textField_error_newPassword;
 	private JTextPane textField_error_confirmNewPassword;
 	
+	//Job Type
+	private String[] jobtypes = {"Full Time", "Part Time","Casual"};
+	private JComboBox comboBox_jobType;
+	
+	//Position ID
+	private String[] positionids = {"1 - Sales Associate", "2 - Cashier", "3 - Manager", "4 - Owner", "5 - Accountant"};
+	private JComboBox comboBox_positionID;
+	
+	//State/Province
+	private String[] provinces = {"Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador",
+			"Northwest Territories","Nova Scotia","Nunavut","Ontario","Prince Edward Island","Quebec","Saskatchewan","Yukon Territory"};
+	private JComboBox comboBox_province;
 	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
@@ -427,12 +443,17 @@ public class Employees extends JFrame{
 							        textPane_details_city.setEditable(false);
 							        textPane_details_city.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_city);
-							        
+							       /* 
 							        JTextField textPane_details_stateProvince = new JTextField();
 							        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
 							        textPane_details_stateProvince.setEditable(false);
 							        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_stateProvince);
+							        */
+							        JComboBox comboBox_detail_province = new JComboBox(provinces);
+							        comboBox_detail_province.setBounds(113, 170, 150, 20);
+							        panel_employeeDetails.add(comboBox_detail_province);
+							        comboBox_detail_province.setEnabled(false);
 							        
 							        JTextField textPane_details_postalCode = new JTextField();
 							        textPane_details_postalCode.setBounds(96, 201, 150, 20);
@@ -458,7 +479,17 @@ public class Employees extends JFrame{
 							        textPane_details_email.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_email);
 							        
-							        JTextField textPane_positionID = new JTextField();
+							        JComboBox comboBox_detail_positions = new JComboBox(positionids);
+							        comboBox_detail_positions.setBounds(90, 330, 150, 20);
+							        panel_employeeDetails.add(comboBox_detail_positions);
+							        comboBox_detail_positions.setEnabled(false);
+							        
+							        JComboBox comboBox_detail_jobtypes = new JComboBox(jobtypes);
+							        comboBox_detail_jobtypes.setBounds(76, 362, 150, 20);
+							        panel_employeeDetails.add(comboBox_detail_jobtypes);
+							        comboBox_detail_jobtypes.setEnabled(false);
+							        
+							        /*JTextField textPane_positionID = new JTextField();
 							        textPane_positionID.setBounds(90, 330, 150, 20);
 							        textPane_positionID.setEditable(false);
 							        textPane_positionID.setBackground(Color.decode(defaultColor));
@@ -469,7 +500,7 @@ public class Employees extends JFrame{
 							        textPane_details_JobType.setEditable(false);
 							        textPane_details_JobType.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_JobType);
-							        
+							        */
 							        JTextField textPane_details_username = new JTextField();
 							        textPane_details_username.setBounds(90, 394, 150, 20);
 							        textPane_details_username.setEditable(false);
@@ -559,7 +590,7 @@ public class Employees extends JFrame{
 							        btn_edit.setFont(new Font("Tahoma", Font.PLAIN, 20));
 							        btn_edit.setFocusable(false);
 									staffDetails.add(btn_edit);
-									//Cancel button closes the window
+									//Edit button
 									btn_edit.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
@@ -580,12 +611,13 @@ public class Employees extends JFrame{
 											textPane_details_city.setEditable(true);
 		
 											//State/Province
-											textPane_details_stateProvince.setBackground(null);
-											textPane_details_stateProvince.setEditable(true);
+											//textPane_details_stateProvince.setBackground(null);
+											//textPane_details_stateProvince.setEditable(true);
+											comboBox_detail_province.setEnabled(true);
 											
 											//Postal code
-											textPane_details_postalCode.setBackground(null);
-											textPane_details_postalCode.setEditable(true);
+											//textPane_details_postalCode.setBackground(null);
+											//textPane_details_postalCode.setEditable(true);
 											
 											//Home phone
 											textPane_details_homePhone.setBackground(null);
@@ -599,13 +631,16 @@ public class Employees extends JFrame{
 											textPane_details_email.setBackground(null);
 											textPane_details_email.setEditable(true);
 											
-											//Position ID
-											textPane_positionID.setBackground(null);
-											textPane_positionID.setEditable(true);
 											
+											if(currentEmployee.getPositionID() == 4){
+												//Position ID
+												//textPane_positionID.setBackground(null);
+												//comboBox_detail_positions.setEditable(true);
+												comboBox_detail_positions.setEnabled(true);
+											}
 											//Job Type
-											textPane_details_JobType.setBackground(null);
-											textPane_details_JobType.setEditable(true);
+											//textPane_details_JobType.setBackground(null);
+											comboBox_detail_jobtypes.setEnabled(true);
 											
 											//Username
 											//textPane_details_username.setBackground(null);
@@ -621,7 +656,7 @@ public class Employees extends JFrame{
 							        btn_save.setFont(new Font("Tahoma", Font.PLAIN, 20));
 							        btn_save.setFocusable(false);
 									staffDetails.add(btn_save);
-									//Cancel button closes the window
+									//Save button 
 									btn_save.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
@@ -680,40 +715,6 @@ public class Employees extends JFrame{
 											}
 											else{
 												textPane_edit_error_city.setText(null);
-											}
-											
-											//Province
-											if(validateEmpty(textPane_details_stateProvince.getText()) == false){
-												textPane_edit_error_stateProvince.setText("State/Province field cannot be Empty.");
-												check = false;
-											}
-											else if(checkForAlphabets(textPane_details_stateProvince.getText()) == false){
-												textPane_edit_error_stateProvince.setText("State/Province field must contain alphabets only.");
-												ok = false;
-											}
-											else{
-												textPane_edit_error_stateProvince.setText(null);
-											}
-											
-											//Postal code
-											if(validateEmpty(textPane_details_postalCode.getText()) == false){
-												textPane_edit_error_postalCode.setText("Postal Code cannot be Empty.");
-												check = false;
-											}
-											else{
-												if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
-													textPane_edit_error_postalCode.setText(null);
-												}
-												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[ ]{1}([0-9][A-Za-z][0-9])$")){ //A1B 2C3
-													textPane_edit_error_postalCode.setText(null);
-												}
-												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[-]{1}([0-9][A-Za-z][0-9])$")){ //A1B-2C3
-													textPane_edit_error_postalCode.setText(null);
-												}
-												else{
-													textPane_edit_error_postalCode.setText("Postal code does not have a valid code pattern.");
-													ok = false;
-												}
 											}
 											
 											//Home phone
@@ -779,32 +780,6 @@ public class Employees extends JFrame{
 												}
 											}
 											
-											//Position
-											if(validateEmpty(textPane_positionID.getText()) == false){
-												textPane_edit_error_positionID.setText("Position ID cannot be Empty.");
-												check = false;
-											}
-											//show positions, which will go to db and get position # for u
-											else if(checkForNumbers(textPane_positionID.getText()) == false){
-												textPane_edit_error_positionID.setText("Position ID must contain numbers only.");
-												check = false;
-											}
-											else{
-												textPane_edit_error_positionID.setText(null);
-											}
-											
-											//Job type
-											if(validateEmpty(textPane_details_JobType.getText()) == false){
-												textPane_error_edit_jobType.setText("Job Type cannot be Empty.");
-												check = false;
-											}
-											else if(checkForAlphabets(textPane_details_JobType.getText()) == false){
-												textPane_error_edit_jobType.setText("Job Type must contain alphabets only.");
-												check = false;
-											}
-											else{
-												textPane_error_edit_jobType.setText(null);
-											}
 											*/
 											if(position.checkPosition(currentEmployee.getPositionID()) == false){
 												JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
@@ -847,8 +822,8 @@ public class Employees extends JFrame{
 																textPane_details_city.setEditable(false);
 						
 																//State/Province
-																textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-																textPane_details_stateProvince.setEditable(false);
+																//textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
+																comboBox_detail_province.setEnabled(false);
 																
 																//Postal code
 																textPane_details_postalCode.setBackground(Color.decode(defaultColor));
@@ -866,13 +841,14 @@ public class Employees extends JFrame{
 																textPane_details_email.setBackground(Color.decode(defaultColor));
 																textPane_details_email.setEditable(false);
 																
-																//Position ID
-																textPane_positionID.setBackground(Color.decode(defaultColor));
-																textPane_positionID.setEditable(false);
-																
+																if(currentEmployee.getPositionID() == 4){
+																	//Position ID
+																	//textPane_positionID.setBackground(Color.decode(defaultColor));
+																	comboBox_detail_positions.setEnabled(false);
+																}
 																//Job Type
-																textPane_details_JobType.setBackground(Color.decode(defaultColor));
-																textPane_details_JobType.setEditable(false);
+																//textPane_details_JobType.setBackground(Color.decode(defaultColor));
+																comboBox_detail_jobtypes.setEnabled(false);
 																
 																//Username
 																//textPane_details_username.setBackground(Color.decode(defaultColor));
@@ -891,13 +867,13 @@ public class Employees extends JFrame{
 																	ps.setString(2, textPane_details_lastName.getText().trim());
 																	ps.setString(3, textPane_details_street.getText().trim());
 																	ps.setString(4, textPane_details_city.getText().trim());
-																	ps.setString(5, textPane_details_stateProvince.getText().trim());
+																	ps.setString(5, provinces[comboBox_detail_province.getSelectedIndex()]);
 																	ps.setString(6, textPane_details_postalCode.getText().trim());
 																	ps.setString(7, textPane_details_homePhone.getText().trim());
 																	ps.setString(8, textPane_details_cellPhone.getText().trim());
 																	ps.setString(9, textPane_details_email.getText().trim());
-																	ps.setString(10, textPane_positionID.getText().trim());
-																	ps.setString(11, textPane_details_JobType.getText().trim());
+																	ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
+																	ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
 																	ps.setString(12, textPane_details_id.getText().trim());
 																    ps.executeUpdate();
 																	
@@ -1160,13 +1136,29 @@ public class Employees extends JFrame{
 								        		textPane_details_lastName.setText(staffList.get(i).getLastName());
 								        		textPane_details_street.setText(staffList.get(i).getStreet());
 								        		textPane_details_city.setText(staffList.get(i).getCity());
-								        		textPane_details_stateProvince.setText(staffList.get(i).getStateProvince());
+								        		//textPane_details_stateProvince.setText(staffList.get(i).getStateProvince());
+								        		for(int j = 0; j < provinces.length; j++){
+								        			if(staffList.get(i).getStateProvince().equals(provinces[j])){
+								        				comboBox_detail_province.setSelectedIndex(j);
+								        			}
+								        		}
 								        		textPane_details_postalCode.setText(staffList.get(i).getPostalCode());
 								        		textPane_details_homePhone.setText(staffList.get(i).getHomePhone());
 								        		textPane_details_cellPhone.setText(staffList.get(i).getCellPhone());
 								        		textPane_details_email.setText(staffList.get(i).getEmail());
-								        		textPane_positionID.setText(String.valueOf(staffList.get(i).getPositionID()));
-								        		textPane_details_JobType.setText(staffList.get(i).getJobType());
+								        		comboBox_detail_positions.setSelectedIndex(staffList.get(i).getPositionID()-1);
+								        		for(int j = 0; j < jobtypes.length; j++){
+								        			//System.out.println(staffList.get(i).getJobType());
+								        			if(staffList.get(i).getJobType().trim().equals("Full Time")){
+								        				comboBox_detail_jobtypes.setSelectedIndex(0);
+								        			}
+								        			else if(staffList.get(i).getJobType().trim().equals("Part Time")){
+								        				comboBox_detail_jobtypes.setSelectedIndex(1);
+								        			}
+								        			else if(staffList.get(i).getJobType().trim().equals("Casual")){
+								        				comboBox_detail_jobtypes.setSelectedIndex(2);
+								        			}
+								        		}
 								        		textPane_details_username.setText(staffList.get(i).getUsername());
 								        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
 								        		break;
@@ -1199,7 +1191,7 @@ public class Employees extends JFrame{
         panel_add_staff.setLayout(null);
         
         JTabbedPane tabbedPane_add_employee = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_add_employee.setBounds(250, 6, 763, 615);
+        tabbedPane_add_employee.setBounds(150, 6, 976, 615);
         panel_add_staff.add(tabbedPane_add_employee);
         
         JPanel panel_add_employee = new JPanel();
@@ -1340,11 +1332,6 @@ public class Employees extends JFrame{
         panel_add_employee.add(textField_city);
         textField_city.setColumns(10);
         
-        textField_province = new JTextField();
-        textField_province.setBounds(110, 130, 150, 26);
-        panel_add_employee.add(textField_province);
-        textField_province.setColumns(10);
-        
         textField_postalCode = new JTextField();
         textField_postalCode.setBounds(93, 162, 150, 26);
         panel_add_employee.add(textField_postalCode);
@@ -1365,16 +1352,11 @@ public class Employees extends JFrame{
         panel_add_employee.add(textField_email);
         textField_email.setColumns(10);
         
-        textField_positionID = new JTextField();
+        /*textField_positionID = new JTextField();
         textField_positionID.setBounds(90, 290, 150, 26);
         panel_add_employee.add(textField_positionID);
         textField_positionID.setColumns(10);
-        
-        textField_jobType = new JTextField();
-        textField_jobType.setBounds(73, 322, 150, 26);
-        panel_add_employee.add(textField_jobType);
-        textField_jobType.setColumns(10);
-        
+        */
         textField_userName = new JTextField();
         textField_userName.setBounds(80, 352, 150, 26);
         panel_add_employee.add(textField_userName);
@@ -1404,7 +1386,7 @@ public class Employees extends JFrame{
         		}
         	}
         });
-        btnSubmit.setBounds(10, 458, 350, 75);
+        btnSubmit.setBounds(10, 488, 441, 75);
         panel_add_employee.add(btnSubmit);
         
         JButton btnClear = new JButton("Clear");
@@ -1414,7 +1396,7 @@ public class Employees extends JFrame{
         		textField_firstName.requestFocus();
         	}
         });
-        btnClear.setBounds(386, 458, 350, 75);
+        btnClear.setBounds(508, 488, 441, 75);
         panel_add_employee.add(btnClear);
         
         textPane_error_firstName = new JTextPane();
@@ -1491,7 +1473,7 @@ public class Employees extends JFrame{
         
         textPane_error_password = new JTextPane();
         textPane_error_password.setEditable(false);
-        textPane_error_password.setBounds(240, 387, 496, 20);
+        textPane_error_password.setBounds(240, 387, 709, 20);
         textPane_error_password.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_password);
         
@@ -1500,6 +1482,18 @@ public class Employees extends JFrame{
         textPane_error_hireDate.setBounds(240, 420, 496, 20);
         textPane_error_hireDate.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_hireDate);
+        
+        comboBox_jobType = new JComboBox(jobtypes);
+        comboBox_jobType.setBounds(75, 321, 150, 27);
+        panel_add_employee.add(comboBox_jobType);
+        
+        comboBox_positionID = new JComboBox(positionids);
+        comboBox_positionID.setBounds(85, 289, 170, 27);
+        panel_add_employee.add(comboBox_positionID);
+        
+        comboBox_province = new JComboBox(provinces);
+        comboBox_province.setBounds(111, 129, 150, 27);
+        panel_add_employee.add(comboBox_province);
         
         JPanel panel_staff_edit = new JPanel();
         tabbedPane.addTab("Edit", null, panel_staff_edit, null);
@@ -2351,13 +2345,14 @@ public class Employees extends JFrame{
 			ps.setString(2, textField_lastName.getText().trim());
 			ps.setString(3, textField_street.getText().trim());
 			ps.setString(4, textField_city.getText().trim());
-			ps.setString(5, textField_province.getText().trim());
+			String p = provinces[comboBox_province.getSelectedIndex()];
+			ps.setString(5, p);
 			ps.setString(6, textField_postalCode.getText().trim());
 			ps.setString(7, textField_homePhone.getText().trim());
 			ps.setString(8, textField_cellPhone.getText().trim());
 			ps.setString(9, textField_email.getText().trim());
-			ps.setString(10, textField_positionID.getText().trim());
-			ps.setString(11, textField_jobType.getText().trim());
+			ps.setInt(10, comboBox_positionID.getSelectedIndex()+1);
+			ps.setString(11, jobtypes[comboBox_jobType.getSelectedIndex()]);
 			ps.setString(12, textField_userName.getText().trim());
 			ps.setString(13, hashedPassword);
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -2454,18 +2449,13 @@ public class Employees extends JFrame{
 			textPane_error_city.setText(null);
 		}
 		
-		//Province
-		if(validateEmpty(textField_province.getText()) == false){
-			textPane_error_stateProvince.setText("State/Province field cannot be Empty.");
-			check = false;
-		}
-		else if(checkForAlphabets(textField_province.getText()) == false){
-			textPane_error_stateProvince.setText("State/Province field must contain alphabets only.");
-			ok = false;
-		}
-		else{
-			textPane_error_stateProvince.setText(null);
-		}
+		//Provinces
+		comboBox_province.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//comboBox_province.getSelectedIndex();
+			}
+		});
 		
 		//Postal code
 		if(validateEmpty(textField_postalCode.getText()) == false){
@@ -2546,37 +2536,26 @@ public class Employees extends JFrame{
 				textPane_error_email.setText(null);
 			}
 			else{
-				textPane_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-'.");
+				textPane_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-','@'.");
 				ok = false;
 			}
 		}
 		
 		//Position
-		if(validateEmpty(textField_positionID.getText()) == false){
-			textPane_error_positionID.setText("Position ID cannot be Empty.");
-			check = false;
-		}
-		//show positions, which will go to db and get position # for u
-		else if(checkForNumbers(textField_positionID.getText()) == false){
-			textPane_error_positionID.setText("Position ID must contain numbers only.");
-			check = false;
-		}
-		else{
-			textPane_error_positionID.setText(null);
-		}
+		comboBox_positionID.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//comboBox_positionID.getSelectedIndex();
+			}
+		});
 		
 		//Job type
-		if(validateEmpty(textField_jobType.getText()) == false){
-			textPane_error_jobType.setText("Job Type cannot be Empty.");
-			check = false;
-		}
-		else if(checkForAlphabets(textField_jobType.getText()) == false){
-			textPane_error_jobType.setText("Job Type must contain alphabets only.");
-			check = false;
-		}
-		else{
-			textPane_error_jobType.setText(null);
-		}
+		comboBox_jobType.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//comboBox_jobType.getSelectedIndex();
+			}
+		});
 		
 		//Username
 		if(validateEmpty(textField_userName.getText()) == false){
@@ -2629,11 +2608,11 @@ public class Employees extends JFrame{
 			check = false;
 		}
 		else{
-			if(textField_password.getText().trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+			if(textField_password.getText().trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 				textPane_error_password.setText(null);
 			}
 			else{
-				textPane_error_password.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+				textPane_error_password.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
 				ok = false;
 			}
 		}
@@ -2701,13 +2680,13 @@ public class Employees extends JFrame{
 		textField_lastName.setText(null);
 		textField_street.setText(null);
 		textField_city.setText(null);
-		textField_province.setText(null);
+		comboBox_province.setSelectedIndex(0);
 		textField_postalCode.setText(null);
 		textField_homePhone.setText(null);
 		textField_cellPhone.setText(null);
 		textField_email.setText(null);
-		textField_positionID.setText(null);
-		textField_jobType.setText(null);
+		comboBox_positionID.setSelectedIndex(0);
+		comboBox_jobType.setSelectedIndex(0);
 		textField_userName.setText(null);
 		textField_password.setText(null);
 		textField_hireDate.setText(null);
