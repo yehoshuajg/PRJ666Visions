@@ -622,21 +622,44 @@ public class Employees extends JFrame{
 												
 												//Email
 												textPane_details_email.setBackground(null);
-												textPane_details_email.setEditable(true);
+											textPane_details_email.setEditable(true);
 												
-												if(currentEmployee.getPositionID() == 4){
-													//Position ID
-													//textPane_positionID.setBackground(null);
-													//comboBox_detail_positions.setEditable(true);
-													comboBox_detail_positions.setEnabled(true);
-												
+											if(currentEmployee.getPositionID() == 4){
+												//Position ID
+												//textPane_positionID.setBackground(null);
+												//comboBox_detail_positions.setEditable(true);
+												comboBox_detail_positions.setEnabled(true);
+											
 												//Job Type
 												//textPane_details_JobType.setBackground(null);
 												comboBox_detail_jobtypes.setEnabled(true);
-												
-												btn_edit.setVisible(false);
-												btn_save.setVisible(true);
-												}
+											}
+											//Manager and Cashier <=
+											else if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
+							        			comboBox_detail_jobtypes.setEnabled(true);
+							        		}
+											
+											//Manager and Cashier
+							        		if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
+												textPane_details_terminateDate.setBackground(null);
+												textPane_details_terminateDate.setEditable(true);
+											}
+							        		//Owner and Manager <=
+							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 3 && btn_save.isVisible()){
+							        			textPane_details_terminateDate.setBackground(null);
+												textPane_details_terminateDate.setEditable(true);
+							        		}
+							        		//Owner and accountant
+							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 5){
+							        			textPane_details_terminateDate.setBackground(null);
+												textPane_details_terminateDate.setEditable(true);
+							        		}
+											
+											
+											
+											
+											btn_edit.setVisible(false);
+											btn_save.setVisible(true);
 										}
 									});
 									
@@ -1178,26 +1201,6 @@ public class Employees extends JFrame{
 								        		textPane_details_cellPhone.setText(staffList.get(i).getCellPhone());
 								        		textPane_details_email.setText(staffList.get(i).getEmail());
 								        		comboBox_detail_positions.setSelectedIndex(staffList.get(i).getPositionID()-1);
-								        		//Manager and Cashier
-								        		if(currentEmployee.getPositionID() == 3 && staffList.get(i).getPositionID() <= 2){
-													textPane_details_terminateDate.setBackground(null);
-													textPane_details_terminateDate.setEditable(true);
-												}
-								        		//Owner and Manager <=
-								        		else if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() <= 3 && btn_save.isVisible()){
-								        			textPane_details_terminateDate.setBackground(null);
-													textPane_details_terminateDate.setEditable(true);
-								        		}
-								        		//Owner and accountant
-								        		else if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() <= 5){
-								        			textPane_details_terminateDate.setBackground(null);
-													textPane_details_terminateDate.setEditable(true);
-								        		}
-								        		//Manager and Cashier <=
-								        		if(currentEmployee.getPositionID() == 3 && staffList.get(i).getPositionID() <= 2){
-								        			comboBox_detail_jobtypes.setEnabled(false);	
-								        		}
-								        		
 								        		for(int j = 0; j < jobtypes.length; j++){
 								        			//System.out.println(staffList.get(i).getJobType());
 								        			if(staffList.get(i).getJobType().trim().equals("Full Time")){

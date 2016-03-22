@@ -3285,10 +3285,12 @@ public class Home extends JFrame implements KeyListener{
 								@Override
 								public void run() {
 									String tempQuantity = model_refund.getValueAt(row2, refund_returned).toString();
+									char c = 0;
+									char c2 = 0;
 									if(!tempQuantity.isEmpty()){
-										char c = tempQuantity.charAt(0);
-										char c2 = tempQuantity.charAt(tempQuantity.length()-1);
-									}
+										c = tempQuantity.charAt(0);
+										c2 = tempQuantity.charAt(tempQuantity.length()-1);
+									}	
 									//Previous Quantity
 									int previousQuantity2 = 0;
 									if(model_refund.getRowCount() > 0){
@@ -3313,12 +3315,12 @@ public class Home extends JFrame implements KeyListener{
 										table_refund.setRowSelectionInterval(row2, row2);
 										table_refund.setColumnSelectionInterval(0, 0);
 									}
-									/*else if(c == '0' && c2 >= '0'){
-										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
+									else if(c == '0' && c2 >= '0'){
+										//JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
 										model_refund.setValueAt(previousQuantity2, row2, col2);
 										table_refund.setRowSelectionInterval(row2, row2);
 										table_refund.setColumnSelectionInterval(0, 0);
-									}*/
+									}
 									else{
 										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
 										int sold = Integer.parseInt(model_refund.getValueAt(row2, refund_QuantitySold).toString().trim());
