@@ -86,7 +86,7 @@ public class BackupAndRestore {
 				int processComplete = runtimeProcess.waitFor();
 		 
 				if (processComplete == 0) {
-					JOptionPane.showMessageDialog(null,"Backup restored successfully.");
+					//JOptionPane.showMessageDialog(null,"Backup restored successfully.");
 				} else {
 					JOptionPane.showMessageDialog(null,"Could not restore the backup.");
 				}
@@ -106,7 +106,7 @@ public class BackupAndRestore {
             int processComplete = runtimeProcess.waitFor();
  
             if (processComplete == 0) {
-            	JOptionPane.showMessageDialog(null,"Backup created successfully.");
+            	//JOptionPane.showMessageDialog(null,"Backup created successfully.");
             } else {
             	JOptionPane.showMessageDialog(null,"Could not create the backup.");
             }

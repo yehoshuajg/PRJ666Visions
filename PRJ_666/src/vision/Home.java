@@ -3908,7 +3908,7 @@ public class Home extends JFrame implements KeyListener{
 												
 												//Calculating new Subtotal
 												//Subtotal = Product of returning Unitprice * (new quantity - previous quantity of returned), so it doesn't go into negative
-												remainingSubtotal += returning.get(i).getUnitPrice() * (returning.get(i).getReturned() - tr.get(i).getReturned());
+												remainingSubtotal += returning.get(i).getUnitPrice() * (returning.get(i).getReturned() - tr.get(j).getReturned());
 												refundChange = remainingSubtotal;
 												finalRefundSubtotal = (t.getSubTotal()-remainingSubtotal);
 												finalRefundSubtotal = Math.round(finalRefundSubtotal * 100.0) / 100.0;
