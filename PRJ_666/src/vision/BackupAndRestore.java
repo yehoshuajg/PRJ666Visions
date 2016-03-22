@@ -3,7 +3,9 @@ package vision;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 import java.sql.Connection;
@@ -11,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -56,6 +59,7 @@ public class BackupAndRestore {
 		else if (isMac()) {
 			defaultPath = "/Users/"+ getMachineUser() +"/Desktop/backup.sql";
 			//System.out.println("This is Mac");
+			//System.out.println(path);
 			if(path != null){
 				setPath(path);
 			}
@@ -73,27 +77,31 @@ public class BackupAndRestore {
 		//restoreDB();
 	}
 	public void restoreDB(){
-		createDB();
-		String[] executeCmd = new String[]{"/usr/local/mysql/bin/mysql", "--user=" + getUsername(), "--password=" + getPassword(), getDbName(),"-e", "source "+getPath()};
-		Process runtimeProcess;
-		try {
-			runtimeProcess = Runtime.getRuntime().exec(executeCmd);
-			int processComplete = runtimeProcess.waitFor();
-	 
-			if (processComplete == 0) {
-				JOptionPane.showMessageDialog(null,"Backup restored successfully.");
-			} else {
-				JOptionPane.showMessageDialog(null,"Could not restore the backup.");
+		if(fileExists()){
+			createDB();
+			String[] executeCmd = new String[]{"/usr/local/mysql/bin/mysql", "--user=" + getUsername(), "--password=" + getPassword(), getDbName(),"-e", "source "+getPath()};
+			Process runtimeProcess;
+			try {
+				runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+				int processComplete = runtimeProcess.waitFor();
+		 
+				if (processComplete == 0) {
+					JOptionPane.showMessageDialog(null,"Backup restored successfully.");
+				} else {
+					JOptionPane.showMessageDialog(null,"Could not restore the backup.");
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		}
+		else{
+			JOptionPane.showMessageDialog(null,"Backup file could not be found.");
 		}
 	}
 	public void backupDB() {
 		String executeCmd = "/usr/local/mysql/bin/mysqldump -u " + getUsername() + " -p" + getPassword() + " " + getDbName() +" -r "+ getPath();
 		Process runtimeProcess;
         try {
- 
             runtimeProcess = Runtime.getRuntime().exec(executeCmd);
             int processComplete = runtimeProcess.waitFor();
  
@@ -125,6 +133,64 @@ public class BackupAndRestore {
 			e.printStackTrace();
 		}
 	}
+	
+	public boolean fileExists(){
+		File f = new File(this.getPath());
+		if(f.exists() && !f.isDirectory()) { 
+			//System.out.println("exists");
+			return true;
+		}
+		else{
+			//System.out.println("does not exist");
+			return false;
+		}
+	}
+	
+	public void setBackupRestorePath(){
+		File file = new File("backupPath.txt");
+        
+        Scanner in;
+
+        if (file.exists()){
+            try{
+                in = new Scanner(file);
+                while(in.hasNext()){
+                    String input = in.next();
+                    if(input != null){
+                    	BackupAndRestore.setPath(input);
+                    }
+                }
+                in.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        }
+        //If file does not exist, create one and write the default location (Desktop)
+        else{
+        	try {
+        		file.createNewFile();
+	        } catch (IOException e1) {
+	            e1.printStackTrace();
+	        }
+        	BackupAndRestore br = new BackupAndRestore();
+        	br.initialize();
+        	if (file.exists()) {
+	            PrintWriter writer = null;
+	            try {
+	                writer = new PrintWriter(file, "UTF-8");
+	            } catch (FileNotFoundException e1) {
+	                e1.printStackTrace();
+	            } catch (UnsupportedEncodingException e1) {
+	                e1.printStackTrace();
+	            }
+	            writer.println(BackupAndRestore.getPath());
+	            writer.close();
+	        }
+        	br.initialize();
+			br.backupDB();
+        }
+	}
+	
 	public static String getPath() {
 		return path;
 	}

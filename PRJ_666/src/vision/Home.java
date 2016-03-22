@@ -348,7 +348,7 @@ public class Home extends JFrame implements KeyListener{
 			public void actionPerformed(ActionEvent e) {
 				//UIManager.put("OptionPane.buttonFont", new FontUIResource(new Font("ARIAL",Font.PLAIN,35)));
 				Object[] options = {"Cancel","Restore","Backup"};
-				int cashCredit = JOptionPane.showOptionDialog(null,"Checkout using: ","Checkout",
+				int cashCredit = JOptionPane.showOptionDialog(null,"Backup/Restore using: ","",
 				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 				
 				//Cancel
@@ -376,6 +376,7 @@ public class Home extends JFrame implements KeyListener{
 							Employees tempEmployee = new Employees(employee.getUsername());
 							if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
 								BackupAndRestore br = new BackupAndRestore();
+								br.setBackupRestorePath();
 								br.initialize();
 								br.restoreDB();
 								go = true;
@@ -410,6 +411,7 @@ public class Home extends JFrame implements KeyListener{
 							Employees tempEmployee = new Employees(employee.getUsername());
 							if(tempEmployee.fetchLogin(employee.getUsername(), passwordInput)){
 								BackupAndRestore br = new BackupAndRestore();
+								br.setBackupRestorePath();
 								br.initialize();
 								br.backupDB();
 								go = true;
@@ -458,6 +460,7 @@ public class Home extends JFrame implements KeyListener{
 					    	//System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
 					    	String path = chooser.getSelectedFile() + "/backup.sql";
 					    	BackupAndRestore.setPath(path);
+					    	//System.out.println(path);
 					    	//Write path to file, set this path as normal path
 					    	File file = new File("backupPath.txt");
 					        try {
@@ -479,6 +482,7 @@ public class Home extends JFrame implements KeyListener{
 					        }
 					        JOptionPane.showMessageDialog(null,"Backup and Restore location has been changed to " + path + ".");
 					        BackupAndRestore br = new BackupAndRestore();
+					        br.setBackupRestorePath();
 					        br.initialize();
 							br.backupDB();
 						}
@@ -2186,10 +2190,6 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.refreshInventoryTable();
-				
-			//Payments
-			JPanel panel_payments = new JPanel();
-			tabbedPane.addTab("Payments", null, panel_payments, null);
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2221,10 +2221,6 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.refreshInventoryTable();
-				
-			//Payments
-			JPanel panel_payments = new JPanel();
-			tabbedPane.addTab("Payments", null, panel_payments, null);
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2253,56 +2249,10 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.refreshInventoryTable();
-				
-			//Payments
-			JPanel panel_payments = new JPanel();
-			tabbedPane.addTab("Payments", null, panel_payments, null);	
 		}
 			
-		setBackupRestorePath();
-	}
-	
-	public void setBackupRestorePath(){
-		File file = new File("backupPath.txt");
-        
-        Scanner in;
-
-        if (file.exists()){
-            try{
-                in = new Scanner(file);
-                while(in.hasNext()){
-                    String input = in.next();
-                    if(input != null){
-                    	BackupAndRestore.setPath(input);
-                    }
-                }
-                in.close();
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-            }
-        }
-        //If file does not exist, create one and write the default location (Desktop)
-        else{
-        	try {
-        		file.createNewFile();
-	        } catch (IOException e1) {
-	            e1.printStackTrace();
-	        }
-        	BackupAndRestore br = new BackupAndRestore();
-        	br.initialize();
-        	if (file.exists()) {
-	            PrintWriter writer = null;
-	            try {
-	                writer = new PrintWriter(file, "UTF-8");
-	            } catch (FileNotFoundException e1) {
-	                e1.printStackTrace();
-	            } catch (UnsupportedEncodingException e1) {
-	                e1.printStackTrace();
-	            }
-	            writer.println(BackupAndRestore.getPath());
-	            writer.close();
-	        }
-        }
+		BackupAndRestore br = new BackupAndRestore();  
+		br.setBackupRestorePath();
 	}
 	
 	public void calculateCashCheckout(){
@@ -2370,6 +2320,11 @@ public class Home extends JFrame implements KeyListener{
 					transactionRecord.insertTransactionRecord(transactionID, productBySearch.get(i).getID(),productNewQuantity,productBySearch.get(i).getSalePrice(),employee.getID());
 					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
 				}
+				//Backup db after sale transaction
+				BackupAndRestore br = new BackupAndRestore();
+				br.setBackupRestorePath();
+				br.initialize();
+				br.backupDB();
 				
 				try {
 					Connect connect = new Connect();
@@ -4000,6 +3955,11 @@ public class Home extends JFrame implements KeyListener{
 												}
 											}
 										}
+										//Backup db after sale transaction
+										BackupAndRestore br = new BackupAndRestore();
+										br.setBackupRestorePath();
+										br.initialize();
+										br.backupDB();
 									}
 								});
 								
