@@ -2206,7 +2206,7 @@ public class Home extends JFrame implements KeyListener{
 			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
-			inv.refreshInventoryTable();
+			inv.initiateInventory();
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2253,7 +2253,7 @@ public class Home extends JFrame implements KeyListener{
 			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
-			inv.refreshInventoryTable();
+			inv.initiateInventory();
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2297,7 +2297,7 @@ public class Home extends JFrame implements KeyListener{
 			//tabbedPane.addTab("Inventory", null, panel_inventory, null);
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
-			inv.refreshInventoryTable();
+			inv.initiateInventory();
 		}
 			
 		BackupAndRestore br = new BackupAndRestore();  

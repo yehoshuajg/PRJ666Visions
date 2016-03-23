@@ -9,11 +9,14 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,15 +24,19 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.management.modelmbean.ModelMBean;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -41,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.JViewport;
 import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.ComparisonType;
@@ -50,19 +58,29 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.JTextArea;
+import javax.swing.border.LineBorder;
+import java.awt.SystemColor;
+import javax.swing.BoxLayout;
 
 
 
 public class Inventory extends JPanel {
 
 private DefaultTableModel MyModel = null;
-private Connection con_Invoice = null; //Shigemi
+private Connection con_Inv = null; //Shigemi
 
 private JTextField add_prodID_tf;
 private JTextField add_prodName_tf;
@@ -70,28 +88,20 @@ private JTextField add_prodDesc_tf;
 //private JTextField textUnitCost;
 private JTextField add_prodSalePrice_tf;
 private JTextField add_prodQty_tf;
-private JTextField add_prodNotes_tf;
+private JTextArea add_prodNotes_tf;
 private JComboBox add_prodCat_cb;
 private JComboBox add_prodSubCat_cb;
+private JLabel add_prodID_title;
 private JLabel add_prodID_lbl;
 private JLabel add_prodName_lbl;
 private JLabel add_prodDesc_lbl;
-private JLabel add_prodQty_lbl;
+private JLabel add_prodQty_war;
 private JLabel add_prodCat_lbl;
 private JLabel add_prodSubCat_lbl;
 private JLabel add_prodSalePrice_lbl;
 private JLabel add_prodNotes_lbl;
-
-private JTextField edit_prodID_tf;
-private JTextField edit_prodName_tf;
-private JTextField edit_prodDesc_tf;
-private JTextField edit_prodQty_tf;
-private JTextField edit_prodCatID_tf;
-private JTextField edit_prodSubCatID_tf;
 private JTextField edit_prodUnitCost_tf;
-private JTextField edit_prodSalePrice_tf;
-private JTextField edit_prodNotes_tf;
-private JTable table_inventoryList;
+static JTable table_inventoryList;
 
 private JComboBox<CbSupItem> ord_Sup_cb = new JComboBox<CbSupItem>(); 
 
@@ -101,7 +111,7 @@ private JScrollPane scp_inventoryList;
 private JTabbedPane tabbedPane_Inventory;	
 private static TableRowSorter<MyTableModelClass> sorter;
 
-private static  InventoryFilterFrame filter = new InventoryFilterFrame();
+private static  InventoryFilterFrame filterFrame = new InventoryFilterFrame();
 private static  JLabel jl_filter_status;
 private JTable table_createOrder;
 private JTable table_createOrderSummary;
@@ -116,7 +126,38 @@ private int sizeProdNotes = 80;
 private int sizeProdQty = 11;
 
 private TableModelListener tml_CreateTable;
+private static TableModelListener tml_newSalePrice;
 
+private boolean newSalePriceFlag;
+private JButton btnConfirm;
+private static int prodDetailCount;
+static ProdDetail prodDetails;
+
+
+private JLabel dataProdID;
+private JTextArea dataCat;
+private JTextArea dataSubCat;
+private JTextArea dataName;
+private JTextArea dataDesc;
+private JLabel dataQty;
+private JLabel dataToBe;
+private JLabel dataUnitCost;
+private JLabel dataSalePrice;
+private JTextArea dataNote;
+private JTable inv_sup_prod_table;
+private JTextField textField;
+private JTextField dataNewSalePrice;
+private JTable inv_soldByTable;
+private JTable inv_priceHisTable;
+
+private JComboBox<CbSupItem> simpleSupList;
+
+private DefaultStyledDocument doc;
+private JTable inv_orderListTable;
+private JTable inv_orderDetailTable;
+private JTextField dataDeliveryCost;
+private JTextField dataInvoiceNumber;
+private final JPanel panel_3 = new JPanel();
 
 
 public Inventory() {
@@ -131,53 +172,8 @@ add(panel, BorderLayout.NORTH);
 	//*************Sub tabbled Pane for Inventory Module
 			tabbedPane_Inventory = new JTabbedPane(JTabbedPane.LEFT);
 			tabbedPane_Inventory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane_Inventory.setFont(new Font("Tahoma", Font.PLAIN, 13));
+			tabbedPane_Inventory.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			add(tabbedPane_Inventory);
-				   
-			JPanel panel_Inv_EditDetails = new JPanel();
-				   panel_Inv_EditDetails.setLayout(null);
-							
-							
-				/********************<< Update Product Details >>*************************/
-						
-				JButton btnUpdateInventory = new JButton("Update");
-					    btnUpdateInventory.setBounds(279, 442, 97, 25);
-					    btnUpdateInventory.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						
-						try{
-							//System.out.println(tfEditDescription.getText().length());
-							
-							Connection connectionInvoice = Connect.connectionSetup();
-							String query = "Update Product Set "
-									+ "Name = '"+edit_prodName_tf.getText()+"',"
-									+ "Description = '"+edit_prodDesc_tf.getText()+"',"
-								    + "Quantity='"+edit_prodQty_tf.getText()+"',"
-								    + "CategoryID='"+edit_prodCatID_tf.getText()+"',"
-								    + "SubCategoryID='"+edit_prodSubCatID_tf.getText()+"',"
-								    //+ "UnitCost='"+tfEditUnitCost.getText()+"',"
-								   	+ "SalePrice='"+edit_prodSalePrice_tf.getText()+"',"
-								   	//+ "SupplierID='"+tfEditSupplierID.getText()+"',"
-								   	+ "Notes='"+edit_prodNotes_tf.getText()+"' "
-								   	+ "WHERE ID= '"+edit_prodID_tf.getText()+"'";					
-														
-							PreparedStatement pst = connectionInvoice.prepareStatement(query);
-
-							
-							pst.execute();
-							connectionInvoice.close();
-							pst.close();
-							JOptionPane.showMessageDialog(null, "Data Updated");
-
-
-						}catch (Exception e1) {
-							e1.printStackTrace();
-						}
-						refreshInventoryTable();
-					}
-				});
-				
-				panel_Inv_EditDetails.add(btnUpdateInventory);
 									
 					
 			//*************JPanle for Inventory List page 
@@ -186,7 +182,7 @@ add(panel, BorderLayout.NORTH);
 				    public void stateChanged(ChangeEvent CE) {
 				    	
 				        try{
-				        	refreshInventoryTable();
+				        	refreshInventoryTable(1);
 				        }catch(Exception ex){
 				        	ex.printStackTrace();
 				        }
@@ -221,7 +217,7 @@ add(panel, BorderLayout.NORTH);
 					public void actionPerformed(ActionEvent e) {
 						
 						try {
-							refreshInventoryTable();
+							refreshInventoryTable(1);
 						}catch (Exception ex){
 							ex.printStackTrace();
 						}
@@ -231,7 +227,7 @@ add(panel, BorderLayout.NORTH);
 		JButton btnClearFilter = new JButton("Clear Filter");
 		btnClearFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			 filter.clearFilter();
+			 filterFrame.clearFilter();
 			}
 		});
 		JButton btnEditDetails = new JButton("Edit Details");
@@ -247,7 +243,8 @@ add(panel, BorderLayout.NORTH);
 						JOptionPane.showMessageDialog(null, "Please select only one item");
 					}
 					else {
-						jumpToEditPage(selectedRows.get(0).intValue());
+						//jumpToEditPage(selectedRows.get(0).intValue());
+						displayDetail(selectedRows.get(0).intValue());
 		
 					} // end else
 				}catch (Exception e1) {
@@ -273,9 +270,10 @@ add(panel, BorderLayout.NORTH);
 						selectedProductIDs.append(selectedRows.get(i).toString()).append(", ");
 					}
 				selectedProductIDs.append(selectedRows.get(selectedRows.size()-1).toString());
-				
+				System.out.println("Selected IDs are" + selectedProductIDs);
 				createOrderTable(selectedProductIDs);
 				//createOrderSummary(selectedProductIDs); placed inside createOrderTable();
+				tabbedPane_Inventory.setEnabledAt(3,true);
 				tabbedPane_Inventory.setSelectedIndex(3);
 				}
 			} // end of action performed
@@ -284,7 +282,7 @@ add(panel, BorderLayout.NORTH);
 		JPanel jp_blankspace01 = new JPanel();
 		panel_InventoryList_North.add(jp_blankspace01);
 		jp_blankspace01.setPreferredSize(new Dimension(100, 20));
-		
+	
 	
 		
 		JButton btn_openFilter = new JButton("Apply Filter");
@@ -295,7 +293,7 @@ add(panel, BorderLayout.NORTH);
 			{
 				public void actionPerformed(ActionEvent e) 
 				{
-					filter.setVisible(true);
+					filterFrame.setVisible(true);
 					
 		}});
 		panel_InventoryList_North.add(btnClearFilter);
@@ -306,68 +304,151 @@ add(panel, BorderLayout.NORTH);
 		
 		jl_filter_status = new JLabel("No filter Applied");
 		panel_InventoryList_North.add(jl_filter_status);
+		
+		//newSalePriceFlag = false;
+		JButton btnUpdateSalePrice = new JButton("Update SalePrice"); 
+		btnUpdateSalePrice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				//if (newSalePriceFlag == false){
+					updateBulkSalePrice(1);
+					newSalePriceFlag = true;
+					
+					boolean displayFlag = false;
+					btnLoadProduct.setEnabled(displayFlag);
+					btnGoToOrderPage.setEnabled(displayFlag);
+					btnEditDetails.setEnabled(displayFlag);
+					btnUpdateSalePrice.setEnabled(displayFlag);
+					
+					btnConfirm.setEnabled(true);
+				//}
+			}
+		});
+		panel_InventoryList_North.add(btnUpdateSalePrice);
+		
+		btnConfirm = new JButton("Confirm");
+		btnConfirm.setEnabled(false);
+		btnConfirm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				updateBulkSalePrice(2); //step 2
+				
+				boolean displayFlag = true;
+				btnLoadProduct.setEnabled(displayFlag);
+				btnGoToOrderPage.setEnabled(displayFlag);
+				btnEditDetails.setEnabled(displayFlag);
+				btnUpdateSalePrice.setEnabled(displayFlag);
+				
+				btnConfirm.setEnabled(false);
+				
+			}
+		});
+		panel_InventoryList_North.add(btnConfirm);
+		
+		DocumentListener docListener = new DocumentListener(){
 
-	JPanel panel_AddProduct = new JPanel();
-	panel_AddProduct.setLayout(null);
-	
-	// ======================================================================================
-	// Components for Add Product Page ======================================================
-	// ======================================================================================
-	
-	tabbedPane_Inventory.addTab("Add Product", null, panel_AddProduct, null);
-	
-	JLabel add_prodInstr02_lbl = new JLabel("Required fields are marked as ***");
-	add_prodInstr02_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
-	add_prodInstr02_lbl.setBounds(25, 41, 508, 16);
-	panel_AddProduct.add(add_prodInstr02_lbl);
-	
-	JLabel add_prodInstr01_lbl = new JLabel("Please enter new production information and press \"Add New Product\" button. ");
-	add_prodInstr01_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
-	add_prodInstr01_lbl.setBounds(25, 13, 546, 25);
-	panel_AddProduct.add(add_prodInstr01_lbl);
-	
-	JPanel panel_7 = new JPanel();
-	panel_7.setBounds(23, 88, 630, 309);
-	panel_AddProduct.add(panel_7);
-	GridBagLayout gbl_panel_7 = new GridBagLayout();
-	gbl_panel_7.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-	gbl_panel_7.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	gbl_panel_7.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-	gbl_panel_7.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-	panel_7.setLayout(gbl_panel_7);
-		   
-	add_prodID_lbl = new JLabel("     *** ID");
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				//DocumentEvent.EventType type = e.getType();
+				String priceStr = dataNewSalePrice.getText();
+				if ( ! Inventory.validateDouble(priceStr) ) {
+					JOptionPane.showMessageDialog(null, "New Price must be a valid number");
+					priceStr = dataNewSalePrice.getText();
+					//dataNewSalePrice.setText(priceStr.substring(0,priceStr.length() -1));
+				}
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
+		};
+			JPanel   panel_AddProduct = new JPanel();
+			panel_AddProduct.setLayout(null);
+			
+			// ======================================================================================
+			// Components for Add Product Page ======================================================
+			// ======================================================================================
+			
+			tabbedPane_Inventory.addTab("Add Product", null, panel_AddProduct, null);
+			
+			JPanel panel_7 = new JPanel();
+			panel_7.setBounds(25, 13, 785, 520);
+			panel_AddProduct.add(panel_7);
+			GridBagLayout gbl_panel_7 = new GridBagLayout();
+			gbl_panel_7.columnWidths = new int[]{0, 200, 0, 0, 0, 0};
+			gbl_panel_7.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0};
+			gbl_panel_7.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+			gbl_panel_7.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+			panel_7.setLayout(gbl_panel_7);
+			
+			JLabel lblAddNewProduct = new JLabel("Add New Product");
+			lblAddNewProduct.setFont(new Font("Tahoma", Font.PLAIN, 18));
+			GridBagConstraints gbc_lblAddNewProduct = new GridBagConstraints();
+			gbc_lblAddNewProduct.anchor = GridBagConstraints.WEST;
+			gbc_lblAddNewProduct.gridwidth = 2;
+			gbc_lblAddNewProduct.insets = new Insets(0, 0, 5, 5);
+			gbc_lblAddNewProduct.gridx = 0;
+			gbc_lblAddNewProduct.gridy = 0;
+			panel_7.add(lblAddNewProduct, gbc_lblAddNewProduct);
+			
+			JLabel add_prodInstr01_lbl = new JLabel("Please enter new production information and press \"Add New Product\" button. ");
+			GridBagConstraints gbc_add_prodInstr01_lbl = new GridBagConstraints();
+			gbc_add_prodInstr01_lbl.anchor = GridBagConstraints.WEST;
+			gbc_add_prodInstr01_lbl.gridwidth = 5;
+			gbc_add_prodInstr01_lbl.insets = new Insets(0, 0, 5, 0);
+			gbc_add_prodInstr01_lbl.gridx = 0;
+			gbc_add_prodInstr01_lbl.gridy = 2;
+			panel_7.add(add_prodInstr01_lbl, gbc_add_prodInstr01_lbl);
+			add_prodInstr01_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			JLabel add_prodInstr02_lbl = new JLabel("Required fields are marked as ***");
+			GridBagConstraints gbc_add_prodInstr02_lbl = new GridBagConstraints();
+			gbc_add_prodInstr02_lbl.anchor = GridBagConstraints.WEST;
+			gbc_add_prodInstr02_lbl.gridwidth = 3;
+			gbc_add_prodInstr02_lbl.insets = new Insets(0, 0, 5, 5);
+			gbc_add_prodInstr02_lbl.gridx = 0;
+			gbc_add_prodInstr02_lbl.gridy = 3;
+			panel_7.add(add_prodInstr02_lbl, gbc_add_prodInstr02_lbl);
+			add_prodInstr02_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+	add_prodID_title = new JLabel("     *** ID");
+	add_prodID_title.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 	gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
 	gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
 	gbc_lblNewLabel.gridx = 0;
-	gbc_lblNewLabel.gridy = 0;
-	panel_7.add(add_prodID_lbl, gbc_lblNewLabel);
-	add_prodID_lbl.setHorizontalAlignment(SwingConstants.RIGHT);
+	gbc_lblNewLabel.gridy = 5;
+	panel_7.add(add_prodID_title, gbc_lblNewLabel);
+	add_prodID_title.setHorizontalAlignment(SwingConstants.RIGHT);
 	
 	
 	add_prodID_tf = new JTextField();
+	add_prodID_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodID_tf = new GridBagConstraints();
 	gbc_add_prodID_tf.anchor = GridBagConstraints.WEST;
 	gbc_add_prodID_tf.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodID_tf.gridx = 1;
-	gbc_add_prodID_tf.gridy = 0;
+	gbc_add_prodID_tf.gridy = 5;
 	panel_7.add(add_prodID_tf, gbc_add_prodID_tf);
 	add_prodID_tf.setColumns(15);
 	
 	add_prodID_lbl = new JLabel("ID must be 8 digits number");
+	add_prodID_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodID_lbl = new GridBagConstraints();
 	gbc_add_prodID_lbl.anchor = GridBagConstraints.SOUTHWEST;
 	gbc_add_prodID_lbl.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodID_lbl.gridx = 2;
-	gbc_add_prodID_lbl.gridy = 0;
+	gbc_add_prodID_lbl.gridy = 5;
 	panel_7.add(add_prodID_lbl, gbc_add_prodID_lbl);
 	JLabel lblName = new JLabel("*** Name");
+	lblName.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblName = new GridBagConstraints();
 	gbc_lblName.anchor = GridBagConstraints.EAST;
 	gbc_lblName.insets = new Insets(0, 0, 5, 5);
 	gbc_lblName.gridx = 0;
-	gbc_lblName.gridy = 1;
+	gbc_lblName.gridy = 6;
 	panel_7.add(lblName, gbc_lblName);
 	lblName.setHorizontalAlignment(SwingConstants.RIGHT);
 	
@@ -426,11 +507,12 @@ add(panel, BorderLayout.NORTH);
 			);
 	
 	add_prodName_tf = new JTextField();
+	add_prodName_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodName_tf = new GridBagConstraints();
 	gbc_add_prodName_tf.anchor = GridBagConstraints.WEST;
 	gbc_add_prodName_tf.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodName_tf.gridx = 1;
-	gbc_add_prodName_tf.gridy = 1;
+	gbc_add_prodName_tf.gridy = 6;
 	panel_7.add(add_prodName_tf, gbc_add_prodName_tf);
 	add_prodName_tf.setColumns(15);
 	add_prodName_tf.getDocument().addDocumentListener(
@@ -473,26 +555,29 @@ add(panel, BorderLayout.NORTH);
 			);
 	
 	add_prodName_lbl = new JLabel("Name must be 50 letters or less");
+	add_prodName_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodName_lbl = new GridBagConstraints();
 	gbc_add_prodName_lbl.anchor = GridBagConstraints.WEST;
 	gbc_add_prodName_lbl.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodName_lbl.gridx = 2;
-	gbc_add_prodName_lbl.gridy = 1;
+	gbc_add_prodName_lbl.gridy = 6;
 	panel_7.add(add_prodName_lbl, gbc_add_prodName_lbl);
 	JLabel lblDescription = new JLabel("Description");
+	lblDescription.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblDescription = new GridBagConstraints();
 	gbc_lblDescription.anchor = GridBagConstraints.EAST;
 	gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
 	gbc_lblDescription.gridx = 0;
-	gbc_lblDescription.gridy = 2;
+	gbc_lblDescription.gridy = 7;
 	panel_7.add(lblDescription, gbc_lblDescription);
 	lblDescription.setHorizontalAlignment(SwingConstants.RIGHT);
 	add_prodDesc_tf = new JTextField();
+	add_prodDesc_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodDesc_tf = new GridBagConstraints();
 	gbc_add_prodDesc_tf.anchor = GridBagConstraints.WEST;
 	gbc_add_prodDesc_tf.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodDesc_tf.gridx = 1;
-	gbc_add_prodDesc_tf.gridy = 2;
+	gbc_add_prodDesc_tf.gridy = 7;
 	panel_7.add(add_prodDesc_tf, gbc_add_prodDesc_tf);
 	add_prodDesc_tf.setColumns(15);
 	add_prodDesc_tf.getDocument().addDocumentListener(
@@ -536,98 +621,106 @@ add(panel, BorderLayout.NORTH);
 	
 	
 	add_prodDesc_lbl = new JLabel("Description must be 80 char or less");
-	GridBagConstraints gbc_label_2 = new GridBagConstraints();
-	gbc_label_2.fill = GridBagConstraints.HORIZONTAL;
-	gbc_label_2.insets = new Insets(0, 0, 5, 5);
-	gbc_label_2.gridx = 2;
-	gbc_label_2.gridy = 2;
-	panel_7.add(add_prodDesc_lbl, gbc_label_2);
+	add_prodDesc_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	GridBagConstraints gbc_dataSubCat = new GridBagConstraints();
+	gbc_dataSubCat.fill = GridBagConstraints.HORIZONTAL;
+	gbc_dataSubCat.insets = new Insets(0, 0, 5, 5);
+	gbc_dataSubCat.gridx = 2;
+	gbc_dataSubCat.gridy = 7;
+	panel_7.add(add_prodDesc_lbl, gbc_dataSubCat);
+	/*
 	JLabel lblQuantity = new JLabel("Quantity");
+	lblQuantity.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblQuantity = new GridBagConstraints();
 	gbc_lblQuantity.anchor = GridBagConstraints.EAST;
 	gbc_lblQuantity.insets = new Insets(0, 0, 5, 5);
 	gbc_lblQuantity.gridx = 0;
-	gbc_lblQuantity.gridy = 3;
+	gbc_lblQuantity.gridy = 8;
 	panel_7.add(lblQuantity, gbc_lblQuantity);
 	
 	add_prodQty_tf = new JTextField();
+	add_prodQty_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodQty_tf = new GridBagConstraints();
 	gbc_add_prodQty_tf.anchor = GridBagConstraints.WEST;
 	gbc_add_prodQty_tf.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodQty_tf.gridx = 1;
-	gbc_add_prodQty_tf.gridy = 3;
+	gbc_add_prodQty_tf.gridy = 8;
 	panel_7.add(add_prodQty_tf, gbc_add_prodQty_tf);
 	add_prodQty_tf.setColumns(10);
 	add_prodQty_tf.getDocument().addDocumentListener(
 			new DocumentListener(){
 				public void changedUpdate(DocumentEvent e){
 					if (add_prodQty_tf.getDocument().getLength() > 11){
-						add_prodQty_lbl.setText("Quantity must be a number less than 11 digits");
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);					
+						add_prodQty_war.setText("Quantity must be a number less than 11 digits");
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);					
 					}else if( !validateStrToInt(add_prodQty_tf.getText() ) ){
-						add_prodQty_lbl.setText("Invalid Number" );
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);
+						add_prodQty_war.setText("Invalid Number" );
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);
 					}else{
-						add_prodQty_lbl.setText("valid");
-						add_prodQty_lbl.setOpaque(false);
+						add_prodQty_war.setText("valid");
+						add_prodQty_war.setOpaque(false);
 					}
 				}
 				public void insertUpdate(DocumentEvent e){
 					if (add_prodQty_tf.getDocument().getLength() > 11){
-						add_prodQty_lbl.setText("Quantity must be a number less than 11 digits");
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);					
+						add_prodQty_war.setText("Quantity must be a number less than 11 digits");
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);					
 					}else if( !validateStrToInt(add_prodQty_tf.getText() ) ){
-						add_prodQty_lbl.setText("Invalid Number" );
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);
+						add_prodQty_war.setText("Invalid Number" );
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);
 					}else{
-						add_prodQty_lbl.setText("valid");
-						add_prodQty_lbl.setOpaque(false);
+						add_prodQty_war.setText("valid");
+						add_prodQty_war.setOpaque(false);
 					}
 				}
 				public void removeUpdate(DocumentEvent e){
 					if (add_prodQty_tf.getDocument().getLength() > 11){
-						add_prodQty_lbl.setText("Quantity must be a number less than 11 digits");
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);					
+						add_prodQty_war.setText("Quantity must be a number less than 11 digits");
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);					
 					}else if( !validateStrToInt(add_prodQty_tf.getText() ) ){
-						add_prodQty_lbl.setText("Invalid Number" );
-						add_prodQty_lbl.setBackground(new Color(255,255,0));
-						add_prodQty_lbl.setOpaque(true);
+						add_prodQty_war.setText("Invalid Number" );
+						add_prodQty_war.setBackground(new Color(255,255,0));
+						add_prodQty_war.setOpaque(true);
 					}else{
-						add_prodQty_lbl.setText("valid");
-						add_prodQty_lbl.setOpaque(false);
+						add_prodQty_war.setText("valid");
+						add_prodQty_war.setOpaque(false);
 					}
 				}
 			}
 			);
 	
 	
-	add_prodQty_lbl = new JLabel("Quantity must be a number less than 11 digits");
-	GridBagConstraints gbc_label_3 = new GridBagConstraints();
-	gbc_label_3.anchor = GridBagConstraints.WEST;
-	gbc_label_3.insets = new Insets(0, 0, 5, 5);
-	gbc_label_3.gridx = 2;
-	gbc_label_3.gridy = 3;
-	panel_7.add(add_prodQty_lbl, gbc_label_3);
+	add_prodQty_war = new JLabel("Quantity must be a number less than 11 digits");
+	add_prodQty_war.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	*/
+	GridBagConstraints gbc_dataName = new GridBagConstraints();
+	gbc_dataName.anchor = GridBagConstraints.WEST;
+	gbc_dataName.insets = new Insets(0, 0, 5, 5);
+	gbc_dataName.gridx = 2;
+	gbc_dataName.gridy = 8;
+	//panel_7.add(add_prodQty_war, gbc_dataName);
 	JLabel lblCategoryid = new JLabel("*** Category");
+	lblCategoryid.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblCategoryid = new GridBagConstraints();
 	gbc_lblCategoryid.anchor = GridBagConstraints.EAST;
 	gbc_lblCategoryid.insets = new Insets(0, 0, 5, 5);
 	gbc_lblCategoryid.gridx = 0;
-	gbc_lblCategoryid.gridy = 4;
+	gbc_lblCategoryid.gridy = 9;
 	panel_7.add(lblCategoryid, gbc_lblCategoryid);
 	lblCategoryid.setHorizontalAlignment(SwingConstants.RIGHT);
 	
 	add_prodCat_cb = new JComboBox();
+	add_prodCat_cb.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodCat_cb = new GridBagConstraints();
 	gbc_add_prodCat_cb.fill = GridBagConstraints.HORIZONTAL;
 	gbc_add_prodCat_cb.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodCat_cb.gridx = 1;
-	gbc_add_prodCat_cb.gridy = 4;
+	gbc_add_prodCat_cb.gridy = 9;
 	panel_7.add(add_prodCat_cb, gbc_add_prodCat_cb);
 	add_prodCat_cb.setMaximumRowCount(15);
 	
@@ -636,110 +729,114 @@ add(panel, BorderLayout.NORTH);
 	fillComboBoxCategory(add_prodCat_cb);
 	
 	add_prodCat_cb.setRenderer(new CbCatListRenderer());
-		add_prodCat_cb.addActionListener(
-				new ActionListener(){
-					@Override
-					public void actionPerformed(ActionEvent e) {
+	add_prodCat_cb.addActionListener(
+			new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+				
+					try{
+					JComboBox combo = (JComboBox)e.getSource();
+					CbCategoryItem item = (CbCategoryItem) combo.getSelectedItem();
+					newProdCategoryID = item.getID();
 					
-						try{
-						JComboBox combo = (JComboBox)e.getSource();
-						CbCategoryItem item = (CbCategoryItem) combo.getSelectedItem();
-						newProdCategoryID = item.getID();
-						
-						con_Invoice = Connect.connectionSetup();
-						String query = "Select ID, Name From Category Where ParentID = " + newProdCategoryID + " Order By Name;";
-						PreparedStatement pst = con_Invoice.prepareStatement(query);
-						ResultSet rs = pst.executeQuery();
-						
-							//clean cbSubCategory before adding new sub categories
-						add_prodSubCat_cb.removeAllItems(); 
-						boolean rowExist = false;
-						
-						CbCategoryItem firstItem = new CbCategoryItem(0, "-- please select sub category --");
+					con_Inv = Connect.connectionSetup();
+					String query = "Select ID, Name From Category Where ParentID = " + newProdCategoryID + " Order By Name;";
+					PreparedStatement pst = con_Inv.prepareStatement(query);
+					ResultSet rs = pst.executeQuery();
+					
+						//clean cbSubCategory before adding new sub categories
+					add_prodSubCat_cb.removeAllItems(); 
+					boolean rowExist = false;
+					
+					CbCategoryItem firstItem = new CbCategoryItem(0, "-- please select sub category --");
 
-							//if no row returned, rs.next() returns false
-						while(rs.next()){
-							String str = rs.getString("Name").trim();
-							int id = rs.getInt("ID");
-							
-							add_prodSubCat_cb.addItem(new CbCategoryItem(id, str));
-							rowExist = true;
-						}
-						if(rowExist){
-							add_prodSubCat_cb.insertItemAt(new CbCategoryItem(0, "-- please select sub category --"), 0);
-							CbCategoryItem firstitem = (CbCategoryItem)add_prodSubCat_cb.getItemAt(0);
-							add_prodSubCat_cb.setSelectedItem(firstitem);
-							add_prodSubCat_cb.setEnabled(true);
+						//if no row returned, rs.next() returns false
+					while(rs.next()){
+						String str = rs.getString("Name").trim();
+						int id = rs.getInt("ID");
+						
+						add_prodSubCat_cb.addItem(new CbCategoryItem(id, str));
+						rowExist = true;
+					}
+					if(rowExist){
+						add_prodSubCat_cb.insertItemAt(new CbCategoryItem(0, "-- please select sub category --"), 0);
+						CbCategoryItem firstitem = (CbCategoryItem)add_prodSubCat_cb.getItemAt(0);
+						add_prodSubCat_cb.setSelectedItem(firstitem);
+						add_prodSubCat_cb.setEnabled(true);
 	
-						} else {
-							add_prodSubCat_cb.insertItemAt(new CbCategoryItem(0, "-- No sub category available --"), 0);
-							add_prodSubCat_cb.setEnabled(false);
-								//at least one item must be added to the combobox, or null pointer exception occurs
-						}
-					
-						con_Invoice.close();
-						pst.close();
-						rs.close();
+					} else {
+						add_prodSubCat_cb.insertItemAt(new CbCategoryItem(0, "-- No sub category available --"), 0);
+						add_prodSubCat_cb.setEnabled(false);
+							//at least one item must be added to the combobox, or null pointer exception occurs
+					}
+				
+					con_Inv.close();
+					pst.close();
+					rs.close();
 	
-						}catch (Exception e1){
-							e1.printStackTrace();
-						} //catch
-					} //Action performed		
-				}//Action Listner
-				);
+					}catch (Exception e1){
+						e1.printStackTrace();
+					} //catch
+				} //Action performed		
+			}//Action Listner
+			);
 	
 	add_prodCat_lbl = new JLabel("");
-	GridBagConstraints gbc_label = new GridBagConstraints();
-	gbc_label.anchor = GridBagConstraints.WEST;
-	gbc_label.insets = new Insets(0, 0, 5, 5);
-	gbc_label.gridx = 2;
-	gbc_label.gridy = 4;
-	panel_7.add(add_prodCat_lbl, gbc_label);
+	GridBagConstraints gbc_dataProdID = new GridBagConstraints();
+	gbc_dataProdID.anchor = GridBagConstraints.WEST;
+	gbc_dataProdID.insets = new Insets(0, 0, 5, 5);
+	gbc_dataProdID.gridx = 2;
+	gbc_dataProdID.gridy = 9;
+	panel_7.add(add_prodCat_lbl, gbc_dataProdID);
 	
 	JLabel lblSubcategoryid = new JLabel("Sub Category");
+	lblSubcategoryid.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblSubcategoryid = new GridBagConstraints();
 	gbc_lblSubcategoryid.anchor = GridBagConstraints.EAST;
 	gbc_lblSubcategoryid.insets = new Insets(0, 0, 5, 5);
 	gbc_lblSubcategoryid.gridx = 0;
-	gbc_lblSubcategoryid.gridy = 5;
+	gbc_lblSubcategoryid.gridy = 10;
 	panel_7.add(lblSubcategoryid, gbc_lblSubcategoryid);
 	lblSubcategoryid.setHorizontalAlignment(SwingConstants.RIGHT);
 	
 	add_prodSubCat_cb = new JComboBox();
+	add_prodSubCat_cb.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodSubCat_cb = new GridBagConstraints();
 	gbc_add_prodSubCat_cb.fill = GridBagConstraints.HORIZONTAL;
 	gbc_add_prodSubCat_cb.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodSubCat_cb.gridx = 1;
-	gbc_add_prodSubCat_cb.gridy = 5;
+	gbc_add_prodSubCat_cb.gridy = 10;
 	panel_7.add(add_prodSubCat_cb, gbc_add_prodSubCat_cb);
 	add_prodSubCat_cb.setRenderer(new CbCatListRenderer());
 	
 	add_prodSubCat_lbl = new JLabel("            ");
-	GridBagConstraints gbc_label_4 = new GridBagConstraints();
-	gbc_label_4.anchor = GridBagConstraints.WEST;
-	gbc_label_4.insets = new Insets(0, 0, 5, 5);
-	gbc_label_4.gridx = 2;
-	gbc_label_4.gridy = 5;
-	panel_7.add(add_prodSubCat_lbl, gbc_label_4);
+	GridBagConstraints gbc_dataDesc = new GridBagConstraints();
+	gbc_dataDesc.anchor = GridBagConstraints.WEST;
+	gbc_dataDesc.insets = new Insets(0, 0, 5, 5);
+	gbc_dataDesc.gridx = 2;
+	gbc_dataDesc.gridy = 10;
+	panel_7.add(add_prodSubCat_lbl, gbc_dataDesc);
 	//JLabel lblUnitCost = new JLabel("Unit Cost");		
 	//	   lblUnitCost.setBounds(30, 219, 51, 16);		
 	JLabel lblSalePrice = new JLabel("*** Sale Price");
+	lblSalePrice.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblSalePrice = new GridBagConstraints();
 	gbc_lblSalePrice.anchor = GridBagConstraints.EAST;
 	gbc_lblSalePrice.insets = new Insets(0, 0, 5, 5);
 	gbc_lblSalePrice.gridx = 0;
-	gbc_lblSalePrice.gridy = 6;
+	gbc_lblSalePrice.gridy = 11;
 	panel_7.add(lblSalePrice, gbc_lblSalePrice);
 	lblSalePrice.setHorizontalAlignment(SwingConstants.RIGHT);
 	//textUnitCost = new JTextField();			
 	//textUnitCost.setBounds(150, 215, 116, 22);			
 	//textUnitCost.setColumns(10);
 	add_prodSalePrice_tf = new JTextField();
+	add_prodSalePrice_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_add_prodSalePrice_tf = new GridBagConstraints();
 	gbc_add_prodSalePrice_tf.anchor = GridBagConstraints.WEST;
 	gbc_add_prodSalePrice_tf.insets = new Insets(0, 0, 5, 5);
 	gbc_add_prodSalePrice_tf.gridx = 1;
-	gbc_add_prodSalePrice_tf.gridy = 6;
+	gbc_add_prodSalePrice_tf.gridy = 11;
 	panel_7.add(add_prodSalePrice_tf, gbc_add_prodSalePrice_tf);
 	add_prodSalePrice_tf.setColumns(10);
 	add_prodSalePrice_tf.getDocument().addDocumentListener(
@@ -782,39 +879,40 @@ add(panel, BorderLayout.NORTH);
 			);
 	
 	add_prodSalePrice_lbl = new JLabel("Sale Price must be a number");
-	GridBagConstraints gbc_label_1 = new GridBagConstraints();
-	gbc_label_1.anchor = GridBagConstraints.WEST;
-	gbc_label_1.insets = new Insets(0, 0, 5, 5);
-	gbc_label_1.gridx = 2;
-	gbc_label_1.gridy = 6;
-	panel_7.add(add_prodSalePrice_lbl, gbc_label_1);
+	add_prodSalePrice_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	GridBagConstraints gbc_dataCat = new GridBagConstraints();
+	gbc_dataCat.anchor = GridBagConstraints.WEST;
+	gbc_dataCat.insets = new Insets(0, 0, 5, 5);
+	gbc_dataCat.gridx = 2;
+	gbc_dataCat.gridy = 11;
+	panel_7.add(add_prodSalePrice_lbl, gbc_dataCat);
 	//JLabel lblSupplierId = new JLabel("Supplier ID");	
 	//	   lblSupplierId.setBounds(30, 278, 115, 16);	
 	JLabel lblNote = new JLabel("Notes");
+	lblNote.setVerticalAlignment(SwingConstants.TOP);
+	lblNote.setFont(new Font("Tahoma", Font.PLAIN, 15));
 	GridBagConstraints gbc_lblNote = new GridBagConstraints();
-	gbc_lblNote.anchor = GridBagConstraints.EAST;
+	gbc_lblNote.anchor = GridBagConstraints.NORTHEAST;
 	gbc_lblNote.insets = new Insets(0, 0, 5, 5);
 	gbc_lblNote.gridx = 0;
-	gbc_lblNote.gridy = 7;
+	gbc_lblNote.gridy = 12;
 	panel_7.add(lblNote, gbc_lblNote);
 	lblNote.setHorizontalAlignment(SwingConstants.RIGHT);
-	add_prodNotes_tf = new JTextField();
-	GridBagConstraints gbc_add_prodNotes_tf = new GridBagConstraints();
-	gbc_add_prodNotes_tf.fill = GridBagConstraints.BOTH;
-	gbc_add_prodNotes_tf.gridheight = 3;
-	gbc_add_prodNotes_tf.insets = new Insets(0, 0, 5, 5);
-	gbc_add_prodNotes_tf.gridx = 1;
-	gbc_add_prodNotes_tf.gridy = 7;
-	panel_7.add(add_prodNotes_tf, gbc_add_prodNotes_tf);
-	add_prodNotes_tf.setColumns(10);
 	
-	add_prodNotes_lbl = new JLabel("Notes must be 80 char or less");
-	GridBagConstraints gbc_label_5 = new GridBagConstraints();
-	gbc_label_5.anchor = GridBagConstraints.WEST;
-	gbc_label_5.insets = new Insets(0, 0, 5, 5);
-	gbc_label_5.gridx = 2;
-	gbc_label_5.gridy = 7;
-	panel_7.add(add_prodNotes_lbl, gbc_label_5);
+	JScrollPane scrollPane_5 = new JScrollPane();
+	GridBagConstraints gbc_scrollPane_5 = new GridBagConstraints();
+	gbc_scrollPane_5.insets = new Insets(0, 0, 5, 5);
+	gbc_scrollPane_5.fill = GridBagConstraints.BOTH;
+	gbc_scrollPane_5.gridx = 1;
+	gbc_scrollPane_5.gridy = 12;
+	panel_7.add(scrollPane_5, gbc_scrollPane_5);
+	scrollPane_5.setPreferredSize(new Dimension(150, 100));
+	add_prodNotes_tf = new JTextArea();
+	add_prodNotes_tf.setWrapStyleWord(true);
+	scrollPane_5.setViewportView(add_prodNotes_tf);
+	add_prodNotes_tf.setLineWrap(true);
+	add_prodNotes_tf.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	add_prodNotes_tf.setColumns(10);
 	add_prodNotes_tf.getDocument().addDocumentListener(
 			new DocumentListener(){
 				
@@ -853,301 +951,495 @@ add(panel, BorderLayout.NORTH);
 				}
 			}
 			);
-
 	
-	JButton btnAdd = new JButton("Add New Product");
-	GridBagConstraints gbc_btnAdd = new GridBagConstraints();
-	gbc_btnAdd.anchor = GridBagConstraints.WEST;
-	gbc_btnAdd.insets = new Insets(0, 0, 0, 5);
-	gbc_btnAdd.gridx = 1;
-	gbc_btnAdd.gridy = 10;
-	panel_7.add(btnAdd, gbc_btnAdd);
-	
-	btnAdd.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
+	add_prodNotes_lbl = new JLabel("Notes must be 80 char or less");
+	add_prodNotes_lbl.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	GridBagConstraints gbc_dataQty = new GridBagConstraints();
+	gbc_dataQty.anchor = GridBagConstraints.NORTHWEST;
+	gbc_dataQty.insets = new Insets(0, 0, 5, 5);
+	gbc_dataQty.gridx = 2;
+	gbc_dataQty.gridy = 12;
+	panel_7.add(add_prodNotes_lbl, gbc_dataQty);
+		
 			
-			try{
-				int flag = 0;
-				String prodID = add_prodID_tf.getText();
-				String prodName = add_prodName_tf.getText();
-				String prodDesc = add_prodDesc_tf.getText();
-				String prodQty = add_prodQty_tf.getText();
-				String prodSalePrice = add_prodSalePrice_tf.getText();
-				CbCategoryItem catItem = (CbCategoryItem) add_prodCat_cb.getSelectedItem();
-				CbCategoryItem subCatItem = (CbCategoryItem) add_prodSubCat_cb.getSelectedItem();
-				
-				
-				int catID = catItem.getID();
-				int subCatID = 0;
-				// if user does not select category, give error
-				if ( catID == 0 ) flag = 2;
-				System.out.println("category ID is /" + catID);
-				//sub category throws exception if user does not select category
-				System.out.println("sub category ID is /" + subCatID);
-				
-			    	//validate user input 
-			    if ( !validateProdID(prodID) ) flag = 1;
-			    if ( !validateStringSize(prodName, sizeProdName) ) flag = 1;
-			    
-			    if ( prodDesc.isEmpty()){
-			    	prodDesc = ""; //assign "" to product description if it is empty
-			    } else {  if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;}
-			    if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;
-			    if ( prodQty.isEmpty()){
-			    	prodQty = "0"; //assign 0 to product quantity if it is empty
-			    } else {  if ( !validateIntSize(prodQty, sizeProdQty) ) flag = 1;}
-			    
-			    if ( !validateDouble(prodSalePrice) ) flag = 1;
+			JButton btnAdd = new JButton("Add New Product");
+			GridBagConstraints gbc_btnAdd = new GridBagConstraints();
+			gbc_btnAdd.anchor = GridBagConstraints.WEST;
+			gbc_btnAdd.insets = new Insets(0, 0, 5, 5);
+			gbc_btnAdd.gridx = 1;
+			gbc_btnAdd.gridy = 13;
+			panel_7.add(btnAdd, gbc_btnAdd);
+			
+			btnAdd.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					
+					
+					addProduct();
+					/*
+					try{
+						int flag = 0;
+						String prodID = add_prodID_tf.getText();
+						String prodName = add_prodName_tf.getText();
+						String prodDesc = add_prodDesc_tf.getText();
+						String prodQty = add_prodQty_tf.getText();
+						String prodSalePrice = add_prodSalePrice_tf.getText();
+						CbCategoryItem catItem = (CbCategoryItem) add_prodCat_cb.getSelectedItem();
+						CbCategoryItem subCatItem = (CbCategoryItem) add_prodSubCat_cb.getSelectedItem();
+						
+						
+						int catID = catItem.getID();
+						int subCatID = 0;
+						// if user does not select category, give error
+						if ( catID == 0 ) flag = 2;
+						System.out.println("category ID is /" + catID);
+						//sub category throws exception if user does not select category
+						System.out.println("sub category ID is /" + subCatID);
+						
+					    	//validate user input 
+					    if ( !validateProdID(prodID) ) flag = 1;
+					    if ( !validateStringSize(prodName, sizeProdName) ) flag = 1;
+					    
+					    if ( prodDesc.isEmpty()){
+					    	prodDesc = ""; //assign "" to product description if it is empty
+					    } else {  if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;}
+					    if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;
+					    if ( prodQty.isEmpty()){
+					    	prodQty = "0"; //assign 0 to product quantity if it is empty
+					    } else {  if ( !validateIntSize(prodQty, sizeProdQty) ) flag = 1;}
+					    
+					    if ( !validateDouble(prodSalePrice) ) flag = 1;
 
-			    if (flag == 1){
-			    	JOptionPane.showMessageDialog(null, "Invalid input - try again");
-			    }
-			    else if (flag == 2 ){
-			    	JOptionPane.showMessageDialog(null, "Category is required");
-			    }
-			    else if ( flag == 0 )
-			    {
-					con_Invoice = Connect.connectionSetup();
-					//update product table
-					String query = "insert into product (ID, Name, Description, Quantity, CategoryID, SubCategoryID, SalePrice, Notes)"
-							+ "values ( ?,?,?,?,?,?,?,?)";
-					PreparedStatement pst = con_Invoice.prepareStatement(query);		 
-					pst.setInt(1, Integer.parseInt( prodID ));
-					pst.setString(2, prodName);
-					pst.setString(3, prodDesc);
-					pst.setInt(4, Integer.parseInt( prodQty ) );
-					pst.setInt(5, catID);
-					if (subCatID != 0){
-						pst.setInt(6, subCatID);
-					} else {
-						pst.setNull(6, java.sql.Types.INTEGER);
+					    if (flag == 1){
+					    	JOptionPane.showMessageDialog(null, "Invalid input - try again");
+					    }
+					    else if (flag == 2 ){
+					    	JOptionPane.showMessageDialog(null, "Category is required");
+					    }
+					    else if ( flag == 0 )
+					    {
+							con_Inv = Connect.connectionSetup();
+							//update product table
+							String query = "insert into product (ID, Name, Description, Quantity, CategoryID, SubCategoryID, SalePrice, Notes)"
+									+ "values ( ?,?,?,?,?,?,?,?)";
+							PreparedStatement pst = con_Inv.prepareStatement(query);		 
+							pst.setInt(1, Integer.parseInt( prodID ));
+							pst.setString(2, prodName);
+							pst.setString(3, prodDesc);
+							pst.setInt(4, Integer.parseInt( prodQty ) );
+							pst.setInt(5, catID);
+							if (subCatID != 0){
+								pst.setInt(6, subCatID);
+							} else {
+								pst.setNull(6, java.sql.Types.INTEGER);
+							}
+							
+							pst.setDouble(7, Double.parseDouble(prodSalePrice));
+							pst.setString(8, add_prodNotes_tf.getText());
+							
+														
+							pst.executeUpdate();
+							JOptionPane.showMessageDialog(null, "New Product Added");
+								
+							for (int i= 0; i < table_inventoryList.getRowCount(); i++){
+								if( prodID.equals( table_inventoryList.getValueAt(i, 1) )){
+									table_inventoryList.setRowSelectionInterval(i, i);
+								}
+								refreshInventoryTable(1);
+								
+							}
+							
+							pst.close();
+							con_Inv.close();
+					    }// if - validate user input 
 					}
-					
-					pst.setDouble(7, Double.parseDouble(prodSalePrice));
-					pst.setString(8, add_prodNotes_tf.getText());
-					
-												
-					pst.executeUpdate();
-					JOptionPane.showMessageDialog(null, "New Product Added");
-					
-					
-					pst.close();
-					con_Invoice.close();
-			    }// if - validate user input 
-			}
-			 catch (SQLException ex) {
+					 catch (SQLException ex) {
                     if (ex.getSQLState().startsWith("23")) {
                           JOptionPane.showMessageDialog(null, "Duplicated Product ID - please try again");
                     } 
-			 }catch (Exception e1) {
-				e1.printStackTrace();
+					 }catch (Exception e1) {
+						e1.printStackTrace();
+					 }
+					*/
+						
+					}
+						
+			});
+		
+		JButton btnNewButton_1 = new JButton("Clear Form");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				clearAddProductForm();
 			}
-			refreshInventoryTable();
-		}
-	});
+		});
+		btnNewButton_1.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
+		gbc_btnNewButton_1.anchor = GridBagConstraints.WEST;
+		gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 5);
+		gbc_btnNewButton_1.gridx = 2;
+		gbc_btnNewButton_1.gridy = 13;
+		panel_7.add(btnNewButton_1, gbc_btnNewButton_1);
+		
+			JPanel panel_editDetails = new JPanel();
+			
+	  tabbedPane_Inventory.addTab("Product Details", null, panel_editDetails, null);
+	  tabbedPane_Inventory.setEnabledAt(2, false);
+	  				
+	  				Border border = BorderFactory.createLineBorder(Color.gray);
+	  				panel_editDetails.setLayout(new BorderLayout(0, 0));
+	  				
+	  				JPanel jp_prodDetails = new JPanel();
+	  				panel_editDetails.add(jp_prodDetails, BorderLayout.WEST);
+	  				jp_prodDetails.setLayout(null);
+	  				jp_prodDetails.setPreferredSize(new Dimension(400, 600));
+	  				
+	  				JPanel jp_prodDetail = new JPanel();
+	  				jp_prodDetail.setBounds(12, 13, 376, 509);
+	  				jp_prodDetails.add(jp_prodDetail);
+	  				GridBagLayout gbl_jp_prodDetail = new GridBagLayout();
+	  				gbl_jp_prodDetail.columnWidths = new int[]{0, 15, 142, 0};
+	  				gbl_jp_prodDetail.rowHeights = new int[]{0, 30, 23, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 80, 0, 0, 0};
+	  				gbl_jp_prodDetail.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+	  				gbl_jp_prodDetail.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+	  				jp_prodDetail.setLayout(gbl_jp_prodDetail);
+	  				
+	  				dataProdID = new JLabel("0");
+	  				dataProdID.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  				GridBagConstraints gbc_dataProdID1 = new GridBagConstraints();
+	  				gbc_dataProdID1.anchor = GridBagConstraints.WEST;
+	  				gbc_dataProdID1.insets = new Insets(0, 0, 5, 0);
+	  				gbc_dataProdID1.gridx = 2;
+	  				gbc_dataProdID1.gridy = 2;
+	  				jp_prodDetail.add(dataProdID, gbc_dataProdID1);
+	  				
+	  				dataCat = new JTextArea((String) null);
+	  				dataCat.setBackground(SystemColor.control);
+	  				dataCat.setLineWrap(true);
+	  				dataCat.setEditable(false);
+	  				dataCat.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  				GridBagConstraints gbc_dataCat1 = new GridBagConstraints();
+	  				gbc_dataCat1.fill = GridBagConstraints.BOTH;
+	  				gbc_dataCat1.anchor = GridBagConstraints.WEST;
+	  				gbc_dataCat1.insets = new Insets(0, 0, 5, 0);
+	  				gbc_dataCat1.gridx = 2;
+	  				gbc_dataCat1.gridy = 3;
+	  				jp_prodDetail.add(dataCat, gbc_dataCat1);
+	  				
+	  				dataSubCat = new JTextArea((String) null);
+	  				dataSubCat.setBackground(SystemColor.control);
+	  				dataSubCat.setEditable(false);
+	  				dataSubCat.setLineWrap(true);
+	  				dataSubCat.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  				GridBagConstraints gbc_dataSubCat1 = new GridBagConstraints();
+	  				gbc_dataSubCat1.fill = GridBagConstraints.BOTH;
+	  				gbc_dataSubCat1.anchor = GridBagConstraints.NORTHWEST;
+	  				gbc_dataSubCat1.insets = new Insets(0, 0, 5, 0);
+	  				gbc_dataSubCat1.gridx = 2;
+	  				gbc_dataSubCat1.gridy = 4;
+	  				jp_prodDetail.add(dataSubCat, gbc_dataSubCat1);
+	  				
+	  				dataName = new JTextArea((String) null);
+	  				dataName.setEditable(false);
+	  				dataName.setLineWrap(true);
+	  				dataName.setBackground(SystemColor.control);
+	  				dataName.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  				GridBagConstraints gbc_dataName1 = new GridBagConstraints();
+	  				gbc_dataName1.fill = GridBagConstraints.BOTH;
+	  				gbc_dataName1.gridheight = 2;
+	  				gbc_dataName1.anchor = GridBagConstraints.NORTHWEST;
+	  				gbc_dataName1.insets = new Insets(0, 0, 5, 0);
+	  				gbc_dataName1.gridx = 2;
+	  				gbc_dataName1.gridy = 5;
+	  				jp_prodDetail.add(dataName, gbc_dataName1);
+	  				
+	  				dataDesc = new JTextArea((String) null);
+	  				dataDesc.setBackground(SystemColor.control);
+	  				dataDesc.setLineWrap(true);
+	  				dataDesc.setEditable(false);
+	  				dataDesc.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  				GridBagConstraints gbc_dataDesc1 = new GridBagConstraints();
+	  				gbc_dataDesc1.fill = GridBagConstraints.BOTH;
+	  				gbc_dataDesc1.anchor = GridBagConstraints.WEST;
+	  				gbc_dataDesc1.insets = new Insets(0, 0, 5, 0);
+	  				gbc_dataDesc1.gridx = 2;
+	  				gbc_dataDesc1.gridy = 7;
+	  				jp_prodDetail.add(dataDesc, gbc_dataDesc1);
+	  				
+	  					JLabel label_13 = new JLabel("Description :");
+	  					label_13.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_label_13 = new GridBagConstraints();
+	  					gbc_label_13.anchor = GridBagConstraints.NORTHEAST;
+	  					gbc_label_13.insets = new Insets(0, 0, 5, 5);
+	  					gbc_label_13.gridx = 0;
+	  					gbc_label_13.gridy = 7;
+	  					jp_prodDetail.add(label_13, gbc_label_13);
+	  					
+	  					dataQty = new JLabel("0");
+	  					dataQty.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_dataQty1 = new GridBagConstraints();
+	  					gbc_dataQty1.anchor = GridBagConstraints.WEST;
+	  					gbc_dataQty1.insets = new Insets(0, 0, 5, 0);
+	  					gbc_dataQty1.gridx = 2;
+	  					gbc_dataQty1.gridy = 8;
+	  					jp_prodDetail.add(dataQty, gbc_dataQty1);
+	  					
+	  					dataToBe = new JLabel("<dynamic>");
+	  					dataToBe.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_dataToBe = new GridBagConstraints();
+	  					gbc_dataToBe.anchor = GridBagConstraints.WEST;
+	  					gbc_dataToBe.insets = new Insets(0, 0, 5, 0);
+	  					gbc_dataToBe.gridx = 2;
+	  					gbc_dataToBe.gridy = 9;
+	  					jp_prodDetail.add(dataToBe, gbc_dataToBe);
+	  					
+	  					dataSalePrice = new JLabel("0.0");
+	  					dataSalePrice.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_dataSalePrice = new GridBagConstraints();
+	  					gbc_dataSalePrice.anchor = GridBagConstraints.WEST;
+	  					gbc_dataSalePrice.insets = new Insets(0, 0, 5, 0);
+	  					gbc_dataSalePrice.gridx = 2;
+	  					gbc_dataSalePrice.gridy = 10;
+	  					jp_prodDetail.add(dataSalePrice, gbc_dataSalePrice);
+	  					
+	  					// ================ labels =================
+	  					JLabel lblProductDetails = new JLabel("Product Details");
+	  					lblProductDetails.setFont(new Font("Tahoma", Font.PLAIN, 18));
+	  					GridBagConstraints gbc_lblProductDetails = new GridBagConstraints();
+	  					gbc_lblProductDetails.insets = new Insets(0, 0, 5, 5);
+	  					gbc_lblProductDetails.gridx = 0;
+	  					gbc_lblProductDetails.gridy = 0;
+	  					jp_prodDetail.add(lblProductDetails, gbc_lblProductDetails);
+	  					
+	  					JLabel label_9 = new JLabel("Product ID :");
+	  					label_9.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_label_9 = new GridBagConstraints();
+	  					gbc_label_9.anchor = GridBagConstraints.EAST;
+	  					gbc_label_9.insets = new Insets(0, 0, 5, 5);
+	  					gbc_label_9.gridx = 0;
+	  					gbc_label_9.gridy = 2;
+	  					jp_prodDetail.add(label_9, gbc_label_9);
+	  					
+	  					JLabel label_10 = new JLabel("Category :");
+	  					label_10.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  					GridBagConstraints gbc_label_10 = new GridBagConstraints();
+	  					gbc_label_10.anchor = GridBagConstraints.EAST;
+	  					gbc_label_10.insets = new Insets(0, 0, 5, 5);
+	  					gbc_label_10.gridx = 0;
+	  					gbc_label_10.gridy = 3;
+	  					jp_prodDetail.add(label_10, gbc_label_10);
+	  					
+	  						JLabel label_11 = new JLabel("Sub Category :");
+	  						label_11.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  						GridBagConstraints gbc_label_11 = new GridBagConstraints();
+	  						gbc_label_11.anchor = GridBagConstraints.EAST;
+	  						gbc_label_11.insets = new Insets(0, 0, 5, 5);
+	  						gbc_label_11.gridx = 0;
+	  						gbc_label_11.gridy = 4;
+	  						jp_prodDetail.add(label_11, gbc_label_11);
+	  						
+	  						JLabel label_12 = new JLabel("Name :");
+	  						label_12.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  						GridBagConstraints gbc_label_12 = new GridBagConstraints();
+	  						gbc_label_12.anchor = GridBagConstraints.EAST;
+	  						gbc_label_12.insets = new Insets(0, 0, 5, 5);
+	  						gbc_label_12.gridx = 0;
+	  						gbc_label_12.gridy = 5;
+	  						jp_prodDetail.add(label_12, gbc_label_12);
+	  						
+	  						JLabel label_14 = new JLabel("Quantity on Hand :");
+	  						label_14.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  						GridBagConstraints gbc_label_14 = new GridBagConstraints();
+	  						gbc_label_14.anchor = GridBagConstraints.EAST;
+	  						gbc_label_14.insets = new Insets(0, 0, 5, 5);
+	  						gbc_label_14.gridx = 0;
+	  						gbc_label_14.gridy = 8;
+	  						jp_prodDetail.add(label_14, gbc_label_14);
+	  						
+	  						JLabel label_15 = new JLabel("To be delivered :");
+	  						label_15.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  						GridBagConstraints gbc_label_15 = new GridBagConstraints();
+	  						gbc_label_15.anchor = GridBagConstraints.EAST;
+	  						gbc_label_15.insets = new Insets(0, 0, 5, 5);
+	  						gbc_label_15.gridx = 0;
+	  						gbc_label_15.gridy = 9;
+	  						jp_prodDetail.add(label_15, gbc_label_15);
+	  						
+	  							JLabel label_16 = new JLabel("Sale Price :");
+	  							label_16.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  							GridBagConstraints gbc_label_16 = new GridBagConstraints();
+	  							gbc_label_16.anchor = GridBagConstraints.EAST;
+	  							gbc_label_16.insets = new Insets(0, 0, 5, 5);
+	  							gbc_label_16.gridx = 0;
+	  							gbc_label_16.gridy = 10;
+	  							jp_prodDetail.add(label_16, gbc_label_16);
+	  							
 
+	  							
+	  							JLabel label_18 = new JLabel("Unit Cost :");
+	  							label_18.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  							GridBagConstraints gbc_label_18 = new GridBagConstraints();
+	  							gbc_label_18.anchor = GridBagConstraints.EAST;
+	  							gbc_label_18.insets = new Insets(0, 0, 5, 5);
+	  							gbc_label_18.gridx = 0;
+	  							gbc_label_18.gridy = 11;
+	  							jp_prodDetail.add(label_18, gbc_label_18);
+	  							
+	  							dataUnitCost = new JLabel("0.0");
+	  							dataUnitCost.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  							GridBagConstraints gbc_dataUnitCost = new GridBagConstraints();
+	  							gbc_dataUnitCost.insets = new Insets(0, 0, 5, 0);
+	  							gbc_dataUnitCost.anchor = GridBagConstraints.WEST;
+	  							gbc_dataUnitCost.gridx = 2;
+	  							gbc_dataUnitCost.gridy = 11;
+	  							jp_prodDetail.add(dataUnitCost, gbc_dataUnitCost);
+	  							
+	  							JButton btnUpdate = new JButton("Update Sale Price");
+	  							GridBagConstraints gbc_btnUpdate = new GridBagConstraints();
+	  							gbc_btnUpdate.insets = new Insets(0, 0, 5, 5);
+	  							gbc_btnUpdate.anchor = GridBagConstraints.EAST;
+	  							gbc_btnUpdate.gridx = 0;
+	  							gbc_btnUpdate.gridy = 12;
+	  							jp_prodDetail.add(btnUpdate, gbc_btnUpdate);
+	  							btnUpdate.addActionListener(new ActionListener() {
+	  								public void actionPerformed(ActionEvent e) {
+	  									updateIndividualSalePrice();
+	  									
+	  								}
+	  							});
+	  							
+	  							dataNewSalePrice = new JTextField();
+	  							GridBagConstraints gbc_dataNewSalePrice = new GridBagConstraints();
+	  							gbc_dataNewSalePrice.fill = GridBagConstraints.VERTICAL;
+	  							gbc_dataNewSalePrice.anchor = GridBagConstraints.WEST;
+	  							gbc_dataNewSalePrice.insets = new Insets(0, 0, 5, 0);
+	  							gbc_dataNewSalePrice.gridx = 2;
+	  							gbc_dataNewSalePrice.gridy = 12;
+	  							jp_prodDetail.add(dataNewSalePrice, gbc_dataNewSalePrice);
+	  							dataNewSalePrice.setColumns(15);
+	  							dataNewSalePrice.getDocument().addDocumentListener(docListener);
+	  							
+	  							JButton btnUpdateNote = new JButton("Update Note");
+	  							GridBagConstraints gbc_btnUpdateNote = new GridBagConstraints();
+	  							gbc_btnUpdateNote.insets = new Insets(0, 0, 5, 5);
+	  							gbc_btnUpdateNote.anchor = GridBagConstraints.NORTHEAST;
+	  							gbc_btnUpdateNote.gridx = 0;
+	  							gbc_btnUpdateNote.gridy = 14;
+	  							jp_prodDetail.add(btnUpdateNote, gbc_btnUpdateNote);
+	  							btnUpdateNote.addActionListener(new ActionListener() {
+	  								public void actionPerformed(ActionEvent e) {
+	  									
+	  									updateNote();
+	  								}
+	  							});
+	  							
+	  							JScrollPane scrollPane_4 = new JScrollPane();
+	  							GridBagConstraints gbc_scrollPane_4 = new GridBagConstraints();
+	  							gbc_scrollPane_4.fill = GridBagConstraints.BOTH;
+	  							gbc_scrollPane_4.insets = new Insets(0, 0, 5, 0);
+	  							gbc_scrollPane_4.gridx = 2;
+	  							gbc_scrollPane_4.gridy = 14;
+	  							jp_prodDetail.add(scrollPane_4, gbc_scrollPane_4);
+	  							
+	  							dataNote = new JTextArea();
+	  							scrollPane_4.setViewportView(dataNote);
+	  							dataNote.setText((String) null);
+	  							dataNote.setLineWrap(true);
+	  							dataNote.setBorder(border);
+	  							
+	  							JButton btnBackToInventory = new JButton("Back to Inventory");
+	  							btnBackToInventory.addActionListener(new ActionListener() {
+	  								public void actionPerformed(ActionEvent e) {
 
+	  											tabbedPane_Inventory.setSelectedIndex(0);
 
+	  								}
+	  							});
+	  							btnBackToInventory.setHorizontalAlignment(SwingConstants.RIGHT);
+	  							GridBagConstraints gbc_btnBackToInventory = new GridBagConstraints();
+	  							gbc_btnBackToInventory.fill = GridBagConstraints.BOTH;
+	  							gbc_btnBackToInventory.anchor = GridBagConstraints.EAST;
+	  							gbc_btnBackToInventory.insets = new Insets(0, 0, 0, 5);
+	  							gbc_btnBackToInventory.gridx = 0;
+	  							gbc_btnBackToInventory.gridy = 16;
+	  							jp_prodDetail.add(btnBackToInventory, gbc_btnBackToInventory);
+	  								  				
+	  								  				JPanel jp_editDetailCenter = new JPanel();
+	  								  				panel_editDetails.add(jp_editDetailCenter, BorderLayout.CENTER);
+	  								  				jp_editDetailCenter.setLayout(new BorderLayout(0, 0));
+	  								  				
+	  								  				JPanel jp_priceHistory = new JPanel();
+	  								  				jp_editDetailCenter.add(jp_priceHistory, BorderLayout.CENTER);
+	  								  				jp_priceHistory.setLayout(new BorderLayout(5, 5));
+	  								  				
+	  								  				JPanel panel_10 = new JPanel();
+	  								  				FlowLayout flowLayout_6 = (FlowLayout) panel_10.getLayout();
+	  								  				flowLayout_6.setAlignment(FlowLayout.LEFT);
+	  								  				jp_priceHistory.add(panel_10, BorderLayout.NORTH);
+	  								  				
+	  								  				JLabel lblPriceChangeHistory = new JLabel("Price Change History :");
+	  								  				panel_10.add(lblPriceChangeHistory);
+	  								  				lblPriceChangeHistory.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  								  				
+	  								  				JScrollPane scrollPane_1 = new JScrollPane();
+	  								  				jp_priceHistory.add(scrollPane_1, BorderLayout.CENTER);
+	  								  				
+	  								  				inv_priceHisTable = new JTable();
+	  								  				scrollPane_1.setViewportView(inv_priceHisTable);
+	  								  				
+	  								  				JPanel jp_supAssociation = new JPanel();
+	  								  				jp_editDetailCenter.add(jp_supAssociation, BorderLayout.NORTH);
+	  								  				jp_supAssociation.setLayout(new BorderLayout(5, 5));
+	  								  				jp_supAssociation.setPreferredSize(new Dimension(200, 200));
+	  								  				
+	  								  				JPanel panel_8 = new JPanel();
+	  								  				FlowLayout flowLayout_5 = (FlowLayout) panel_8.getLayout();
+	  								  				flowLayout_5.setAlignment(FlowLayout.LEFT);
+	  								  				jp_supAssociation.add(panel_8, BorderLayout.NORTH);
+	  								  				
+	  								  				JLabel lblThisItemIs = new JLabel("Suppliers who sell this item :");
+	  								  				panel_8.add(lblThisItemIs);
+	  								  				lblThisItemIs.setFont(new Font("Tahoma", Font.PLAIN, 15));
+	  								  				
+	  								  				JPanel panel_9 = new JPanel();
+	  								  				FlowLayout flowLayout_4 = (FlowLayout) panel_9.getLayout();
+	  								  				flowLayout_4.setAlignment(FlowLayout.LEFT);
+	  								  				jp_supAssociation.add(panel_9, BorderLayout.SOUTH);
+	  								  				
+	  								  				simpleSupList = new JComboBox<CbSupItem>();
+	  								  				panel_9.add(simpleSupList);
+	  								  				simpleSupList.setPreferredSize(new Dimension(200, 25));
+	  								  				
+	  								  				JButton btn_associateSup = new JButton("Associate Supplier");
+	  								  				panel_9.add(btn_associateSup);
+	  								  				
+	  								  				JScrollPane scrollPane = new JScrollPane();
+	  								  				jp_supAssociation.add(scrollPane, BorderLayout.CENTER);
+	  								  				
+	  								  				inv_soldByTable = new JTable();
+	  								  				scrollPane.setViewportView(inv_soldByTable);
+	  								  				btn_associateSup.addActionListener(new ActionListener() {
+	  								  					public void actionPerformed(ActionEvent e) {
+	  								  						
+	  								  					associateSupplier();
+	  								  					
+	  								  					}
+	  								  				});
+	  				
+		
 
-JPanel panel_3 = new JPanel();
-	   panel_3.setBounds(159, 72, 445, 357);
 		
-	 
-	  panel_Inv_EditDetails.add(panel_3);
-	   
-	  tabbedPane_Inventory.addTab("Edit Details", null, panel_Inv_EditDetails, null);
+		
 
 		
-
-		GridBagLayout gbl_panel_3 = new GridBagLayout();
-		gbl_panel_3.columnWeights = new double[]{0.0, 0.0, 1.0};
-		gbl_panel_3.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		panel_3.setLayout(gbl_panel_3);
-		
-		JLabel label_Edit_ID = new JLabel("ID");
-		GridBagConstraints gbc_label_Edit_ID = new GridBagConstraints();
-		gbc_label_Edit_ID.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_ID.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_ID.gridx = 1;
-		gbc_label_Edit_ID.gridy = 0;
-		panel_3.add(label_Edit_ID, gbc_label_Edit_ID);
-		
-		edit_prodID_tf = new JTextField();
-		edit_prodID_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditID = new GridBagConstraints();
-		gbc_tfEditID.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditID.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditID.gridx = 2;
-		gbc_tfEditID.gridy = 0;
-		panel_3.add(edit_prodID_tf, gbc_tfEditID);
-		
-		JLabel label_Edit_Name = new JLabel("Name");
-		GridBagConstraints gbc_label_Edit_Name = new GridBagConstraints();
-		gbc_label_Edit_Name.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_Name.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_Name.gridx = 1;
-		gbc_label_Edit_Name.gridy = 1;
-		panel_3.add(label_Edit_Name, gbc_label_Edit_Name);
-		
-		edit_prodName_tf = new JTextField();
-		edit_prodName_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditName = new GridBagConstraints();
-		gbc_tfEditName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_tfEditName.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditName.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditName.gridx = 2;
-		gbc_tfEditName.gridy = 1;
-		panel_3.add(edit_prodName_tf, gbc_tfEditName);
-		
-		JLabel label_Edit_Desc = new JLabel("Description");
-		GridBagConstraints gbc_label_Edit_Desc = new GridBagConstraints();
-		gbc_label_Edit_Desc.fill = GridBagConstraints.HORIZONTAL;
-		gbc_label_Edit_Desc.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_Desc.gridx = 1;
-		gbc_label_Edit_Desc.gridy = 2;
-		panel_3.add(label_Edit_Desc, gbc_label_Edit_Desc);
-		
-		edit_prodDesc_tf = new JTextField(); 
-		edit_prodDesc_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditDescription = new GridBagConstraints();
-		gbc_tfEditDescription.fill = GridBagConstraints.HORIZONTAL;
-		gbc_tfEditDescription.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditDescription.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditDescription.gridx = 2;
-		gbc_tfEditDescription.gridy = 2;
-		panel_3.add(edit_prodDesc_tf, gbc_tfEditDescription);
-		
-		JLabel label_Edit_Quantity = new JLabel("Quantity");
-		GridBagConstraints gbc_label_Edit_Quantity = new GridBagConstraints();
-		gbc_label_Edit_Quantity.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_Quantity.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_Quantity.gridx = 1;
-		gbc_label_Edit_Quantity.gridy = 3;
-		panel_3.add(label_Edit_Quantity, gbc_label_Edit_Quantity);
-		
-		edit_prodQty_tf = new JTextField();
-		edit_prodQty_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditQuantity = new GridBagConstraints();
-		gbc_tfEditQuantity.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditQuantity.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditQuantity.gridx = 2;
-		gbc_tfEditQuantity.gridy = 3;
-		panel_3.add(edit_prodQty_tf, gbc_tfEditQuantity);
-		
-		JLabel label_Edit_Category = new JLabel("CategoryID");
-		GridBagConstraints gbc_label_Edit_Category = new GridBagConstraints();
-		gbc_label_Edit_Category.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_Category.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_Category.gridx = 1;
-		gbc_label_Edit_Category.gridy = 4;
-		panel_3.add(label_Edit_Category, gbc_label_Edit_Category);
-		
-		edit_prodCatID_tf = new JTextField();
-		edit_prodCatID_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditCategoryID = new GridBagConstraints();
-		gbc_tfEditCategoryID.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditCategoryID.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditCategoryID.gridx = 2;
-		gbc_tfEditCategoryID.gridy = 4;
-		panel_3.add(edit_prodCatID_tf, gbc_tfEditCategoryID);
-		
-		JLabel label_Edit_SubCategory = new JLabel("SubCategoryID");
-		GridBagConstraints gbc_label_Edit_SubCategory = new GridBagConstraints();
-		gbc_label_Edit_SubCategory.fill = GridBagConstraints.HORIZONTAL;
-		gbc_label_Edit_SubCategory.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_SubCategory.gridx = 1;
-		gbc_label_Edit_SubCategory.gridy = 5;
-		panel_3.add(label_Edit_SubCategory, gbc_label_Edit_SubCategory);
-		
-		edit_prodSubCatID_tf = new JTextField();
-		edit_prodSubCatID_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditSubCategoryID = new GridBagConstraints();
-		gbc_tfEditSubCategoryID.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditSubCategoryID.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditSubCategoryID.gridx = 2;
-		gbc_tfEditSubCategoryID.gridy = 5;
-		panel_3.add(edit_prodSubCatID_tf, gbc_tfEditSubCategoryID);
-		
-		/*
-		JLabel label_Edit_UnitCost = new JLabel("Unit Cost");
-		GridBagConstraints gbc_label_Edit_UnitCost = new GridBagConstraints();
-		gbc_label_Edit_UnitCost.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_UnitCost.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_UnitCost.gridx = 1;
-		gbc_label_Edit_UnitCost.gridy = 6;
-		panel_3.add(label_Edit_UnitCost, gbc_label_Edit_UnitCost);
-		*/
-		//tfEditUnitCost = new JTextField();
-		//tfEditUnitCost.setColumns(10);
-		//GridBagConstraints gbc_tfEditUnitCost = new GridBagConstraints();
-		//gbc_tfEditUnitCost.anchor = GridBagConstraints.NORTHWEST;
-		//gbc_tfEditUnitCost.insets = new Insets(0, 0, 5, 0);
-		//gbc_tfEditUnitCost.gridx = 2;
-		//gbc_tfEditUnitCost.gridy = 6;
-		//panel_3.add(tfEditUnitCost, gbc_tfEditUnitCost);
-		
-		JLabel label_Edit_SalePrice = new JLabel("Sale Price");
-		GridBagConstraints gbc_label_Edit_SalePrice = new GridBagConstraints();
-		gbc_label_Edit_SalePrice.fill = GridBagConstraints.HORIZONTAL;
-		gbc_label_Edit_SalePrice.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_SalePrice.gridx = 1;
-		gbc_label_Edit_SalePrice.gridy = 7;
-		panel_3.add(label_Edit_SalePrice, gbc_label_Edit_SalePrice);
-		
-		edit_prodSalePrice_tf = new JTextField();
-		edit_prodSalePrice_tf.setColumns(10);
-		GridBagConstraints gbc_tfEditSalePrice = new GridBagConstraints();
-		gbc_tfEditSalePrice.anchor = GridBagConstraints.NORTHWEST;
-		gbc_tfEditSalePrice.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditSalePrice.gridx = 2;
-		gbc_tfEditSalePrice.gridy = 7;
-		panel_3.add(edit_prodSalePrice_tf, gbc_tfEditSalePrice);
-		/*
-		JLabel label_Edit_SupplierID = new JLabel("Supplier ID");
-		GridBagConstraints gbc_label_Edit_SupplierID = new GridBagConstraints();
-		gbc_label_Edit_SupplierID.fill = GridBagConstraints.HORIZONTAL;
-		gbc_label_Edit_SupplierID.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_SupplierID.gridx = 1;
-		gbc_label_Edit_SupplierID.gridy = 8;
-		panel_3.add(label_Edit_SupplierID, gbc_label_Edit_SupplierID);
-		*/
-		
-		/*
-		tfEditSupplierID = new JTextField();
-		tfEditSupplierID.setText("");
-		tfEditSupplierID.setColumns(10);
-		GridBagConstraints gbc_tfEditSupplierID = new GridBagConstraints();
-		gbc_tfEditSupplierID.anchor = GridBagConstraints.SOUTHWEST;
-		gbc_tfEditSupplierID.insets = new Insets(0, 0, 5, 0);
-		gbc_tfEditSupplierID.gridx = 2;
-		gbc_tfEditSupplierID.gridy = 8;
-		panel_3.add(tfEditSupplierID, gbc_tfEditSupplierID);
-		*/
-		JLabel label_Edit_Notes = new JLabel("Notes");
-		GridBagConstraints gbc_label_Edit_Notes = new GridBagConstraints();
-		gbc_label_Edit_Notes.anchor = GridBagConstraints.WEST;
-		gbc_label_Edit_Notes.insets = new Insets(0, 0, 5, 5);
-		gbc_label_Edit_Notes.gridx = 1;
-		gbc_label_Edit_Notes.gridy = 9;
-		panel_3.add(label_Edit_Notes, gbc_label_Edit_Notes);
-		
-		edit_prodNotes_tf = new JTextField();
-		GridBagConstraints gbc_textEditNotes = new GridBagConstraints();
-		gbc_textEditNotes.gridheight = 2;
-		gbc_textEditNotes.fill = GridBagConstraints.BOTH;
-		gbc_textEditNotes.gridx = 2;
-		gbc_textEditNotes.gridy = 9;
-		panel_3.add(edit_prodNotes_tf, gbc_textEditNotes);
-		edit_prodNotes_tf.setColumns(10);
-		
-		
-		
-		// ============== Create Order page =======================================================
+		///der page =======================================================
 		// ========================================================================================
 		
 		JPanel jp_createOrder = new JPanel();
 		tabbedPane_Inventory.addTab("Create Order", null, jp_createOrder, null);
+		tabbedPane_Inventory.setEnabledAt(3, false);
+		
 		jp_createOrder.setLayout(new BorderLayout(0, 0));
+		
 		
 		JPanel jp_createOrder_north = new JPanel();
 		jp_createOrder.add(jp_createOrder_north, BorderLayout.NORTH);
@@ -1164,41 +1456,216 @@ JPanel panel_3 = new JPanel();
 		
 		ord_Sup_cb.setRenderer(new CbSupListRenderer());
 		
+		JPanel jp_createOrder_center = new JPanel();
+		jp_createOrder.add(jp_createOrder_center, BorderLayout.CENTER);
+		jp_createOrder_center.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_12 = new JPanel();
+		jp_createOrder_center.add(panel_12, BorderLayout.EAST);
+		jp_createOrder_center.add(scrollPane_ceateOrder);
+		
+		JPanel panel_5 = new JPanel();
+		panel_5.setPreferredSize(new Dimension(10, 70));
+		scrollPane_ceateOrder.setColumnHeaderView(panel_5);
+		jp_createOrder_center.setMinimumSize(new Dimension(100, 700));
+		
+		
+		JPanel jp_createOrder_east = new JPanel();
+		jp_createOrder.add(jp_createOrder_east, BorderLayout.EAST);
+		jp_createOrder_east.setLayout(new BorderLayout(0, 0));
+		jp_createOrder_east.setPreferredSize(new Dimension(300, 100));
+		
+		JPanel panel_1 = new JPanel();
+		FlowLayout flowLayout_1 = (FlowLayout) panel_1.getLayout();
+		flowLayout_1.setAlignment(FlowLayout.LEFT);
+		jp_createOrder_east.add(panel_1, BorderLayout.NORTH);
+		panel_1.setPreferredSize(new Dimension(100, 70));
+		
 		JButton btn_createOrder = new JButton("Create Order");
+		btn_createOrder.setHorizontalAlignment(SwingConstants.LEFT);
+		panel_1.add(btn_createOrder);
 		btn_createOrder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 			//stop editing otherwise null may be assigend to order quanitity
-			if(table_createOrder.isEditing()){
-				table_createOrder.getCellEditor().stopCellEditing();
-			}
-				//call displayOrderSheet() function
-				displayOrderSheet();
+				if (table_createOrder != null ){
+								if(table_createOrder.isEditing()){
+					table_createOrder.getCellEditor().stopCellEditing();
+								}
+					//call displayOrderSheet() function
+					createOrderAndOrderDetail();
+				}
 				
 			} //end of action performed
 		});
 		
-		
-		jp_createOrder_north.add(btn_createOrder);
-		
-		JPanel jp_createOrder_center = new JPanel();
-		jp_createOrder.add(jp_createOrder_center, BorderLayout.CENTER);
-		jp_createOrder_center.setLayout(new BorderLayout(0, 0));
-		jp_createOrder_center.add(scrollPane_ceateOrder);
-		jp_createOrder_center.setMinimumSize(new Dimension(100, 700));
-		
-		
-		JPanel jp_createOrder_south = new JPanel();
-		jp_createOrder.add(jp_createOrder_south, BorderLayout.SOUTH);
-		jp_createOrder_south.setLayout(new BorderLayout(0, 0));
-		
 		JLabel lblNewLabel = new JLabel("Orders less than minimum order may be rejected");
+		panel_1.add(lblNewLabel);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		jp_createOrder_south.add(lblNewLabel, BorderLayout.NORTH);
-		jp_createOrder_south.add(scrollPane_createOrderSummary);
+		jp_createOrder_east.add(scrollPane_createOrderSummary);
 		scrollPane_createOrderSummary.setViewportView(table_createOrderSummary);
 		
 		scrollPane_createOrderSummary.setPreferredSize(new Dimension(200,200));
+		
+		JPanel jp_orderList = new JPanel();
+		tabbedPane_Inventory.addTab("OrderList", null, jp_orderList, null);
+		jp_orderList.setLayout(new BorderLayout(0, 0));
+		
+		JPanel jpOrderListNorth = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) jpOrderListNorth.getLayout();
+		jp_orderList.add(jpOrderListNorth, BorderLayout.NORTH);
+		jpOrderListNorth.setPreferredSize(new Dimension(50, 20));
+	
+		
+		JPanel jpOrderListWest = new JPanel();
+		jp_orderList.add(jpOrderListWest, BorderLayout.WEST);
+		jpOrderListWest.setLayout(new BorderLayout(5, 5));
+		
+		JPanel panel_6 = new JPanel();
+		jpOrderListWest.add(panel_6, BorderLayout.WEST);
+		
+		JPanel panel_2 = new JPanel();
+		jpOrderListWest.add(panel_2, BorderLayout.EAST);
+		
+		JLabel lblOrderList = new JLabel("Order List");
+		FlowLayout flowLayout_2 = (FlowLayout) panel_3.getLayout();
+		flowLayout_2.setHgap(10);
+		flowLayout_2.setAlignment(FlowLayout.LEFT);
+		jpOrderListWest.add(panel_3, BorderLayout.NORTH);
+		panel_3.add(lblOrderList);
+		lblOrderList.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		
+		JLabel lblNewLabel_2 = new JLabel("( double click an order to display details)");
+		panel_3.add(lblNewLabel_2);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		jpOrderListWest.add(scrollPane_2, BorderLayout.CENTER);
+		
+		inv_orderListTable = new JTable();
+		scrollPane_2.setViewportView(inv_orderListTable);
+		
+		JPanel jpOrderListCenter = new JPanel();
+		jp_orderList.add(jpOrderListCenter, BorderLayout.CENTER);
+		jpOrderListCenter.setLayout(new BorderLayout(5, 5));
+		
+		JPanel panel_4 = new JPanel();
+		jpOrderListCenter.add(panel_4, BorderLayout.NORTH);
+		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.X_AXIS));
+		
+		JPanel panel_11 = new JPanel();
+		panel_11.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		panel_4.add(panel_11);
+		panel_11.setPreferredSize(new Dimension(320, 110));
+		GridBagLayout gbl_panel_11 = new GridBagLayout();
+		gbl_panel_11.columnWidths = new int[]{20, 84, 100, 20, 10, 20, 30, 0, 0, 0};
+		gbl_panel_11.rowHeights = new int[]{10, 0, 25, 20, 0};
+		gbl_panel_11.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_11.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_11.setLayout(gbl_panel_11);
+		
+		JLabel lblInvoiceNumber = new JLabel("Invoice #");
+		GridBagConstraints gbc_lblInvoiceNumber = new GridBagConstraints();
+		gbc_lblInvoiceNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInvoiceNumber.gridx = 3;
+		gbc_lblInvoiceNumber.gridy = 1;
+		panel_11.add(lblInvoiceNumber, gbc_lblInvoiceNumber);
+		lblInvoiceNumber.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblInvoiceNumber.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JLabel lblNewLabel_1 = new JLabel("Other Cost");
+		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_1.gridx = 5;
+		gbc_lblNewLabel_1.gridy = 1;
+		panel_11.add(lblNewLabel_1, gbc_lblNewLabel_1);
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblNewLabel_1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		dataInvoiceNumber = new JTextField();
+		GridBagConstraints gbc_dataInvoiceNumber = new GridBagConstraints();
+		gbc_dataInvoiceNumber.fill = GridBagConstraints.BOTH;
+		gbc_dataInvoiceNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_dataInvoiceNumber.gridx = 3;
+		gbc_dataInvoiceNumber.gridy = 2;
+		panel_11.add(dataInvoiceNumber, gbc_dataInvoiceNumber);
+		dataInvoiceNumber.setColumns(7);
+		
+		dataDeliveryCost = new JTextField();
+		GridBagConstraints gbc_dataDeliveryCost = new GridBagConstraints();
+		gbc_dataDeliveryCost.fill = GridBagConstraints.BOTH;
+		gbc_dataDeliveryCost.insets = new Insets(0, 0, 5, 5);
+		gbc_dataDeliveryCost.gridx = 5;
+		gbc_dataDeliveryCost.gridy = 2;
+		panel_11.add(dataDeliveryCost, gbc_dataDeliveryCost);
+		dataDeliveryCost.setColumns(7);
+		dataDeliveryCost.setPreferredSize(new Dimension(40, 25));
+		
+		JLabel lblOrderDetails = new JLabel("Order Details");
+		GridBagConstraints gbc_lblOrderDetails = new GridBagConstraints();
+		gbc_lblOrderDetails.anchor = GridBagConstraints.SOUTHWEST;
+		gbc_lblOrderDetails.insets = new Insets(0, 0, 0, 5);
+		gbc_lblOrderDetails.gridx = 1;
+		gbc_lblOrderDetails.gridy = 3;
+		panel_11.add(lblOrderDetails, gbc_lblOrderDetails);
+		lblOrderDetails.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		lblOrderDetails.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		
+		JButton btnUpdate_2 = new JButton("Update #");
+		GridBagConstraints gbc_btnUpdate_2 = new GridBagConstraints();
+		gbc_btnUpdate_2.fill = GridBagConstraints.BOTH;
+		gbc_btnUpdate_2.insets = new Insets(0, 0, 0, 5);
+		gbc_btnUpdate_2.gridx = 3;
+		gbc_btnUpdate_2.gridy = 3;
+		panel_11.add(btnUpdate_2, gbc_btnUpdate_2);
+		btnUpdate_2.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnUpdate_2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JButton btnNewButton = new JButton("Distribute");
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.fill = GridBagConstraints.BOTH;
+		gbc_btnNewButton.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNewButton.gridx = 5;
+		gbc_btnNewButton.gridy = 3;
+		panel_11.add(btnNewButton, gbc_btnNewButton);
+		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnNewButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		JButton btnUpdate_1 = new JButton("Update Order");
+		btnUpdate_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnUpdate_1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnUpdate_1.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		btnUpdate_1.setVerticalAlignment(SwingConstants.BOTTOM);
+		GridBagConstraints gbc_btnUpdate_1 = new GridBagConstraints();
+		gbc_btnUpdate_1.fill = GridBagConstraints.BOTH;
+		gbc_btnUpdate_1.anchor = GridBagConstraints.SOUTH;
+		gbc_btnUpdate_1.insets = new Insets(0, 0, 0, 5);
+		gbc_btnUpdate_1.gridx = 7;
+		gbc_btnUpdate_1.gridy = 3;
+		panel_11.add(btnUpdate_1, gbc_btnUpdate_1);
+		btnUpdate_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				updateOrderDetail();
+			}
+		});
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				distributeDeliveryCost();
+			}
+		});
+		btnUpdate_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				updateInvoiceID();
+			}
+		});
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		jpOrderListCenter.add(scrollPane_3, BorderLayout.CENTER);
+		
+		inv_orderDetailTable = new JTable();
+		scrollPane_3.setViewportView(inv_orderDetailTable);
 
 		
 
@@ -1216,6 +1683,17 @@ JPanel panel_3 = new JPanel();
         }
         return true;
     }
+    public boolean validateStrToDouble(String s){
+        try { 
+            Double.parseDouble(s); 
+        } catch(NumberFormatException e) { 
+            return false; 
+        } catch(NullPointerException e) {
+            return false;
+        }
+        return true;
+    }
+    
 	public boolean validateProdID(String id){
 		if(id.length() != 8) return false;
 		for(int i = 0; i < id.length(); i++)
@@ -1234,26 +1712,23 @@ JPanel panel_3 = new JPanel();
 			return false;
 		}
 	}
-	
-	public boolean validateDouble(String value){
+	public static boolean validateDouble(String value){
 	try{
 		Double.parseDouble(value);
 		return true;
 		} catch (NumberFormatException ne){
 			return false;
 		}
-	}
-	
+	} //-----------------------------------
 	public boolean validateStringSize(String value, int max){
 		if(value.length() > max ) return false;
 		return true;
-	}
-
+	}//------------------------------------
 	public void fillComboBoxCategory(JComboBox<CbCategoryItem> cb){ //*********************************************
 	try{
-		con_Invoice = Connect.connectionSetup();
+		con_Inv = Connect.connectionSetup();
 		String query = "Select ID, Name FROM category WHERE ParentID is NULL ORDER BY Name";
-		PreparedStatement pst = con_Invoice.prepareStatement(query);
+		PreparedStatement pst = con_Inv.prepareStatement(query);
 		ResultSet rs = pst.executeQuery();
 		
 		CbCategoryItem firstItem = new CbCategoryItem(0, "-- Please select Category --");
@@ -1271,9 +1746,8 @@ JPanel panel_3 = new JPanel();
 				//	cbCategory.addItem(item);
 				//  }	
 		} 
-
 		
-		con_Invoice.close();
+		con_Inv.close();
 		pst.close();
 		rs.close();
 		
@@ -1281,93 +1755,168 @@ JPanel panel_3 = new JPanel();
 	}catch (Exception e){
 		e.printStackTrace();
 	}
-	}// end of fillComboBoxCategory()
-	
+	}// end of fillComboBoxCategory()-----------------------------
 	public Vector<Integer> getSelectedRows(){//*********************************************
 	Vector<Integer> selectedRows = new Vector<Integer>();
 	int rowCount = 	table_inventoryList.getRowCount();
-	for(int i = 0; i < rowCount; i++)
-	{
-	if(table_inventoryList.getValueAt(i, 0) == Boolean.TRUE)
-	{
-		selectedRows.add((Integer) table_inventoryList.getValueAt(i, 1));
-	}
-	}
+		for(int i = 0; i < rowCount; i++)
+		{
+			if(table_inventoryList.getValueAt(i, 0) == Boolean.TRUE)
+				{
+					selectedRows.add((Integer) table_inventoryList.getValueAt(i, 1));
+				}
+		}
 	return selectedRows;
-	}
-	
+	}//--------------------------------
 	public void jumpToEditPage(int ID){//*********************************************
 	
-	try{
-	con_Invoice = Connect.connectionSetup();
-	String query = "Select * from Product Where ID = "+ ID;
-	PreparedStatement pst = con_Invoice.prepareStatement(query);
-	ResultSet rs = pst.executeQuery();
-	if(rs.next())
-	{
-		edit_prodID_tf.setText(Integer.toString(rs.getInt("ID")));
-		edit_prodName_tf.setText(rs.getString("Name"));
-		edit_prodDesc_tf.setText(rs.getString("Description"));
-		edit_prodQty_tf.setText(Integer.toString(rs.getInt("Quantity")));
-		edit_prodCatID_tf.setText(Integer.toString(rs.getInt("CategoryID")));
-		edit_prodSubCatID_tf.setText(Integer.toString(rs.getInt("SubCategoryID")));
-		//tfEditUnitCost.setText(Integer.toString(rs.getInt("UnitCost")));
-		edit_prodSalePrice_tf.setText(Integer.toString(rs.getInt("SalePrice")));
-		//tfEditSupplierID.setText(Integer.toString(rs.getInt("SupplierID")));
-		edit_prodNotes_tf.setText(rs.getString("Notes"));
-								
-		pst.close();
-		rs.close();
-		con_Invoice.close();
-		tabbedPane_Inventory.setSelectedIndex(2); //open Edit panel
+		/*
+		try{
+		con_Inv = Connect.connectionSetup();
+		String query = "Select * from Product Where ID = "+ ID;
+		PreparedStatement pst = con_Inv.prepareStatement(query);
+		ResultSet rs = pst.executeQuery();
+			if(rs.next())
+			{
+				edit_prodID_tf.setText(Integer.toString(rs.getInt("ID")));
+				edit_prodName_tf.setText(rs.getString("Name"));
+				edit_prodDesc_tf.setText(rs.getString("Description"));
+				edit_prodQty_tf.setText(Integer.toString(rs.getInt("Quantity")));
+				edit_prodCatID_tf.setText(Integer.toString(rs.getInt("CategoryID")));
+				edit_prodSubCatID_tf.setText(Integer.toString(rs.getInt("SubCategoryID")));
+				//tfEditUnitCost.setText(Integer.toString(rs.getInt("UnitCost")));
+				edit_prodSalePrice_tf.setText(Integer.toString(rs.getInt("SalePrice")));
+				//tfEditSupplierID.setText(Integer.toString(rs.getInt("SupplierID")));
+				edit_prodNotes_tf.setText(rs.getString("Notes"));
+										
+				pst.close();
+				rs.close();
+				con_Inv.close();
+				tabbedPane_Inventory.setSelectedIndex(2); //open Edit panel
+			
+			}
+		}catch (Exception ex){  ex.printStackTrace(); 	}
+	*/
+	} //---------------------------------
 	
-	}
-	}catch (Exception ex){  ex.printStackTrace(); 	}
 	
-	}
+	public void updateBulkSalePrice(int step) {
+		
+		if (step == 1){
+			//first step is to update table to include new sale price column 
+			refreshInventoryTable(2);
+
+		} else if (step == 2){
+			//next step is to update database based on the user input
+			
+		    int response = JOptionPane.showConfirmDialog(null, "Do you want to update sale price?", "Confirm Update",
+		            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		        if (response == JOptionPane.NO_OPTION) {
+		          
+		        } else if (response == JOptionPane.CLOSED_OPTION) {
+		          
+		        } else if (response == JOptionPane.YES_OPTION) {
+		          
+		        
+		    int count=0;
+		    Vector<Integer> prodIDs = new Vector<Integer>();
+			for(int i = 0; i < table_inventoryList.getRowCount(); i++){
+
+				try {
+					con_Inv = Connect.connectionSetup();
+					String query = "";
+				
+						if ( table_inventoryList.getValueAt(i, 11) != null){
+							
+						double newSalPrice = Double.parseDouble( (String) table_inventoryList.getValueAt(i, 11) );
+						double curUniPrice = (double) table_inventoryList.getValueAt(i, 9)  ;
+						int prodID = (int)table_inventoryList.getValueAt(i, 1);
+					
+							if (newSalPrice > curUniPrice){
+								query = "Update Product Set SalePrice = " + newSalPrice + " WHERE ID = " + prodID ;
+								PreparedStatement pst = con_Inv.prepareStatement(query);
+								pst.executeUpdate();
+								count++;
+								prodIDs.addElement(prodID);
+							}
+						} // end of If new sale price is not Null 
+						
+						con_Inv.close();
+						
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			} // end of for loop
+			
+				if(count > 0) { 
+				JOptionPane.showMessageDialog(null, "Sale Price updated");
+			}else {
+				JOptionPane.showMessageDialog(null, "No data has been updated");
+			}
+			
+				
+				refreshInventoryTable(1);
+				Iterator it = prodIDs.iterator();
+				while(it.hasNext()){
+					int id = (int) it.next();
+					for(int i = 0; i < table_inventoryList.getRowCount() ; i++){
+						if(id == (int) table_inventoryList.getValueAt(i, 1) ){
+							table_inventoryList.addRowSelectionInterval(i, i);
+						}
+					}
+				}
+			
+			} // end of Yes Option
+						
+
+			}// end of step 2
+
+	}// end of function
 	
 	public static void filterByMultiColumn2(){//********************************************
 		RowFilter<MyTableModelClass,Object> rf = null;
 		List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>(2);
 
-		filters.add(RowFilter.regexFilter(".*"+filter.getID().getText()+".*",1));
-		filters.add(RowFilter.regexFilter(".*"+filter.getCategory().getText()+".*", 2));
-		filters.add(RowFilter.regexFilter(".*"+filter.getSubCategory().getText()+".*", 3));
-		filters.add(RowFilter.regexFilter(".*"+filter.getProdName().getText()+".*", 4));
-		filters.add(RowFilter.regexFilter(".*"+filter.getDesc().getText()+".*", 5));
-		filters.add(RowFilter.regexFilter(".*"+filter.getNote().getText()+".*", 8));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getID().getText()+".*",1));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getCategory().getText()+".*", 2));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getSubCategory().getText()+".*", 3));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getProdName().getText()+".*", 4));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getDesc().getText()+".*", 5));
+		filters.add(RowFilter.regexFilter(".*"+filterFrame.getNote().getText()+".*", 8));
 		
-		if (!filter.getQtyGt().getText().isEmpty() ){
-	    String gt = filter.getQtyGt().getText().trim();
+		if (!filterFrame.getQtyGt().getText().isEmpty() ){
+	    String gt = filterFrame.getQtyGt().getText().trim();
 		filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(gt), 6));
 		}
-		if (!filter.getQtyLt().getText().isEmpty() ){
-		String lt = filter.getQtyLt().getText().trim();
+		if (!filterFrame.getQtyLt().getText().isEmpty() ){
+		String lt = filterFrame.getQtyLt().getText().trim();
 		filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(lt), 6));
 		}
-		if (!filter.getSaleGt().getText().isEmpty() ){
-		String gt = filter.getSaleGt().getText().trim();
+		if (!filterFrame.getSaleGt().getText().isEmpty() ){
+		String gt = filterFrame.getSaleGt().getText().trim();
 		filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(gt), 8));
 		}
-		if (!filter.getSaleLt().getText().isEmpty() ){
-		String lt = filter.getSaleLt().getText().trim();
+		if (!filterFrame.getSaleLt().getText().isEmpty() ){
+		String lt = filterFrame.getSaleLt().getText().trim();
 		filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(lt), 8));
 		}
 		
 		rf = RowFilter.andFilter(filters);
 		sorter.setRowFilter(rf);
+
 		
 		if(
-				filter.getID().getText().isEmpty() &&
-				filter.getProdName().getText().isEmpty() &&
-				filter.getDesc().getText().isEmpty() &&
-				filter.getCategory().getText().isEmpty() &&
-				filter.getSubCategory().getText().isEmpty() &&
-				filter.getNote().getText().isEmpty() &&
-				filter.getQtyGt().getText().isEmpty() &&
-				filter.getQtyLt().getText().isEmpty() &&
-				filter.getSaleGt().getText().isEmpty() &&
-				filter.getSaleLt().getText().isEmpty() 
+				filterFrame.getID().getText().isEmpty() &&
+				filterFrame.getProdName().getText().isEmpty() &&
+				filterFrame.getDesc().getText().isEmpty() &&
+				filterFrame.getCategory().getText().isEmpty() &&
+				filterFrame.getSubCategory().getText().isEmpty() &&
+				filterFrame.getNote().getText().isEmpty() &&
+				filterFrame.getQtyGt().getText().isEmpty() &&
+				filterFrame.getQtyLt().getText().isEmpty() &&
+				filterFrame.getSaleGt().getText().isEmpty() &&
+				filterFrame.getSaleLt().getText().isEmpty() 
 			){
 			jl_filter_status.setOpaque(false);
 			jl_filter_status.setText("Filter Not Applied");
@@ -1379,8 +1928,153 @@ JPanel panel_3 = new JPanel();
 		}
 		
 	}
+	public void initiateInventory(){
+		refreshInventoryTable(1);
+		updateInv_orderListTable();
+	}
 	
+	public void addProduct(){//=======================================
+		try{
+			
+			
+			int flag = 0;
+			String prodID = add_prodID_tf.getText();
+			String prodName = add_prodName_tf.getText();
+			String prodDesc = add_prodDesc_tf.getText();
+			//String prodQty = add_prodQty_tf.getText();
+			String prodSalePrice = add_prodSalePrice_tf.getText();
+			CbCategoryItem catItem = (CbCategoryItem) add_prodCat_cb.getSelectedItem();
+			CbCategoryItem subCatItem = (CbCategoryItem) add_prodSubCat_cb.getSelectedItem();
+			
+			int subCatID = 0;
+			int catID = catItem.getID();
+			if(add_prodSubCat_cb.getSelectedItem()!= null){subCatID = subCatItem.getID();}
+			// if user does not select category, give error
+			if ( catID == 0 ) flag = 2;
+			//System.out.println("category ID is /" + catID);
+			//sub category throws exception if user does not select category
+			//System.out.println("sub category ID is /" + subCatID);
+			
+		    	//validate user input 
+		    if ( !validateProdID(prodID) ) flag = 1;
+		    if ( !validateStringSize(prodName, sizeProdName) ) flag = 1;
+		    
+		    if ( prodDesc.isEmpty()){
+		    	prodDesc = ""; //assign "" to product description if it is empty
+		    } else {  if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;}
+		    if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;
+		    /*
+		    if ( prodQty.isEmpty()){
+		    	prodQty = "0"; //assign 0 to product quantity if it is empty
+		    } else {  if ( !validateIntSize(prodQty, sizeProdQty) ) flag = 1;}
+		    */
+		    if ( !validateDouble(prodSalePrice) ) flag = 1;
+
+		    if (flag == 1){
+		    	JOptionPane.showMessageDialog(null, "Invalid input - try again");
+		    }
+		    else if (flag == 2 ){
+		    	JOptionPane.showMessageDialog(null, "Category is required");
+		    }
+		    else if ( flag == 0 )
+		    {
+				con_Inv = Connect.connectionSetup();
+				//update product table
+				String query = "insert into product (ID, Name, Description, CategoryID, SubCategoryID, SalePrice, Notes)"
+						+ "values ( ?,?,?,?,?,?,?)";
+				PreparedStatement pst = con_Inv.prepareStatement(query);		 
+				pst.setInt(1, Integer.parseInt( prodID ));
+				pst.setString(2, prodName);
+				pst.setString(3, prodDesc);
+				//pst.setInt(4, Integer.parseInt( prodQty ) );
+				pst.setInt(4, catID);
+				if (subCatID != 0){
+					pst.setInt(5, subCatID);
+				} else {
+					pst.setNull(5, java.sql.Types.INTEGER);
+				}
+				
+				pst.setDouble(6, Double.parseDouble(prodSalePrice));
+				pst.setString(7, add_prodNotes_tf.getText());
+									
+				pst.executeUpdate();
+				JOptionPane.showMessageDialog(null, "New Product Added");
+					
+					refreshInventoryTable(1);
+					clearAddProductForm();
+					tabbedPane_Inventory.setSelectedIndex(0);
+					
+					int index = 0; 
+					for (int j = 0; j < table_inventoryList.getRowCount(); j++){
+						if(Integer.parseInt(prodID) == (int)table_inventoryList.getValueAt(j, 1)){	
+							index = j;
+						}
+					}
+					JViewport viewport = (JViewport)table_inventoryList.getParent();
+					Rectangle  rect = table_inventoryList.getCellRect(index, 0, true);
+					Point pt = viewport.getViewPosition();
+					rect.setLocation(rect.x-pt.x, rect.y-pt.y);
+					table_inventoryList.scrollRectToVisible(rect);
+					table_inventoryList.getSelectionModel().setSelectionInterval(index, index);
+				
+				
+				pst.close();
+				con_Inv.close();
+		    }// if - validate user input 
+		}
+		 catch (SQLException ex) {
+                if (ex.getSQLState().startsWith("23")) {
+                      JOptionPane.showMessageDialog(null, "Duplicated Product ID - please try again");
+                } 
+		 }catch (Exception e1) {
+			e1.printStackTrace();
+		 }
+	}
 	
+	public void clearAddProductForm(){
+		add_prodID_tf.setText("");
+		add_prodName_tf.setText("");
+		add_prodDesc_tf.setText("");
+		//add_prodQty_tf.setText("");
+		add_prodSalePrice_tf.setText("");
+		add_prodNotes_tf.setText("");
+		add_prodCat_cb.setSelectedIndex(0);
+		add_prodSubCat_cb.removeAllItems();
+	}
+	//===================================================================================================
+	public void associateSupplier(){
+		if (simpleSupList.getSelectedItem() == null){
+			JOptionPane.showMessageDialog(null, "Please select a supplier to associate");
+		}else {
+			CbSupItem thisItem = (CbSupItem) simpleSupList.getSelectedItem();
+			
+			if (thisItem.getID() == 0){
+				JOptionPane.showMessageDialog(null, "Please select a supplier to associate");
+			}else if (dataProdID.getText() == "0"){
+				JOptionPane.showMessageDialog(null, "Please select a product from inventory list");
+			}
+				CbSupItem item = (CbSupItem) simpleSupList.getSelectedItem();
+				int supID = item.getID();
+				String prodID = dataProdID.getText();
+				
+				try {
+					con_Inv = Connect.connectionSetup();
+					String query = "Insert Into product_supplier (ProductID, SupplierID, UnitCost) values ( "+ prodID +"," + supID + " , 0)";
+					PreparedStatement pst = con_Inv.prepareStatement(query);
+					pst.executeUpdate();
+					
+					updateInv_soldByTable();
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
+		
+
 	
 	
 	//===================================================================================================
@@ -1393,17 +2087,17 @@ JPanel panel_3 = new JPanel();
     Vector<Integer> selectedRows = getSelectedRows();
     try{
     	
-    	con_Invoice = Connect.connectionSetup();
+    	con_Inv = Connect.connectionSetup();
     	String query = "Select p.ID, c.Name as Category, sc.Name as 'Sub Category', p.Name, p.Quantity, "
       			+ " SUM(od.OrderedQuantity) - SUM(od.ReceivedQuantity) as 'to be delivered'	"
     			+ " FROM Product p "
-    			+ " INNER JOIN Category as c on c.ID = p.CategoryID"
-    			+ "	INNER JOIN Category as sc on sc.ID = p.SubCategoryID "
-    			+ " INNER JOIN orderdetail as od on od.ProductID = p.ID "
+    			+ " LEFT JOIN Category as c on c.ID = p.CategoryID"
+    			+ "	LEFT JOIN Category as sc on sc.ID = p.SubCategoryID "
+    			+ " LEFT JOIN orderdetail as od on od.ProductID = p.ID "
     			+ " WHERE p.ID IN ( " + mySelection + " )"
     			+ "	GROUP BY p.ID";
     			
-		PreparedStatement pst = con_Invoice.prepareStatement(query);
+		PreparedStatement pst = con_Inv.prepareStatement(query);
 		ResultSet rs = pst.executeQuery();
 		ResultSetMetaData md = rs.getMetaData();
 
@@ -1438,7 +2132,7 @@ JPanel panel_3 = new JPanel();
 		
 		pst.close();
 		rs.close();
-		con_Invoice.close();
+		con_Inv.close();
 		
     }catch (Exception e1) 
 	{	
@@ -1535,7 +2229,7 @@ JPanel panel_3 = new JPanel();
 	
 	
 	//===========================================================================
-	public void displayOrderSheet(){
+	public void createOrderAndOrderDetail(){
 		
 		int flag = 0;
 		int prodID_col = 0;
@@ -1545,6 +2239,7 @@ JPanel panel_3 = new JPanel();
 		int cat_col = 1;
 		int subCat_col = 2;
 		int orderID = 0;
+		int orderCount = 0; 
 		
 			for (int i = 0; i < table_createOrder.getRowCount(); i++){
 				if (table_createOrder.getValueAt(i, sup_col) == null)flag = 1;
@@ -1600,7 +2295,7 @@ JPanel panel_3 = new JPanel();
 				PreparedStatement pst = connForCreateOrder.prepareStatement(query2);
 				ResultSet rs = pst.executeQuery(); 	
 				while(rs.next()){
-				orderID =  (int) rs.getObject(1) ;			
+				orderID =  (int) rs.getObject(1) + 1;	// new ID will be max id + 1		
 				}
 				order.setOrderID(orderID);
 				
@@ -1609,7 +2304,7 @@ JPanel panel_3 = new JPanel();
 						                 + "VALUES (" + supplierID + ", 1, NOW(), "+ orderTotal +")";		
 				pst = connForCreateOrder.prepareStatement(query);
 				pst.executeUpdate(); 
-				
+				orderCount++;
 						//get supplier info for supplier order sheet later 
 						//fill sup
 						query = "Select ID, Name, Street, City, State_Province, PostalCode, PhoneNumber, Email, Status "
@@ -1666,6 +2361,7 @@ JPanel panel_3 = new JPanel();
 				
 				
 				//create a frame for each supplier
+				/*
 				InventoryOrderSheetFrame orderSheet = new InventoryOrderSheetFrame(order, detailList);
 				orderSheet.setSize(new Dimension(650, 750));
 				Dimension screenSize = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
@@ -1677,15 +2373,22 @@ JPanel panel_3 = new JPanel();
 			
 				orderSheet.setLocation(left, top);
 				orderSheet.setVisible(true);
+				*/
 				
 			} // end of for loop uniSupID_list iterator it
 			
 			connForCreateOrder.close();
-			JOptionPane.showMessageDialog(null, "New Order record(s) have been created");
+			//JOptionPane.showMessageDialog(null, "New Order record(s) have been created");
 			
 			scrollPane_ceateOrder.setViewportView(null);
-			refreshInventoryTable();
-			tabbedPane_Inventory.setSelectedIndex(0); 
+			tabbedPane_Inventory.setEnabledAt(3, false);
+			JOptionPane.showMessageDialog(null, orderCount + " order(s) created");
+			refreshInventoryTable(1);
+			tabbedPane_Inventory.setSelectedIndex(4); 
+			updateInv_orderListTable();
+			updateInv_orderDetailTable(orderID); //displays the most recent order
+				inv_orderListTable.setRowSelectionInterval(0, orderCount -1);
+			
 			
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -1694,9 +2397,692 @@ JPanel panel_3 = new JPanel();
 			} // end of Yes option 
 
 			}// end of if flag == 0
-	} // end of displayOrderSheet()
-
+	} // -------------------------------------------------------------------
 	
+	public void updateInv_priceHisTable(){
+		
+			Connection con;
+			try {
+				con = Connect.connectionSetup();
+				
+				String prodIDStr = dataProdID.getText();
+				
+				String query = "Select ProductID, NewPrice, EffectiveDate "
+						+ "From pricehistory WHERE productID =" + prodIDStr + " Order by EffectiveDate Desc";
+			 PreparedStatement pst = con.prepareStatement(query);
+			 ResultSet rs = pst.executeQuery();
+			 
+				Vector<Object> columnNames = new Vector<Object>();
+			    Vector<Object> data = new Vector<Object>();
+			    
+			    columnNames.addElement("Prodct ID");
+			    columnNames.addElement("Price");
+			    columnNames.addElement("Set Date");
+			    
+			    while(rs.next()){
+			    	Vector<Object> row = new Vector<Object>();
+			    	for (int i = 1; i <= 3; i++){
+			    		
+			    		row.addElement(rs.getObject(i));
+			    		
+			    	}
+			    	data.addElement(row);
+			    }
+			    
+			    TM_basic basicModelforPriceHistory = new TM_basic(data, columnNames);
+			    inv_priceHisTable.setModel(basicModelforPriceHistory);
+			    inv_priceHisTable.setRowHeight(30);
+			 
+			 con.close();
+			 pst.close();
+					
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+	//==============================================
+	public void updateInv_orderListTable(){
+		
+		try {
+			con_Inv = Connect.connectionSetup();
+
+		String query = "Select o.ID, CreateDate, s.Name as 'Supplier Name', ReceivedDate, InvoiceID "
+				+ "FROM `order` o "
+				+ "Inner JOIN Supplier s ON s.ID = o.SupplierID "
+				+ "ORDER BY ID DESC;";
+		
+		PreparedStatement pst = con_Inv.prepareStatement(query);
+		ResultSet rs = pst.executeQuery();
+		
+	Vector<Object> columnNames = new Vector<Object>();
+    Vector<Object> data = new Vector<Object>();
+    
+    columnNames.addElement("Order ID");
+    columnNames.addElement("Created");
+    columnNames.addElement("Supplier");
+    columnNames.addElement("Received Date");
+    columnNames.addElement("Invoice ID");
+  
+    
+    while(rs.next()){
+    	Vector<Object> row = new Vector<Object>();
+    	for (int i = 1; i <= 5; i++){
+    		row.addElement(rs.getObject(i));
+    	}
+    	data.addElement(row);
+    }
+    
+    TM_basic orderModel = new TM_basic(data, columnNames);
+    inv_orderListTable.setModel(orderModel);
+    inv_orderListTable.setRowHeight(30);
+    
+	Dimension tableSize = inv_orderListTable.getPreferredSize();
+	tcm = inv_orderListTable.getColumnModel();
+	
+	
+		tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //check
+		tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //ID
+		tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); //Category
+		tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Sub Category
+		tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Name
+		//tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Description
+		//tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Quantity
+		//tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //TO be delivered
+		//tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Sale Price
+		//tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Unit Cost
+    
+		inv_orderListTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseE) {
+			if (mouseE.getClickCount() == 2) {
+			    JTable target = (JTable)mouseE.getSource();
+			    int row = target.getSelectedRow();
+			    int orderID = (int) target.getValueAt(row, 0);
+			    
+			    updateInv_orderDetailTable(orderID);
+
+			}
+		}
+	});	
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+	}//-------------------------------------------------------
+	
+	public void updateInv_orderDetailTable(int orderID){
+		try {
+			
+		con_Inv = Connect.connectionSetup();
+
+		String query = "Select od.OrderID, od.ProductID,  p.Name as 'Product Name', od.OrderedQuantity, od.ReceivedQuantity, od.Cost "
+				+ "FROM orderDetail od "
+				+ "Inner JOIN product p on p.id = od.productID "
+				+ "WHERE od.OrderID = " + orderID;
+		
+		PreparedStatement pst = con_Inv.prepareStatement(query);
+		ResultSet rs = pst.executeQuery();
+		
+	Vector<Object> columnNames = new Vector<Object>();
+    Vector<Object> data = new Vector<Object>();
+    
+    columnNames.addElement("Order ID");
+    columnNames.addElement("Product ID");
+    columnNames.addElement("Product Name");
+    columnNames.addElement("Ordered Quantity");
+    columnNames.addElement("Delivered");
+    columnNames.addElement("Total Cost ");
+    columnNames.addElement("Received Quantity");
+    columnNames.addElement("Cost for this delivery");
+    columnNames.addElement("Other Cost");
+  
+    
+    while(rs.next()){
+    	Vector<Object> row = new Vector<Object>();
+    	for (int i = 1; i <= 6; i++){
+    		row.addElement(rs.getObject(i));
+    	}
+    	data.addElement(row);
+    }
+    
+    TM_orderDetail orderDetailModel = new TM_orderDetail(data, columnNames);
+    inv_orderDetailTable.setModel(orderDetailModel);
+    inv_orderDetailTable.setRowHeight(30);
+    inv_orderDetailTable.getColumnModel().getColumn(6).setCellRenderer(new TCellRend_orderDetail());
+    inv_orderDetailTable.getColumnModel().getColumn(7).setCellRenderer(new TCellRend_orderDetail());
+    
+    TableModelListener TListner = new TableModelListener(){
+    	
+    	TableModel model = inv_orderDetailTable.getModel();
+    	
+		@Override
+		public void tableChanged(TableModelEvent e) {
+			if(e.getType() == TableModelEvent.UPDATE){ //#10
+
+				int row = e.getFirstRow();
+				int col = e.getColumn();
+				int toBeDelivered =0; 
+				if(model.getValueAt(row, 4) != null){
+					toBeDelivered = (int) model.getValueAt(row, 3) - (int)model.getValueAt(row, 4);
+				}else {
+					//if nothing has been delivered, to be delivered will be the ordered quantity
+					toBeDelivered = (int) model.getValueAt(row, 3);
+				}
+				
+				if (col == 6){
+					String received = (String) model.getValueAt(row, col);
+					if (! validateStrToInt(received)){
+						JOptionPane.showMessageDialog(null, "Receive quantity must be a whole number");
+						model.setValueAt("0", row, col);
+					}else if (Integer.parseInt((String) model.getValueAt(row, col)) > toBeDelivered){
+						JOptionPane.showMessageDialog(null, "Received quantity must be less or equal to " + toBeDelivered);
+						model.setValueAt("0", row, col);
+					}
+				}
+				if(col == 7){
+					String cost = (String) model.getValueAt(row, col);
+					if (! validateStrToDouble(cost)){
+						JOptionPane.showMessageDialog(null, "Cost must be a number");
+						model.setValueAt("", row, col);
+					}
+				}
+
+			}
+		}
+    };
+    
+    inv_orderDetailTable.getModel().addTableModelListener(TListner);
+    
+	Dimension tableSize = inv_orderDetailTable.getPreferredSize();
+	tcm = inv_orderDetailTable.getColumnModel();
+	
+	
+		tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); 
+		tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); 
+		tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); 
+		tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); 
+		tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); 
+		tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.10f));
+		tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.15f));
+		tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.15f));
+		tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.10f));
+		//tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Quantity
+		//tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //TO be delivered
+		//tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Sale Price
+		//tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Unit Cost
+		
+		/*
+		inv_orderDetailTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent mouseE) {
+			if (mouseE.getClickCount() == 2) {
+			    JTable target = (JTable)mouseE.getSource();
+			    int row = target.getSelectedRow();
+			    int orderID = (int) target.getValueAt(row, 1);
+
+			}
+		}
+		*/
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+	}
+	
+	//======================================
+	public void updateInv_soldByTable(){
+		
+
+		try {
+			
+			String query = "Select s.id, s.name "
+					+ "from supplier s "
+					+ "Inner join product_supplier ps ON s.id = ps.supplierID "
+					+ "Inner join product p on p.id = ps.productID "
+					+ "where p.id = "+ dataProdID.getText() +" AND "
+					+ "Status = 'Active'";
+			
+			PreparedStatement pst = con_Inv.prepareStatement(query);
+			ResultSet rs = pst.executeQuery();
+			
+		Vector<Object> columnNames = new Vector<Object>();
+	    Vector<Object> data = new Vector<Object>();
+	    
+	    columnNames.addElement("Supplier ID");
+	    columnNames.addElement("Name");
+	    String suppliers = "";
+	    
+	    while(rs.next()){
+	    	Vector<Object> row = new Vector<Object>();
+	    	for (int i = 1; i <= 2; i++){
+	    		
+	    		row.addElement(rs.getObject(i));
+	    		System.out.println("data is" + rs.getObject(i));
+	    		if(i==1){
+	    			suppliers = suppliers.concat(Integer.toString((int) rs.getObject(i)) + " ,");
+	    		}
+	    	}
+	    	data.addElement(row);
+	    }
+	    
+	    TM_basic basicModel = new TM_basic(data, columnNames);
+	    inv_soldByTable.setModel(basicModel);
+	    inv_soldByTable.setRowHeight(30);
+	    
+	    //add elements to combobox
+	    //get list of suppliers not including those already selling the product
+	    if(suppliers.length() > 0){
+	    suppliers = suppliers.substring(0, suppliers.length() -2);
+	    String snippet = "";
+		    if (suppliers.length() != 0 ){
+		    	snippet = snippet.concat("WHERE ID NOT IN (" + suppliers + " )");
+		    }
+		    query = "Select ID, Name from Supplier "+ snippet +" Order By Name";
+			pst = con_Inv.prepareStatement(query);
+			rs = pst.executeQuery();
+			simpleSupList.removeAllItems();
+			simpleSupList.addItem(new CbSupItem(0, "--Please select a supplier--", 1,1));
+			while(rs.next()){
+				int id = rs.getInt(1);
+				String name = rs.getString(2);
+				
+				CbSupItem item = new CbSupItem(id, name, 1, 1);
+				simpleSupList.addItem(item);
+				
+			}
+			
+			//if currently no supplier is associated
+	    }else {
+	    	query = "Select ID, Name from Supplier Order By Name";
+	    	pst = con_Inv.prepareStatement(query);
+			rs = pst.executeQuery();
+			simpleSupList.removeAllItems();
+			simpleSupList.addItem(new CbSupItem(0, "--Please select a supplier--", 1,1));
+			while(rs.next()){
+				int id = rs.getInt(1);
+				String name = rs.getString(2);
+				
+				CbSupItem item = new CbSupItem(id, name, 1, 1);
+				simpleSupList.addItem(item);
+				}
+	    	}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateNote(){ //=========================================
+		
+		String prodID = dataProdID.getText();
+		//String newPrice = dataNewSalePrice.getText();
+		String newNote = dataNote.getText();
+		
+		
+		if (! validateStringSize(dataNote.getText(), 80)){
+			JOptionPane.showMessageDialog(null, "Note must be less than 80 letters");
+		} else 	{
+			try {
+				Connection con = Connect.connectionSetup();
+				String query = "Update Product Set Notes = '" + newNote + "' WHERE ID = " + prodID;
+				 PreparedStatement pst = con.prepareStatement(query);
+				 pst.executeUpdate();
+				 
+				 con.close();
+				 pst.close();
+				 
+				 //dataSalePrice.setText(newPrice);
+				 dataNote.setText(newNote);
+				 //dataNewSalePrice.setText("");
+				 JOptionPane.showMessageDialog(null, "Note updated");
+				 refreshInventoryTable(1);
+				 //updateInv_priceHisTable();
+				 
+				 for(int i = 0; i < table_inventoryList.getRowCount(); i ++){
+						int selectedID = (int) table_inventoryList.getValueAt(i, 1);
+						if (selectedID == Integer.parseInt(prodID)){
+							table_inventoryList.getSelectionModel().setSelectionInterval(i, i);
+						}
+					 } 
+				 
+				 //tabbedPane_Inventory.setSelectedIndex(0);
+				 
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+	public void updateInvoiceID(){
+		
+		
+		try {
+			con_Inv = Connect.connectionSetup();
+		int orderID = 0; 
+		if (inv_orderDetailTable.getValueAt(0, 0) != null){
+			orderID = Integer.parseInt(inv_orderDetailTable.getValueAt(0, 0).toString());
+			
+			if (! dataInvoiceNumber.getText().equals("")){
+			String query = "Update `order` Set InvoiceID = " + dataInvoiceNumber.getText() +" Where id =" + orderID;
+			PreparedStatement pst = con_Inv.prepareStatement(query);
+			pst.executeUpdate();
+		    }
+			
+			updateInv_orderListTable();
+			updateInv_orderDetailTable(orderID);
+			dataInvoiceNumber.setText("");
+		    for(int i=0; i < inv_orderListTable.getRowCount() ; i++){
+		    	if(orderID == Integer.parseInt(inv_orderListTable.getValueAt(i, 0).toString())){
+		    		inv_orderListTable.setRowSelectionInterval(i, i);
+		    	}
+		    }
+		}
+
+		
+		con_Inv.close();
+			
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	public void updateOrderDetail(){
+		
+		try {
+			System.out.println("Starting updateOrderDetail-----------");
+			TableModel model = inv_orderDetailTable.getModel();
+			if(inv_orderDetailTable.isEditing()){
+				inv_orderDetailTable.getCellEditor().stopCellEditing();
+				}
+			con_Inv = Connect.connectionSetup();
+			PreparedStatement pst;
+
+			boolean detailUpdated = false;
+			
+			int orderID = 0;
+			for (int i = 0; i < model.getRowCount(); i++){
+				
+				int qtyToAdd = 0;
+				double costToAdd = 0;
+				double extraCost = 0;
+				int curQty =0;
+				double totalCost = 0; 
+				
+				int prodID = 0;
+				 
+				
+				//both received quantity and cost for this delivery must be filled
+				if( model.getValueAt(i, 6) != null && model.getValueAt(i, 7) != null){
+						qtyToAdd = Integer.parseInt((String) model.getValueAt(i, 6));
+						costToAdd = Integer.parseInt((String) model.getValueAt(i, 7)); 
+						if(model.getValueAt(i, 8) != null ){extraCost =  (double) model.getValueAt(i, 8);}
+						if(model.getValueAt(i, 4) != null){	curQty = Integer.parseInt( model.getValueAt(i, 4).toString() );}
+						if(model.getValueAt(i, 5) != null){	totalCost = Double.parseDouble( model.getValueAt(i, 5).toString() );}
+						
+						orderID = (int) model.getValueAt(i, 0);
+					    prodID = (int) model.getValueAt(i, 1);
+						
+						String query = "Update orderDetail Set cost = " + (totalCost + costToAdd + extraCost) +", "
+								+ "ReceivedQuantity = " + ( curQty + qtyToAdd ) + " "
+								+ "Where OrderID = " + orderID + " AND ProductID = " + prodID ;	
+						pst = con_Inv.prepareStatement(query);
+						pst.executeUpdate();
+						
+						//get quantity and unitcost in the product table and update it
+						int qtyOnHand= 0;
+						double curUnitCost = 0; 
+						double prodValue = 0; 
+						
+						query = "Select Quantity, UnitCost FROM Product WHERE ID = " + prodID;
+						pst = con_Inv.prepareStatement(query);
+						ResultSet rs = pst.executeQuery();
+						
+						while(rs.next()){
+							qtyOnHand = rs.getInt(1);
+							curUnitCost = rs.getDouble(2);
+							}
+							//calculate current product value 
+							prodValue = qtyOnHand * curUnitCost; 
+							System.out.println("qtyOnHand/"+qtyOnHand + " curUnitCost/"+ curUnitCost + " prodValue/" + prodValue);
+														
+							//add cost to prodValue, which results in the total value for the product
+							prodValue = prodValue + (costToAdd + extraCost);
+							System.out.println("costToAdd/" + costToAdd + " extraCost/"+ extraCost +" mew productValue/" + prodValue);
+							
+							double newUnitCost = prodValue / (qtyOnHand + qtyToAdd);
+							System.out.println("prodValue" + prodValue + " / " + qtyOnHand + qtyToAdd + " (new unit cost is)" + newUnitCost);
+							
+							
+							//update unit cost and quantity on hand using the new unit cost
+							query = "Update Product Set UnitCost = " + newUnitCost + ", Quantity = " + (qtyOnHand + qtyToAdd) + ""
+									+ " WHERE ID = " +prodID ;
+							pst = con_Inv.prepareStatement(query);
+							pst.executeUpdate();
+							
+							
+							//finally, update supplier_product table's unit cost specific to a supplier
+							//first, get supplier id based on the orderID
+							int supID = 0;
+							query = "Select SupplierID FROM `order` WHERE ID = " + orderID;
+							pst = con_Inv.prepareStatement(query);
+							rs = pst.executeQuery();
+							while(rs.next()){
+								supID = rs.getInt(1);
+							}
+							// then update unit cost in the product_supplier table
+							query = "Update product_supplier Set UnitCost = " + ( (costToAdd + extraCost) / qtyToAdd ) + ""
+									+ " WHERE ProductID = " + prodID + " AND SupplierID = " + supID ;
+							pst = con_Inv.prepareStatement(query);
+							pst.executeUpdate();
+								
+						detailUpdated = true;
+						JOptionPane.showMessageDialog(null, "Order Updated");
+				}
+				
+				// update order "received date" if it is empty
+				for (int k = 0; k < inv_orderListTable.getRowCount() ; k++){ //444444
+					if (orderID == (int)inv_orderListTable.getValueAt(k, 0) ){ //333333333
+						//if something is delivered, and received date is empty, update received date
+						if(inv_orderListTable.getValueAt(k, 3) == null && detailUpdated){
+							String query = "Update `order` Set receivedDate = sysdate() Where id =" + orderID;
+							pst = con_Inv.prepareStatement(query);
+							pst.executeUpdate();
+							detailUpdated = true;
+						}
+					} // 3333333333
+				}//4444444
+				
+			}// end of looping orderDetail table
+			
+			if (detailUpdated){
+				
+				refreshInventoryTable(1);
+				updateInv_orderListTable();
+				updateInv_orderDetailTable(orderID);
+			    for(int i=0; i < inv_orderListTable.getRowCount() ; i++){
+			    	if(orderID == Integer.parseInt(inv_orderListTable.getValueAt(i, 0).toString())){
+			    		inv_orderListTable.setRowSelectionInterval(i, i);
+			    	}
+			    }
+			}
+			
+		    con_Inv.close();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+	
+	public void updateIndividualSalePrice(){ //=========================================
+		
+		String prodID = dataProdID.getText();
+		String newPrice = dataNewSalePrice.getText();
+		String newNote = dataNote.getText();
+		
+		
+		if (! Inventory.validateDouble(dataNewSalePrice.getText())){
+			JOptionPane.showMessageDialog(null, "New price must be a number");
+		}else if (Double.parseDouble(newPrice) < Double.parseDouble( dataUnitCost.getText() )){
+			JOptionPane.showMessageDialog(null, "new price must be higher than unit cost");
+		} else 	{
+			try {
+				Connection con = Connect.connectionSetup();
+				String query = "Update Product Set SalePrice = " + newPrice + " WHERE ID = " + prodID;
+				 PreparedStatement pst = con.prepareStatement(query);
+				 pst.executeUpdate();
+				 
+				 con.close();
+				 pst.close();
+				 
+				 dataSalePrice.setText(newPrice);
+				 //dataNote.setText(newNote);
+				 dataNewSalePrice.setText("");
+				 
+				 refreshInventoryTable(1);
+				 updateInv_priceHisTable();
+				 
+				 for(int i = 0; i < table_inventoryList.getRowCount(); i ++){
+						int selectedID = (int) table_inventoryList.getValueAt(i, 1);
+						if (selectedID == Integer.parseInt(prodID)){
+							table_inventoryList.getSelectionModel().setSelectionInterval(i, i);
+						}
+					 } 
+				 
+				 //tabbedPane_Inventory.setSelectedIndex(0);
+				 
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+	public void distributeDeliveryCost(){ //=====================================
+		if(inv_orderDetailTable.isEditing()){
+			inv_orderDetailTable.getCellEditor().stopCellEditing();
+		}
+		String cost = dataDeliveryCost.getText();
+		if( ! validateStrToDouble(cost)){
+			JOptionPane.showMessageDialog(null, "Please enter a number in Delivery Cost field");
+		}else {
+			
+			int totalQty = 0;
+			for(int i =0; i < inv_orderDetailTable.getRowCount(); i++){
+				if(inv_orderDetailTable.getValueAt(i, 6) != null){
+					totalQty += Integer.parseInt((String) inv_orderDetailTable.getValueAt(i, 6));	
+				}
+			}
+			
+			System.out.println("Total qty is" + totalQty);
+			if(totalQty == 0){
+				JOptionPane.showMessageDialog(null, "Please update Received Quantity column");
+			}else {
+					for(int i = 0; i < inv_orderDetailTable.getRowCount(); i++){
+						if(inv_orderDetailTable.getValueAt(i, 6) != null){
+						Double thisQty = Double.parseDouble((String)inv_orderDetailTable.getValueAt(i, 6));
+						Double percentage = thisQty / totalQty;
+						System.out.println("Percentage is" + percentage);
+						double thisCost = (Double.parseDouble(cost)) * percentage;
+						inv_orderDetailTable.setValueAt(thisCost, i, 8);
+						}
+
+					}
+			}
+
+		}
+
+		
+	}
+	
+	
+	public void displayDetail(int prodID){
+		
+		tabbedPane_Inventory.setEnabledAt(2, true);
+		
+		try {
+			con_Inv = Connect.connectionSetup();
+			String query = 	" Select p.ID, "
+					+ "c.Name as Category, "
+					+ "cc.Name as 'Sub Category', "
+					+ "p.Name as 'Product Name', "
+					+ "p.Description, "
+					+ "p.Quantity, "
+					+ "SUM(od.OrderedQuantity) - SUM(od.ReceivedQuantity) as 'to be delivered', "
+					+ "p.SalePrice as 'Sales Price',  "
+					+ "UnitCost, "
+					+ "Notes "
+					+ "FROM Product p "
+					+ "LEFT JOIN Category c on p.CategoryID = c.ID "
+					+ "LEFT JOIN Category cc on p.SubCategoryID = cc.ID "
+					+ "LEFT JOIN orderdetail od on p.ID = od.ProductID "
+					+ "WHERE p.ID =" + prodID ; 	
+					
+			PreparedStatement pst = con_Inv.prepareStatement(query);
+			ResultSet rs = pst.executeQuery();
+			
+			Vector<Object> pd = new Vector<Object>();
+			while(rs.next()){
+				for (int i= 1; i < 11; i++){ 
+					pd.addElement(rs.getObject(i));
+				}
+			}
+
+			dataProdID.setText(Integer.toString(((int)pd.get(0)))); 
+			dataCat.setText((String) pd.get(1));
+			if (pd.get(2) !=null ){	
+				dataSubCat.setText((String)pd.get(2)); 
+				}else {dataSubCat.setText("");}
+			dataName.setText((String)pd.get(3));
+			if (pd.get(4) != null){
+				dataDesc.setText((String)pd.get(4));
+			}else {
+				dataDesc.setText("");
+			}
+			dataQty.setText(Integer.toString((int)pd.get(5)));
+			
+			if(pd.get(6) != null ){
+			BigDecimal passedToBe = (BigDecimal) pd.get(6);
+			dataToBe.setText(passedToBe.toString());
+			}else {dataToBe.setText("0");}
+			dataSalePrice.setText(Double.toString((double)pd.get(7)));
+			dataUnitCost.setText(Double.toString((double)pd.get(8)));
+			if(pd.get(9) != null){
+				dataNote.setText((String)pd.get(9));
+			}else {
+				dataNote.setText("");
+			}
+			
+			
+			//update inv_soldByTable
+			updateInv_soldByTable();
+			updateInv_priceHisTable();
+		    //close connection
+		    con_Inv.close();
+			pst.close();
+			rs.close();
+			
+			tabbedPane_Inventory.setSelectedIndex(2);
+
+
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	//=========================================================================================
 	// Table Model Listener for updating prev @ price, Order Total column for table_createORder
 	private void setTMLforCreateOrderTable(){
@@ -1704,68 +3090,130 @@ JPanel panel_3 = new JPanel();
 		
 			TableModel model = table_createOrder.getModel();
 			TableModel model_summary = table_createOrderSummary.getModel();
-			CbSupItem sup;
+			
 			
 			@Override
 			public void tableChanged(TableModelEvent e) {
 				if(e.getType() == TableModelEvent.UPDATE){ //#10
+
 					int row = e.getFirstRow();
 					int col = e.getColumn();
+					double unitP = 0;
+					boolean addRowToSummary = false; 
 					
-					if(col == 6){ //#15
+					CbSupItem sup = null;
+					int supID=0;
+					String supName="";
+					int minOrder=0;
+					double orderTotalforThisSup = 0;
+					
+						//if supplier column is updated 
+					if(col == 6){ //#15  ==========================================
+							//get supplier object from column 6
+						if (model.getValueAt(row, col) != null){
 						sup  = (CbSupItem) model.getValueAt(row, col);
-						if (sup != null){ //#21
-							double unitP = sup.getUnitCost();
-						    model.setValueAt(unitP, row, col+1);
-						    
-						      //add row to summary 
-						    boolean idExist = false;
-							    for(int i = 0; i < model_summary.getRowCount(); i++){ //#20
-							    	if (sup.getID() == (int) model_summary.getValueAt(i, 0)  ){
-							    		idExist = true; 
-							    	} //if
-							    } //#20
-						    	if (idExist == false){
-						    		((DefaultTableModel) model_summary).addRow(new Object[]{ sup.getID(), sup.getSupplierName(), sup.getMinOrder()});
-						    	}
-						}//#21
-					}//#15
-					
-					if(col == 8){ //#20
-						sup = (CbSupItem) model.getValueAt(row, 6);
-						if(sup == null ) { //user must select supplier
-							JOptionPane.showMessageDialog(null,  "Please select supplier first");
+						supID = sup.getID();
+						supName = sup.getSupplierName();
+						minOrder = (int) sup.getMinOrder();
 						}
-						else {
-							int orderQty =  Integer.parseInt( (String) model.getValueAt(row, col));
-							sup  = (CbSupItem) model.getValueAt(row, 6);
-							double unitP = sup.getUnitCost();
-							double subTotal = unitP * orderQty;
-							double orderTotal = 0;
-							model.setValueAt(subTotal,  row,  col+1);
-							
-							int targetRow = 0;
-							for (int i = 0; i < model_summary.getRowCount(); i++){ //#30
-								if (sup.getID() == (int) model_summary.getValueAt(i, 0)){
-									targetRow = i;
-								}
-							}//#30
-								if (model_summary.getValueAt(targetRow, 3) == null){
-										orderTotal = subTotal;
-										//System.out.println("option 1 order total " + orderTotal + "/ sub total "+ subTotal);
-									}else {
-										orderTotal = subTotal + (double)model_summary.getValueAt(targetRow, 3) ;
-										//System.out.println("option 1 order total " + orderTotal + "/ sub total "+ subTotal);
-										//System.out.println("value at target / " + (double)model_summary.getValueAt(targetRow, 3));
-									}
-								//System.out.println("set value ");
-							model_summary.setValueAt(orderTotal, targetRow, 3);
-
-
-						} //else 
 						
-					}//#20
-				}//#10
+							//if supplier is selected, add current unit cost
+						if (sup != null){ //#21
+							unitP = sup.getUnitCost();
+						    model.setValueAt(unitP, row, col+1);
+						}
+						     //if order quantity already exist, update the subtotal 
+						if (model.getValueAt(row, 8) != null ){
+							int qty = Integer.parseInt( (String) model.getValueAt(row, 8) );
+							model.setValueAt(unitP * qty , row, 9);
+							
+							//perform udpate table_orderSummary function
+							addRowToSummary = true; 
+							
+							
+
+						
+						}
+					} //end of - if supplier column is updated 
+					
+						//if order quantity is updated =========================================
+					if(col == 8){
+						addRowToSummary = false;
+						if (validateStrToInt((String) model.getValueAt(row, col)) == false ){
+							JOptionPane.showMessageDialog(null, "Please enter a whole number, or \"0\" ");
+							
+						}
+						else { //#30
+							
+								//if supplier is not selected 
+							if (model.getValueAt(row, 6) == null){
+								JOptionPane.showMessageDialog(null, "Please select supplier first");
+								
+								//if supplier is already selected, update subtotal 
+							} else {
+								sup = (CbSupItem) model.getValueAt(row, 6);
+								unitP = (double) model.getValueAt(row, 7);
+								int qty = Integer.parseInt( (String) model.getValueAt(row, 8) );
+								model.setValueAt(unitP * qty, row, 9);
+								
+								supID = sup.getID();
+								supName= sup.getSupplierName();
+								minOrder= (int) sup.getMinOrder();
+								//orderTotalforThisSup = (double) model.getValueAt(row, 9);
+								
+								addRowToSummary = true;
+							}
+								
+						} //#30
+						
+					}// end of - if order quantity is updated ====================
+					
+						//check if all the cells are filled before updating summary 
+					/*
+						boolean allCellFilled = false; 
+						
+						for (int t = 0; t < model.getRowCount(); t++){
+							if (model.getValueAt(t, 6) != null && model.getValueAt(t, 8) != null ){
+								allCellFilled = true; 
+							}else allCellFilled = false; 
+						}
+					*/
+					
+					if (addRowToSummary == true ) {
+						
+						//------------------------------------
+						//loop through createOrdertable and gather order summary for this supplier 
+						orderTotalforThisSup = 0;
+						for (int i = 0; i < table_createOrder.getRowCount(); i++){
+							
+							if(model.getValueAt(i, 6) != null){
+								CbSupItem curSup = (CbSupItem)model.getValueAt(i, 6);
+								int curSupID = curSup.getID();
+								
+								if(curSupID == supID && model.getValueAt(i, 8) != null){
+									orderTotalforThisSup += (double)model.getValueAt(i, 9);
+								}
+							}
+
+						}
+						
+						//remove row from summary table for the supplier 
+						for(int k = 0; k < model_summary.getRowCount(); k++){
+							int supIDinSummary = (int)model_summary.getValueAt(k, 0);
+							if(supIDinSummary == (int)sup.getID()){
+							((DefaultTableModel)model_summary).removeRow(k);
+							}
+						}
+						//then add new row 
+						((DefaultTableModel)model_summary).addRow(new Object[]{ supID, supName, minOrder, orderTotalforThisSup});
+						//-------------------------------------
+
+						
+					} //end of if addRowToSummary 
+						
+					} //end of update 
+					
+				
 				
 			} //tableChanged()
 			
@@ -1774,13 +3222,13 @@ JPanel panel_3 = new JPanel();
 	} //setTMLforCreateOrder()
 	
 	//===========================================================================
-	public void refreshInventoryTable(){ 
+	public void refreshInventoryTable(int flag){ 
 
 	Vector<Object> columnNames = new Vector<Object>();
     Vector<Object> data = new Vector<Object>();
     
     try{
-    	con_Invoice = Connect.connectionSetup();
+    	con_Inv = Connect.connectionSetup();
 		
 		String query = 
 				" Select p.ID, "
@@ -1791,16 +3239,17 @@ JPanel panel_3 = new JPanel();
 				+ "p.Quantity, "
 				+ "SUM(od.OrderedQuantity) - SUM(od.ReceivedQuantity) as 'to be delivered', "
 				+ "p.SalePrice as 'Sales Price',  "
+				+ "UnitCost, "
 				+ "Notes "
 				+ "FROM Product p "
-				+ "INNER JOIN Category c on p.CategoryID = c.ID "
-				+ "INNER JOIN Category cc on p.SubCategoryID = cc.ID "
-				+ "INNER JOIN orderdetail od on p.ID = od.ProductID "
+				+ "LEFT JOIN Category c on p.CategoryID = c.ID "
+				+ "LEFT JOIN Category cc on p.SubCategoryID = cc.ID "
+				+ "LEFT JOIN orderdetail od on p.ID = od.ProductID "
 				+ "GROUP BY p.ID;";	
 				
 
 		
-		PreparedStatement pst = con_Invoice.prepareStatement(query);
+		PreparedStatement pst = con_Inv.prepareStatement(query);
 		ResultSet rs = pst.executeQuery();
 		ResultSetMetaData md = rs.getMetaData();
 
@@ -1814,161 +3263,274 @@ JPanel panel_3 = new JPanel();
 		columnNames.addElement("Description");
 		columnNames.addElement("Quantity");
 		columnNames.addElement("To be delivered");
-		//columnNames.addElement("Unit Cost");
 		columnNames.addElement("Sale Price");
-		//columnNames.addElement("Supplier");
+		columnNames.addElement("Unit Cost");
 		columnNames.addElement("Notes");
+		if (flag == 2) columnNames.addElement("New Sale Price");
 		
 		//Get row data
-		while(rs.next())
-		{
+		while(rs.next()){
 		Vector<Object> row = new Vector<Object>(columnCount);
 		row.addElement(Boolean.FALSE);
 		
-		for (int i = 1; i <=columnCount; i++)
-		{
-			row.addElement(rs.getObject(i));
-		}
+			for (int i = 1; i <=columnCount; i++){
+				row.addElement(rs.getObject(i));
+			}
 		data.addElement(row);
 		}
 		
-		pst.close();
-		rs.close();
-		con_Invoice.close();
+			pst.close();
+			rs.close();
+			con_Inv.close();
 		
-		}catch (Exception e1) 
-		{	
+		}catch (Exception e1) {	
 		e1.printStackTrace();
 		}
         
-        MyTableModelClass MyModel = new MyTableModelClass(data, columnNames);
-        
-		table_inventoryList.setModel(MyModel);
-		sorter = new TableRowSorter<MyTableModelClass>(MyModel);
-		table_inventoryList.setRowSorter(sorter);
-		
-		
+
+    		MyTableModelClass MyModel = new MyTableModelClass(data, columnNames);
+        	table_inventoryList.setModel(MyModel);
+        	table_inventoryList.getTableHeader().setReorderingAllowed(false);
+        	sorter = new TableRowSorter<MyTableModelClass>(MyModel);
+        	table_inventoryList.setRowSorter(sorter);
+        		
+        	if(flag ==2){
+        		/*
+    			TableColumnModel colModel = table_inventoryList.getColumnModel();
+    			TableColumn check = colModel.getColumn(0);
+    			TableColumn unitCostCol = colModel.getColumn(9);
+    			TableColumn noteCol = colModel.getColumn(10);
+    			//colModel.removeColumn(check);
+    			colModel.removeColumn(unitCostCol);
+    			colModel.removeColumn(noteCol);
+    			colModel.addColumn(unitCostCol);
+    			colModel.addColumn(noteCol);	
+    			*/
+        	}
+        	
+        	table_inventoryList.addMouseListener(new MouseAdapter() {
+        			public void mouseClicked(MouseEvent mouseE) {
+        			if (mouseE.getClickCount() == 2) {
+        			    JTable target = (JTable)mouseE.getSource();
+        			    int row = target.getSelectedRow();
+        			    int prodID = (Integer)target.getValueAt(row, 1);
+        			    System.out.println("prodID is/"+prodID+"/");
+        			    displayDetail(prodID);
+        			    //jumpToEditPage((int)target.getValueAt(row, 1));
+
+        			}
+        		}
+        	});
+        	
+
+
 		Dimension tableSize = table_inventoryList.getPreferredSize();
 		tcm = table_inventoryList.getColumnModel();
-		tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.04f)); //check
-		tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.04f)); //ID
-		tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.13f)); //Category
-		tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.12f)); //Sub Category
-		tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Name
-		tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Description
-		tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.04f)); //
-		tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.04f));
-		tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.04f));
-		tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.20f));
-
-		table_inventoryList.addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent mouseE) {
-		if (mouseE.getClickCount() == 2) {
-		    JTable target = (JTable)mouseE.getSource();
-		    int row = target.getSelectedRow();
-		    //int column = target.getSelectedColumn();
-		    jumpToEditPage((int)target.getValueAt(row, 1));
-		    //JOptionPane.showMessageDialog(null, "double clicked");
-		}
-		}
-		});
 		
-		}// end of refreshInventoryTable()
-	
-	
+		if (flag ==1 ){
+			tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //check
+			tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //ID
+			tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.13f)); //Category
+			tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.12f)); //Sub Category
+			tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Name
+			tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Description
+			tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Quantity
+			tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //TO be delivered
+			tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Sale Price
+			tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Unit Cost
+			
+			if (flag ==2 ){
+				tcm.getColumn(10).setPreferredWidth(Math.round((tableSize.width)* 0.10f));//Notes
+				tcm.getColumn(11).setPreferredWidth(Math.round((tableSize.width)* 0.05f));//new sale price
+			} else if (flag ==1 ){
+				tcm.getColumn(10).setPreferredWidth(Math.round((tableSize.width)* 0.15f));//Notes
+			}
+		}
+
+		if (flag ==2){
+			tml_newSalePrice = new TableModelListener(){
+			
+			TableModel model = table_inventoryList.getModel();
+			
+				@Override 
+				public void tableChanged(TableModelEvent e){
+					if(e.getType() == TableModelEvent.UPDATE){
+						
+						int row = e.getFirstRow();
+						int col = e.getColumn();
+						//boolean validPrice = true;
+						
+						if (col == 11 && model.getValueAt(row, col) != null ){ //=====
+							String newPrice =  (String) model.getValueAt(row, 11);
+							if (!validateDouble(newPrice)){ //----
+								JOptionPane.showMessageDialog(null, "new sale price must be a number");
+								model.setValueAt(null, row, col);
+
+								//validPrice = false;
+							}//----
+						}//=======
+						
+					}
+				}
+			}; //tml_newSalePrice
+			
+			table_inventoryList.getModel().addTableModelListener(tml_newSalePrice);
+			table_inventoryList.getColumnModel().getColumn(11).setCellRenderer(new TCellRend_newSalePrice());
+			
+			
+		}//if(flag ==2) 
+		
+		
+		
+	}// end of refreshInventoryTable()
 } // end of class inventory 
 //==============================================================================================
 //==============================================================================================
 //==============================================================================================
-//==============================================================================================
-//==============================================================================================
-//==============================================================================================
-//==============================================================================================
-//==============================================================================================
 
 
+//===========================================================
+class TCellRend_newSalePrice extends DefaultTableCellRenderer { 
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean   isSelected, boolean hasFocus, int row, int col) 
+	{ 
+	    Component c  = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col); 
+	   
+	    double curSalePrice = (double) table.getValueAt(row, 8);
+	    double curUnitPrice = (double) table.getValueAt(row, 9);
+	    if (table.getValueAt(row, col) != null){
+	    		if (Double.valueOf(table.getValueAt(row, col).toString()) <= curUnitPrice  ){
+	    			setBackground(Color.RED);
+	    		}else if (Double.valueOf(table.getValueAt(row, col).toString()) <= curSalePrice  ){
+	    			setBackground(Color.YELLOW);
+	    		}else {
+	    			setBackground(Color.WHITE);
+	    		}
+			} else { //if no data is in the cell
+				setBackground(new Color(100, 255, 255));
 
+			}
+	    return c; 
+	}
+} // -------------------------
 
+//===========================================================
+class TCellRend_orderDetail extends DefaultTableCellRenderer { 
+  public Component getTableCellRendererComponent(JTable table, Object value, boolean   isSelected, boolean hasFocus, int row, int col) 
+	{ 
+	    Component c  = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col); 
+	  
+	    	setBackground(new Color(100, 255, 255));
 
+	    /*
+	    if (table.getValueAt(row, col) != null){
+	    		if (Double.valueOf(table.getValueAt(row, col).toString()) <= curUnitPrice  ){
+	    			setBackground(Color.RED);
+	    		}else if (Double.valueOf(table.getValueAt(row, col).toString()) <= curSalePrice  ){
+	    			setBackground(Color.YELLOW);
+	    		}else {
+	    			setBackground(Color.WHITE);
+	    		}
+			} else { //if no data is in the cell
+				setBackground(new Color(100, 255, 255));
 
+			}
+	    
+	    */
+	    return c; 
+	}
+} // -------------------------
 
-
-
-
-
-class MyTableModelClass extends DefaultTableModel{ //********************************************
-
-	public MyTableModelClass(Vector<Object> data, Vector<Object> columnNames) {
+//===========================================================
+class TM_orderDetail extends DefaultTableModel{ //********************************************
+	public TM_orderDetail(Vector<Object> data, Vector<Object> columnNames) {
 		super(data,columnNames);
 	}
-	@Override
-	public Class getColumnClass(int column)
-	{
-	 for (int row = 0; row < getRowCount(); row++)
-	 {
-	     Object o = getValueAt(row, column);
-	
-	     if (o != null)
-	     {
-	         return o.getClass();
-	     }
-	 }
-	 return Object.class;
+	@Override //tells table model that columns contain object ?
+	public Class getColumnClass(int column)	{
+		 for (int row = 0; row < getRowCount(); row++){
+		     Object o = getValueAt(row, column);
+		     if (o != null) {
+		         return o.getClass();
+		     }
+		 }
+	return Object.class;
 	}
-
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex){
+		
 		switch (columnIndex){
-		case 0: return true;
-		case 1: return false;
-		case 2: return false;
+		case 6: return true;
+		case 7: return true; //if new sale price column is inserted
 		default: return false;
 		
 		}
-		
 	}
-}
+}// -------------------------
+
+class MyTableModelClass extends DefaultTableModel{ //********************************************
+	public MyTableModelClass(Vector<Object> data, Vector<Object> columnNames) {
+		super(data,columnNames);
+	}
+	@Override //tells table model that columns contain object ?
+	public Class getColumnClass(int column)	{
+		 for (int row = 0; row < getRowCount(); row++){
+		     Object o = getValueAt(row, column);
+		     if (o != null) {
+		         return o.getClass();
+		     }
+		 }
+	return Object.class;
+	}
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex){
+		
+		switch (columnIndex){
+		case 0: return true;
+		case 11: return true; //if new sale price column is inserted
+		default: return false;
+		
+		}
+	}
+}//--------------------------
 
 class TM_basic extends DefaultTableModel{
 	public TM_basic (Vector<Object> data, Vector<Object> columnNames) {
 		super(data,columnNames);
 	}
 	@Override
-	public Class getColumnClass(int column)
-	{
-	 for (int row = 0; row < getRowCount(); row++)
-	 {
-	     Object o = getValueAt(row, column);
+	public Class getColumnClass(int column){
+		 for (int row = 0; row < getRowCount(); row++){
+		     Object o = getValueAt(row, column);
+		
+		     if (o != null) {
+		         return o.getClass();
+		     }
+		 }
 	
-	     if (o != null)
-	     {
-	         return o.getClass();
-	     }
-	 }
-	 return Object.class;
+	return Object.class;
 	}
-}
+	@Override
+	public boolean isCellEditable(int row, int col){
 
-
+	    switch (col){
+		default: return false;
+	    }	
+	}
+}//-------------------------------------
 
 class TM_CreateOrder extends DefaultTableModel{//********************************************
-
 	public TM_CreateOrder (Vector<Object> data, Vector<Object> columnNames) {
 		super(data,columnNames);
 	}
 	@Override
-	public Class getColumnClass(int column)
-	{
-	 for (int row = 0; row < getRowCount(); row++)
-	 {
-	     Object o = getValueAt(row, column);
-	
-	     if (o != null)
-	     {
-	         return o.getClass();
-	     }
-	 }
-	 return Object.class;
+	public Class getColumnClass(int column){
+		 for (int row = 0; row < getRowCount(); row++) {
+		     Object o = getValueAt(row, column);
+		     if (o != null) {
+		         return o.getClass();
+		     }
+		 }
+	return Object.class;
 	}
 	@Override
 	public boolean isCellEditable(int row, int col){
@@ -1977,28 +3539,24 @@ class TM_CreateOrder extends DefaultTableModel{//*******************************
 	    case 6: return true;
 		case 8: return true;
 		default: return false;
-	    }
-		
+	    }	
 	}
-} //MyTableModelClassForCreateOrder
+} //MyTableModelClassForCreateOrder --------------------
 
 class TM_CreateOrderSummary extends DefaultTableModel{//********************************************
-
 	public TM_CreateOrderSummary (Vector<Object> data, Vector<Object> columnNames) {
 		super(data,columnNames);
 	}
 	@Override
-	public Class getColumnClass(int column)
-	{
-	 for (int row = 0; row < getRowCount(); row++)
-	 {
-	     Object o = getValueAt(row, column);
-	
-	     if (o != null)
-	     {
-	         return o.getClass();
-	     }
-	 }
+	public Class getColumnClass(int column){
+		 for (int row = 0; row < getRowCount(); row++){
+		     Object o = getValueAt(row, column);
+		
+		     if (o != null)
+		     {
+		         return o.getClass();
+		     }
+		 }
 	 return Object.class;
 	}
 	@Override
@@ -2009,24 +3567,19 @@ class TM_CreateOrderSummary extends DefaultTableModel{//************************
 		case 8: return true;
 		default: return false;
 	    }
-		
 	}
-} //MyTableModelClassForCreateOrder
-
+} //MyTableModelClassForCreateOrder ---------------------
 
 class CbCategoryItem{
 	private int id;
 	private String categoryName; 
-	
 	public CbCategoryItem(int idInput, String nameInput){
 		this.id = idInput; 
 		this.categoryName = nameInput;
 	}
 	public int getID(){	return this.id;}
 	public String getCategoryName(){return this.categoryName;}
-	
-} //cbCategoryItem
-
+} //cbCategoryItem-----------------------------
 
 class CbCatListRenderer extends JLabel implements ListCellRenderer {
 	@Override
@@ -2039,14 +3592,13 @@ class CbCatListRenderer extends JLabel implements ListCellRenderer {
 		}
 		return this;
 	}
-}//CbCatListRenderer
+}//CbCatListRenderer---------------------------
 
 class CbSupItem{
 	private int id; 
 	private String supplierName;
 	private double minOrder;
 	private double unitCost;
-	
 	public CbSupItem(int idInput, String nameInput, double minOrderInput, double unitCostInput){
 		this.id = idInput;
 		this.supplierName = nameInput;		
@@ -2057,13 +3609,11 @@ class CbSupItem{
 	public String getSupplierName(){return this.supplierName;}
 	public double getMinOrder(){return this.minOrder;}
 	public double getUnitCost(){return this.unitCost;}
-	
 		//return string so that when item selected, supplier name is displayed in jcombo box
 	public String toString(){
 		return this.supplierName;
 	}
 }
-
 
 class CbSupListRenderer extends JLabel implements ListCellRenderer<CbSupItem> {
 	@Override
@@ -2078,7 +3628,43 @@ class CbSupListRenderer extends JLabel implements ListCellRenderer<CbSupItem> {
 	}
 }//CbSubListRenderer
 
-
+class ProdDetail {
+	
+	private int prodID; 
+	private String Cat;
+	private String SubCat;
+	private String prodName;
+	private String desc;
+	private int qty;
+	private int toBeDel;
+	private double salePrice;
+	private double unitCost;
+	private String note;
+	
+	public ProdDetail(int pid, String c, String sc, String n, String d, int qt, int tobe, double sp, double uc, String not){
+		prodID = pid;
+		Cat = c;
+		SubCat = sc;
+		prodName = n;
+		desc = d;
+		qty = qt;
+		toBeDel = tobe;
+		salePrice = sp;
+		unitCost = uc;
+		note = not;
+	}
+	
+	public int getID(){ return prodID; }
+	public String getCat() { return Cat;}
+	public String getSubCat() {return SubCat;}
+	public String getName() { return prodName;}
+	public String getDesc() {return desc;}
+	public int getQty(){ return qty; }
+	public int getToBe(){ return toBeDel;}
+	public double getSaleP() {return salePrice;}
+	public double getUnitC(){ return unitCost;}
+	public String getNote(){ return note;}
+}
 
 
 
