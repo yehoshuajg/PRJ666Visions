@@ -5,13 +5,12 @@
  */
 package vision;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.print.PrinterException;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -28,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -103,9 +103,8 @@ public class Reports extends JFrame implements AutoCloseable {
     private Vector<String> Invoices_headings = new Vector<>();
     private Vector<String> Performance_headings = new Vector<>();
     
-    //Color code data
+    //for printing apporiate table record
     private int active;
-    private int revenue_color_col;
     
     public Reports(){
         super();
@@ -133,35 +132,7 @@ public class Reports extends JFrame implements AutoCloseable {
                 if(rs.next()) {
                     rs.beforeFirst();
                     jTable1.setModel(DbUtils.resultSetToTableModel(rs));
-                    /*
-                    switch (active){
-                        case 0: 
-                            jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer(){
-                                @Override
-                                public Component getTableCellRendererComponent(JTable table,
-                                        Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-
-                                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-
-                                    double status = (double)table.getModel().getValueAt(row, revenue_color_col);
-                                    if (status < 2500) {
-                                        setBackground(new Color(232, 137, 143)); //Light red color
-                                    } else if(status < 5000){
-                                        setBackground(new Color(250, 210, 90)); //Light yellow/orange color
-                                    } else {
-                                        setBackground(new Color(121, 237, 135)); //Light green color
-                                    }
-                                    return this;
-                                }   
-                            });
-                            break;
-                    /*    case 1: break;
-                        case 2: break;
-                        case 3: break;
-                        case 4: break;
-                        default: break;
-                    }
-                    */
+                    
                 } else {
                     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
                     model.setRowCount(0);
@@ -278,8 +249,6 @@ public class Reports extends JFrame implements AutoCloseable {
             + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
             + " where TransactionType = 'Sale' "
             + " group by Year, Month ";
-        
-        revenue_color_col = 7;
         
 	Revenue_headings.clear();
         Revenue_headings.add("`Year`");
@@ -802,7 +771,6 @@ public class Reports extends JFrame implements AutoCloseable {
                 revenue_query = "select Year(CreateDate) as 'Year', ";
                 order = "group by Year";
                 
-                revenue_color_col = 0;
                 Revenue_headings.clear();
                 Revenue_headings.add("`Year`");
                 
@@ -810,7 +778,6 @@ public class Reports extends JFrame implements AutoCloseable {
                 revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month', ";
                 order = "group by Year, Month";
                 
-                revenue_color_col = 1;
                 Revenue_headings.clear();
                 Revenue_headings.add("`Year`");
                 Revenue_headings.add("`Month`");
@@ -826,7 +793,6 @@ public class Reports extends JFrame implements AutoCloseable {
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
                     + " where TransactionType = 'Sale' ";
                 
-                revenue_color_col += 6;
                 Revenue_headings.add("`Order Cost`");
                 Revenue_headings.add("`Order Paid`");
                 Revenue_headings.add("`SubTotal`");
@@ -843,7 +809,6 @@ public class Reports extends JFrame implements AutoCloseable {
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
                     + " where TransactionType = 'Sale' ";
                 
-                revenue_color_col += 4;
                 Revenue_headings.add("`SubTotal`");
                 Revenue_headings.add("`Tax`");
                 Revenue_headings.add("`Total`");
@@ -2065,7 +2030,7 @@ public class Reports extends JFrame implements AutoCloseable {
         
         return jPanel_Performance;
     }
-    
+
     //returns JPanel for Report section
     public JPanel getWindow(){
         if(Reports == null)
@@ -2074,6 +2039,77 @@ public class Reports extends JFrame implements AutoCloseable {
         }
         
         return Reports;
+    }
+    
+    //Prints table data for currently selected tab.
+    public void printReport() {
+        MessageFormat header = null;
+        MessageFormat footer = new MessageFormat("Page {0, number, integer}");
+
+        
+        switch(active){
+            case 0:
+                header = new MessageFormat("Revenue Report");
+                try {
+                    Revenue_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing revenue report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+                
+            case 1: 
+                header = new MessageFormat("Inventory Report");
+                try {
+                    Inventory_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing inventory report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+                
+            case 2: 
+                header = new MessageFormat("Order Report");
+                try {
+                    Orders_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing order report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+                
+            case 3: 
+                header = new MessageFormat("Transaction Report");
+                try {
+                    Transactions_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing transaction report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            
+            case 4: 
+                header = new MessageFormat("Invoice Report");
+                try {
+                    Invoices_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing invoice report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            
+            case 5:
+                header = new MessageFormat("Performance Report");
+                try {
+                    Performance_table.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+                } catch (PrinterException e){
+                    JOptionPane.showMessageDialog(null, "Error printing performance report. " + e.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+                
+            default: break;
+        }
     }
 
     @Override
