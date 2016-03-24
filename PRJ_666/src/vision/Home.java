@@ -342,7 +342,7 @@ public class Home extends JFrame implements KeyListener{
 		});
 		btnSignOut.setBounds(521, 273, 276, 45);
 		panel_home.add(btnSignOut);
-		
+		/*
 		JButton btnBackupRestore = new JButton("Backup/Restore");
 		btnBackupRestore.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -498,7 +498,7 @@ public class Home extends JFrame implements KeyListener{
 		});
 		btnChangeBackupAnd.setBounds(430, 397, 320, 29);
 		panel_home.add(btnChangeBackupAnd);
-		
+		*/
 		//Staff
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
@@ -2300,8 +2300,8 @@ public class Home extends JFrame implements KeyListener{
 			inv.initiateInventory();
 		}
 			
-		BackupAndRestore br = new BackupAndRestore();  
-		br.setBackupRestorePath();
+		//BackupAndRestore br = new BackupAndRestore();  
+		//br.setBackupRestorePath();
 	}
 	
 	public void calculateCashCheckout(){
@@ -2370,11 +2370,11 @@ public class Home extends JFrame implements KeyListener{
 					transactionRecord.updateProduct(productBySearch.get(i).getID(),previousValue.get(i));
 				}
 				//Backup db after sale transaction
-				BackupAndRestore br = new BackupAndRestore();
+				/*BackupAndRestore br = new BackupAndRestore();
 				br.setBackupRestorePath();
 				br.initialize();
 				br.backupDB();
-				
+				*/
 				try {
 					Connect connect = new Connect();
 					Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
@@ -4007,10 +4007,10 @@ public class Home extends JFrame implements KeyListener{
 											}
 										}
 										//Backup db after sale transaction
-										BackupAndRestore br = new BackupAndRestore();
+										/*BackupAndRestore br = new BackupAndRestore();
 										br.setBackupRestorePath();
 										br.initialize();
-										br.backupDB();
+										br.backupDB();*/
 									}
 								});
 								

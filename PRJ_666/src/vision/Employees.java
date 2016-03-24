@@ -677,7 +677,7 @@ public class Employees extends JFrame{
 											boolean check = true;
 											boolean ok = true;
 											//First name
-											/*if(validateEmpty(textPane_details_firstName.getText()) == false){
+											if(validateEmpty(textPane_details_firstName.getText()) == false){
 												textPane_edit_error_firstName.setText("First name cannot be Empty.");
 												check = false;
 											}
@@ -792,8 +792,6 @@ public class Employees extends JFrame{
 													ok = false;
 												}
 											}
-											
-											*/
 											if(position.checkPosition(currentEmployee.getPositionID()) == false){
 												JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
 												//System.exit(0);
@@ -2198,14 +2196,27 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+					if(newPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 						textField_error_newPassword.setText(null);
 					}
 					else{
-						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						textField_error_newPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
 						ok = false;
 					}
 				}
+				
+				
+				if(textField_password.getText().trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
+					textPane_error_password.setText(null);
+				}
+				else{
+					textPane_error_password.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
+					ok = false;
+				}
+				
+				
+				
+				
 				
 				//Confirm New Password
 				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
@@ -2215,11 +2226,11 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+					if(cnewPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 						textField_error_confirmNewPassword.setText(null);
 					}
 					else{
-						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						textField_error_confirmNewPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
 						ok = false;
 					}
 				}
