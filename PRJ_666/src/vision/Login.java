@@ -72,7 +72,7 @@ public class Login extends JFrame {
 		textField.setBounds(196, 82, 86, 20);
 		contentPane.add(textField);
 		textField.setColumns(10);
-
+		
 		passwordField = new JPasswordField();
 		passwordField.setBounds(196, 110, 86, 20);
 		contentPane.add(passwordField);
@@ -99,10 +99,21 @@ public class Login extends JFrame {
 					}
 					else{
 						if(employee.login(textField.getText(),pass) == true){
-							dispose();
-							Home home = new Home();
-							home.setEmployee(employee);					
-							home.setVisible(true);
+							Thread t2 = new Thread(new Runnable() {
+								public void run() {
+									dispose();
+									Home home;
+									try {
+										home = new Home();
+										home.setEmployee(employee);					
+										home.setVisible(true);
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							});
+							t2.start();
 						}
 						else{
 							JOptionPane.showMessageDialog(null,"Incorrect Username or Password.");

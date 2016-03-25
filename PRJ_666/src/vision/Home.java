@@ -66,6 +66,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
@@ -503,7 +504,7 @@ public class Home extends JFrame implements KeyListener{
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
-		
+		loadCashier();
 	}
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();
@@ -574,6 +575,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_productID_input.setBounds(85, 9, 141, 20);;
 		item_info.add(textField_productID_input);
 		textField_productID_input.setColumns(10);
+		textField_productID_input.setText(String.valueOf(1000000));
 		
 		//Places cursor in ID field as soon as page loads, like focus in html
 		textField_productID_input.addAncestorListener(new AncestorListener() {
@@ -1643,7 +1645,7 @@ public class Home extends JFrame implements KeyListener{
 	        	}
 			}
 		});
-		
+		/*
 		table.getModel().addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
 				if(model.getRowCount() > 0){
@@ -1656,6 +1658,84 @@ public class Home extends JFrame implements KeyListener{
 								@Override
 								public void run() {
 									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
+									//System.out.println("tempQuantity: " + tempQuantity);
+									char c = 0;
+									char c2 = 0;
+									if(!tempQuantity.isEmpty()){
+										c = tempQuantity.charAt(0);
+										c2 = tempQuantity.charAt(tempQuantity.length()-1);
+									}
+									//Previous Quantity
+									int previousQuantity = 0;
+									String nID = model.getValueAt(row, id_column).toString();
+									for(int i = 0; i < productBySearch.size(); i++){
+										if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
+											previousQuantity = previousValue.get(i);
+										}
+									}
+									if(validateEmpty(tempQuantity) == false){
+										JOptionPane.showMessageDialog(null,"Quantity field cannot be left empty. "
+												+ "Please enter a quantity above 0 for row #" + (row+1) + ".");
+										model.setValueAt(previousQuantity, row, col);
+										table.setRowSelectionInterval(row, row);
+										table.setColumnSelectionInterval(0, 0);
+									}
+									else if(checkForNumbers(tempQuantity) == false){
+										JOptionPane.showMessageDialog(null,"Quantity entered for row #" + (row+1) + 
+												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+										model.setValueAt(previousQuantity, row, col);
+										table.setRowSelectionInterval(row, row);
+										table.setColumnSelectionInterval(0, 0);
+									}
+									else if(c == '0' && c2 >= '0'){
+										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
+										model.setValueAt(previousQuantity, row, col);
+										table.setRowSelectionInterval(row, row);
+										table.setColumnSelectionInterval(0, 0);
+									}
+									else{
+										boolean spaceCheck = true;
+										for(int i = 0; i < tempQuantity.length(); i++){
+											if(tempQuantity.charAt(i) == ' '){
+												spaceCheck = true;
+											}
+											JOptionPane.showMessageDialog(null,"Please enter a quantity that does contain space in it for row #" + (row+1) + ".");
+											table.setRowSelectionInterval(row, row);
+											table.setColumnSelectionInterval(0, 0);
+											break;
+										}
+										if(spaceCheck == false){
+											String tempPrice = model.getValueAt(row, productPrice_column).toString();
+											System.out.println(tempPrice);
+											
+											table.setRowSelectionInterval(row, row);
+											table.setColumnSelectionInterval(0, 0);
+											//textField_productID_input.requestFocusInWindow();
+										}
+									}
+								}
+							};
+							SwingUtilities.invokeLater(run1);
+			        	}
+			        }
+				}
+			}
+		});
+		*/
+		/*
+		table.getModel().addTableModelListener(new TableModelListener() {
+			public void tableChanged(TableModelEvent e) {
+				if(model.getRowCount() > 0){
+					//Sales Total
+					int col = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+			        int row = table.getSelectionModel().getLeadSelectionIndex();
+			        if(row > -1 && col > -1){
+			        	if(col == productQuantity_column){
+							Runnable run1 = new Runnable() {
+								@Override
+								public void run() {
+									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
+									//System.out.println("tempQuantity: " + tempQuantity);
 									char c = 0;
 									char c2 = 0;
 									if(!tempQuantity.isEmpty()){
@@ -1703,8 +1783,8 @@ public class Home extends JFrame implements KeyListener{
 											model.setValueAt(tempTotal, row, productQuantityAndPrice_column);
 										
 											if(tableListenerCount == 1){
-												calculateSubtotal();
-												calculateInventoryQuantity();
+												//calculateSubtotal();
+												//calculateInventoryQuantity();
 												//calculateSalePrice(row,model.getValueAt(row, id_column));
 											}
 											else if(tableListenerCount == 0){
@@ -1736,7 +1816,7 @@ public class Home extends JFrame implements KeyListener{
 				}
 		   }
 		});
-		
+		*/
 		tabbedPane_7 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_7.setBounds(961, 0, 279, 416);
 		cashier_submenu.add(tabbedPane_7);
@@ -2304,6 +2384,17 @@ public class Home extends JFrame implements KeyListener{
 		//br.setBackupRestorePath();
 	}
 	
+	/*public void calculateSalePrice(int row, Object objID){
+		int id = (int) objID;
+		for(int i = 0; i < productBySearch.size(); i++){
+			if(id == productBySearch.get(i).getID()){
+				double t = (double) model.getValueAt(row, productQuantityAndPrice_column);
+				productBySearch.get(i).setSalePrice(t);
+				break;
+			}
+		}
+	}*/
+	
 	public void calculateCashCheckout(){
 		String cashTenderInput = checkout_amount_tender_input.getText();
 		if(validateEmpty(cashTenderInput) == false){
@@ -2375,32 +2466,53 @@ public class Home extends JFrame implements KeyListener{
 				br.initialize();
 				br.backupDB();
 				*/
-				try {
-					Connect connect = new Connect();
-					Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-					
-					JasperDesign jd = JRXmlLoader.load("recipt.jrxml");
-					String sql = "SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, tr.ProductID, p.Name, "
-							+ " tr. QuantitySold, tr.UnitPrice, (tr.QuantitySold * tr.UnitPrice) as PTotal FROM StoreDB.Transaction t,"
-							+ " StoreDB.TransactionRecord tr, StoreDB.Product p WHERE t.ID = tr.TransactionID AND tr.ProductID = p.ID AND t.ID = " + transactionID;
-					JRDesignQuery jdq = new JRDesignQuery();
-					jdq.setText(sql);
-					jd.setQuery(jdq);
 				
-					JasperReport jr = JasperCompileManager.compileReport(jd);
-					JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+				Thread t2 = new Thread(new Runnable() {
+					public void run() {
+						try {
+							Connect connect = new Connect();
+							Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+							
+							JasperDesign jd = JRXmlLoader.load("recipt.jrxml");
+							String sql = "SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, tr.ProductID, p.Name, "
+									+ " tr. QuantitySold, tr.UnitPrice, (tr.QuantitySold * tr.UnitPrice) as PTotal FROM StoreDB.Transaction t,"
+									+ " StoreDB.TransactionRecord tr, StoreDB.Product p WHERE t.ID = tr.TransactionID AND tr.ProductID = p.ID AND t.ID = " + transactionID;
+							JRDesignQuery jdq = new JRDesignQuery();
+							jdq.setText(sql);
+							jd.setQuery(jdq);
+							
+							JasperReport jr = JasperCompileManager.compileReport(jd);
+							JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+							
+							JasperPrintManager.printReport(jp, true);
+						
+						} catch (Exception e) {
+							JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
+									"Error with printing", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				});
+				t2.start();
+				/*
+				Object[] options = {"Yes","No"};
+				int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
+				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+				
+				//Cancel
+				if(cashCredit == JOptionPane.YES_OPTION){
 					
-					JasperPrintManager.printReport(jp, true);
-					
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
-							"Error with printing", JOptionPane.ERROR_MESSAGE);
 				}
-				
-				d4.dispose();
-				textField_productID_input.requestFocusInWindow();
+				else if(cashCredit == JOptionPane.NO_OPTION){
+					
+				}
+				*/
+				//d4.dispose();
+				//textField_productID_input.requestFocusInWindow();
 			}
 		}
+	}
+	public void stopPrint(boolean finished){
+		finished = true;
 	}
 	
 	public void calculateOneTimeDiscount(){
@@ -2481,9 +2593,10 @@ public class Home extends JFrame implements KeyListener{
 				check = true;
 				break;
 			}
+			/*
 			else{
 				check = false;
-			}
+			}*/
 		}
 		return check;
 	}
@@ -3046,6 +3159,7 @@ public class Home extends JFrame implements KeyListener{
 		
 	}
 	public void calculateSubtotal(){
+		System.out.println("CalculateSubtotal()");
 		double sub = 0;
 		for(int i = 0; i < model.getRowCount(); i++){
 			sub += Double.parseDouble(model.getValueAt(i, productQuantityAndPrice_column).toString());
@@ -3372,6 +3486,7 @@ public class Home extends JFrame implements KeyListener{
 									}
 									else{
 										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
+							
 										int sold = Integer.parseInt(model_refund.getValueAt(row2, refund_QuantitySold).toString().trim());
 										if(newReturn > sold){
 											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be above the number of quantity bought.");
