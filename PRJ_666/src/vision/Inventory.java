@@ -73,7 +73,16 @@ import javax.swing.border.Border;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 import java.awt.SystemColor;
+import java.sql.DriverManager;
 import javax.swing.BoxLayout;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperPrintManager;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JRDesignQuery;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 
 
@@ -3383,6 +3392,50 @@ add(panel, BorderLayout.NORTH);
 		
 		
 	}// end of refreshInventoryTable()
+        
+    //Added by Gaurav
+    public void printOrderSheet() {
+    	if(tabbedPane_Inventory.getSelectedIndex() == 4){
+    		if(inv_orderDetailTable.getRowCount() != 0){
+    			int orderid = Integer.parseInt(inv_orderDetailTable.getModel().getValueAt(0, 0).toString());
+    			Thread thread = new Thread(new Runnable() {    
+    				public void run() {
+    					try {
+    	                	Connect connect = new Connect();
+    	                	Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+    						
+    	                	JasperDesign jd = JRXmlLoader.load("order.jrxml");
+    	                	String sql = "SELECT DATE_FORMAT(o.CreateDate, '%d-%M-%Y %H:%i')  as CreateDate, o.Cost, "
+    	                			+ " ROUND(o.Cost * 0.13, 2) as 'Tax', ROUND(o.Cost + (o.Cost * 0.13) + s.DeliveryCost, 2) as 'Total', "
+    	                            + " s.Name, s.Street, s.City, s.State_Province, s.PostalCode, s.PhoneNumber, s.Email, s.DeliveryCost, "
+    	                            + " od.ProductID, p.Name as 'ProductName', p.Description, od.OrderedQuantity, od.Cost as 'EstimateCost' " 
+    	                            + " FROM  StoreDB.Order o, StoreDB.Supplier s, StoreDB.OrderDetail od, StoreDB.Product p " 
+    	                            + " WHERE o.ID = od.OrderID AND od.ProductID = p.ID AND o.SupplierID = s.ID AND o.ID =" + orderid;
+    				
+    	                    JRDesignQuery jdq = new JRDesignQuery();
+    	                    jdq.setText(sql);
+    	                    jd.setQuery(jdq);
+    					
+    	                    JasperReport jr = JasperCompileManager.compileReport(jd);
+    	                    JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+    						
+    	                    JasperPrintManager.printReport(jp, true);
+    						
+    	                } catch (Exception e) {
+    	                	JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
+    	                			"Error with printing", JOptionPane.ERROR_MESSAGE);
+    	                }
+    				}
+    			});
+    			
+                thread.start();                    
+    		} else {
+    			JOptionPane.showMessageDialog(null, "Order Details is empty, please view order details for print.");
+    		}
+    	} else {
+        	JOptionPane.showMessageDialog(null, "Only order details on OrderList tab is allowed to print.");
+    	}
+    }
 } // end of class inventory 
 //==============================================================================================
 //==============================================================================================
@@ -3664,6 +3717,7 @@ class ProdDetail {
 	public double getSaleP() {return salePrice;}
 	public double getUnitC(){ return unitCost;}
 	public String getNote(){ return note;}
+        
 }
 
 

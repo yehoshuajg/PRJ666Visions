@@ -242,23 +242,23 @@ public class Reports extends JFrame implements AutoCloseable {
 	revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month',"
             + " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
             + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
-            + " sum(ROUND(Total, 2)) as 'Total', "
-            + " ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2)"
-            + " as 'Revenue' from Transaction Left join Invoice i"
+            + " sum(ROUND(Total, 2)) as 'Revenue', "
+            + " ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2) - sum(ROUND(Tax, 2))"
+            + " as 'Profit' from Transaction Left join Invoice i"
             + " ON Year(i.ReceivedDate) = Year(CreateDate)"
             + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
             + " where TransactionType = 'Sale' "
             + " group by Year, Month ";
         
-	Revenue_headings.clear();
+		Revenue_headings.clear();
         Revenue_headings.add("`Year`");
         Revenue_headings.add("`Month`");
         Revenue_headings.add("`Order Cost`");
         Revenue_headings.add("`Order Paid`");
         Revenue_headings.add("`SubTotal`");
         Revenue_headings.add("`Tax`");
-        Revenue_headings.add("`Total`");
         Revenue_headings.add("`Revenue`");
+        Revenue_headings.add("`Profit`");
         
 	updateReport(Revenue_table, revenue_query);
 	
@@ -370,9 +370,9 @@ public class Reports extends JFrame implements AutoCloseable {
             f.setLocationRelativeTo(null);
         });
 
-        orders_query = "select o.ID, s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received'," 
-            + " o.Cost as 'Cost', IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '" 
-            + " from `Order` o, Supplier s" 
+        orders_query = "select o.ID, s.Name as 'Supplier', DATE_FORMAT(o.CreateDate, '%d-%M-%Y %H:%i') as 'Date Created', "
+        	+ " DATE_FORMAT(o.ReceivedDate, '%d-%M-%Y %H:%i') as 'Date Received', o.Cost as 'Cost', "
+        	+ " IFNULL(o.AmountPaid, 0) as 'Amount Paid' from `Order` o, Supplier s" 
             + " where o.SupplierID = s.ID ";
         
         Orders_headings.clear();
@@ -454,10 +454,10 @@ public class Reports extends JFrame implements AutoCloseable {
             f.setLocationRelativeTo(null);
         });
 
-	transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
-            + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
-            + " SubTotal, Tax, Total, 'View Details' as '' from `Transaction` t, Employee e" 
-            + " where t.EmployeeID = e.ID";
+	transactions_query = "select t.ID as 'ID', DATE_FORMAT(CreateDate, '%d-%M-%Y %H:%i') as 'Date Created', "
+			+ " TransactionType as 'Transaction Type', Method as 'Payment Type', "
+			+ " CONCAT(e.FirstName, ' ', e.LastName) as 'Employee', SubTotal, Tax, Total"
+			+ " from `Transaction` t, Employee e where t.EmployeeID = e.ID";
 	
         Transactions_headings.clear();
         Transactions_headings.add("`ID`");
@@ -574,10 +574,9 @@ public class Reports extends JFrame implements AutoCloseable {
             f.setLocationRelativeTo(null);
         });
 
-	invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
-            + "'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding', 'View/Process Details' as ''" 
-            + " FROM StoreDB.Invoice i, Supplier s" 
-            + " where i.SupplierID = s.ID ";
+	invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', DATE_FORMAT(i.ReceivedDate, '%d-%M-%Y %H:%i') as 'Date Received', "
+			+ " i.AmountDue as 'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding'" 
+            + " FROM StoreDB.Invoice i, Supplier s  where i.SupplierID = s.ID ";
 	
         Invoices_headings.clear();
         Invoices_headings.add("`ID`");
@@ -786,9 +785,9 @@ public class Reports extends JFrame implements AutoCloseable {
             if(!remove_order.isSelected()){
                 revenue_query += " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
                     + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
-                    + " sum(ROUND(Total, 2)) as 'Total', "
-                    + " (ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2))"
-                    + " as Revenue from Transaction Left join Invoice i"
+                    + " sum(ROUND(Total, 2)) as 'Revenue', "
+                    + " (ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2)) - sum(ROUND(Tax, 2))"
+                    + " as 'Profit' from Transaction Left join Invoice i"
                     + " ON Year(i.ReceivedDate) = Year(CreateDate)"
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
                     + " where TransactionType = 'Sale' ";
@@ -797,13 +796,13 @@ public class Reports extends JFrame implements AutoCloseable {
                 Revenue_headings.add("`Order Paid`");
                 Revenue_headings.add("`SubTotal`");
                 Revenue_headings.add("`Tax`");
-                Revenue_headings.add("`Total`");
                 Revenue_headings.add("`Revenue`");
+                Revenue_headings.add("`Profit`");
                 
             } else {
                 revenue_query += " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
-                    + " sum(ROUND(Total, 2)) as 'Total', "
-                    + " sum(ROUND(Total, 2)) as Revenue"
+                    + " sum(ROUND(Total, 2)) as 'Revenue', "
+                    + " sum(ROUND(Total, 2)) - sum(ROUND(Tax, 2)) as Profit"
                     + " from Transaction Left join Invoice i"
                     + " ON Year(i.ReceivedDate) = Year(CreateDate)"
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
@@ -811,8 +810,8 @@ public class Reports extends JFrame implements AutoCloseable {
                 
                 Revenue_headings.add("`SubTotal`");
                 Revenue_headings.add("`Tax`");
-                Revenue_headings.add("`Total`");
                 Revenue_headings.add("`Revenue`");
+                Revenue_headings.add("`Profit`");
                 
             }
             
@@ -823,16 +822,19 @@ public class Reports extends JFrame implements AutoCloseable {
             String revenuemore = revenue_more.getText();
             
             if(!(revenueless.equals("") || revenuemore.equals(""))){
-                float less = Float.parseFloat(revenueless);
-                float more = Float.parseFloat(revenuemore);
-                
-                if(less > more){
-                    float temp = less;
-                    less = more;
-                    more = temp;
+            	try{
+	                float less = Float.parseFloat(revenueless);
+	                float more = Float.parseFloat(revenuemore);
+	                
+	                if(less > more){
+	                    float temp = less;
+	                    less = more;
+	                    more = temp;
+	                }
+	                revenue_query += " HAVING Revenue BETWEEN " + less + " AND " + more;
+            	} catch (NumberFormatException e){
+                	//parsing number failed.. defaulted to normal result.
                 }
-                revenue_query += " HAVING Revenue BETWEEN " + less + " AND " + more;
-                
             }
             updateReport(Revenue_table, revenue_query);
             
@@ -1246,8 +1248,8 @@ public class Reports extends JFrame implements AutoCloseable {
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             String sup = (String)supplier.getSelectedItem();
             
-            orders_query = "select o.ID, s.Name as 'Supplier', o.CreateDate as 'Date Created', o.ReceivedDate as 'Date Received',"
-                    + " o.Cost as 'Cost', ";
+            orders_query = "select o.ID, s.Name as 'Supplier', DATE_FORMAT(o.CreateDate, '%d-%M-%Y %H:%i') as 'Date Created', "
+            		+ "DATE_FORMAT(o.ReceivedDate, '%d-%M-%Y %H:%i') as 'Date Received', o.Cost as 'Cost', ";
             
             Orders_headings.clear();
             Orders_headings.add("`ID`");
@@ -1257,13 +1259,13 @@ public class Reports extends JFrame implements AutoCloseable {
             Orders_headings.add("`Cost`");
             
             if(outstanding.isSelected()) {
-                orders_query += " ROUND(o.Cost - IFNULL(o.AmountPaid, 0), 2) as 'Outstanding', 'View Details' as ' '"
+                orders_query += " ROUND(o.Cost - IFNULL(o.AmountPaid, 0), 2) as 'Outstanding' "
                         + " from `Order` o, Supplier s"
                         + " where o.SupplierID = s.ID";
                 
                 Orders_headings.add("`Outstanding`");
             } else {
-                orders_query += " IFNULL(o.AmountPaid, 0) as 'Amount Paid', 'View Details' as ' '"
+                orders_query += " IFNULL(o.AmountPaid, 0) as 'Amount Paid' "
                         + " from `Order` o, Supplier s"
                         + " where o.SupplierID = s.ID";
                 
@@ -1435,10 +1437,9 @@ public class Reports extends JFrame implements AutoCloseable {
         submit.setText("Submit");
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
             String sup = (String)supplier.getSelectedItem();
-            invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', i.ReceivedDate as 'Date Received', i.AmountDue as "
-                    + "'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding', 'View Details' as ''"
-                    + " FROM StoreDB.Invoice i, Supplier s"
-                    + " where i.SupplierID = s.ID";
+            invoices_query = "SELECT i.ID as 'ID', s.Name as 'Name', DATE_FORMAT(i.ReceivedDate, '%d-%M-%Y %H:%i') as 'Date Received', "
+            		+ " i.AmountDue as 'Amount Due', ROUND(i.AmountDue - i.AmountPaid, 2) as 'Outstanding' "
+                    + " FROM StoreDB.Invoice i, Supplier s where i.SupplierID = s.ID";
             
             if(outstanding.isSelected()) {
                 invoices_query += " AND ROUND(i.AmountDue - i.AmountPaid, 2) > 0";
@@ -1576,10 +1577,10 @@ public class Reports extends JFrame implements AutoCloseable {
 
         submit.setText("Submit");
         submit.addActionListener((java.awt.event.ActionEvent evt) -> {
-            transactions_query = "select t.ID as 'ID', CreateDate as 'Date Created', TransactionType as 'Transaction Type'," 
-                    + " Method as 'Payment Type', CONCAT(e.FirstName, ' ', e.LastName) as 'Employee',"
-                    + " SubTotal, Tax, Total, 'View Details' as '' from `Transaction` t, Employee e" 
-                    + " where t.EmployeeID = e.ID";
+            transactions_query = "select t.ID as 'ID', DATE_FORMAT(CreateDate, '%d-%M-%Y %H:%i') as 'Date Created', "
+            		+ " TransactionType as 'Transaction Type', Method as 'Payment Type', "
+            		+ " CONCAT(e.FirstName, ' ', e.LastName) as 'Employee', SubTotal, Tax, Total"
+            		+ " from `Transaction` t, Employee e where t.EmployeeID = e.ID";
             
             order = " ";
             

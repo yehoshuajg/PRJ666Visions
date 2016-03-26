@@ -2252,23 +2252,6 @@ public class Home extends JFrame implements KeyListener{
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
 			tabbedPane.addTab("Reports", panel_reports);
-			
-			//Menu bar added by Gaurav
-            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
-            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
-            print_item.addActionListener((ActionEvent ae) -> {
-                int selected = tabbedPane.getSelectedIndex();
-                if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
-                    report_sec.printReport();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports tab.");
-                }
-                
-            });
-            mb.add(print_item);
-
-            add(mb, BorderLayout.NORTH);
-            setJMenuBar(mb);
             
 			//Staff
 			Employees staff = new Employees();
@@ -2287,6 +2270,25 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.initiateInventory();
+			
+			//Menu bar added by Gaurav
+            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
+            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
+            print_item.addActionListener((ActionEvent ae) -> {
+            	int selected = tabbedPane.getSelectedIndex();
+            	if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
+                	report_sec.printReport();
+            	} else if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Inventory")){
+                	inv.printOrderSheet();
+                } else {
+                	JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports and inventory tab.");
+                }
+
+            });
+            mb.add(print_item);
+
+            add(mb, BorderLayout.NORTH);
+            setJMenuBar(mb);
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2300,22 +2302,6 @@ public class Home extends JFrame implements KeyListener{
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
 			tabbedPane.addTab("Reports", panel_reports);
-			
-			//Menu bar added by Gaurav
-            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
-            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
-            print_item.addActionListener((ActionEvent ae) -> {
-                int selected = tabbedPane.getSelectedIndex();
-                if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
-                    report_sec.printReport();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports tab.");
-                }
-            });
-            mb.add(print_item);
-
-            add(mb, BorderLayout.NORTH);
-            setJMenuBar(mb);
             
 			//Staff
 			Employees staff = new Employees();
@@ -2334,6 +2320,25 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.initiateInventory();
+			
+			//Menu bar added by Gaurav
+            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
+            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
+            print_item.addActionListener((ActionEvent ae) -> {
+            	int selected = tabbedPane.getSelectedIndex();
+            	if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
+                	report_sec.printReport();
+            	} else if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Inventory")){
+                	inv.printOrderSheet();
+                } else {
+                	JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports and inventory tab.");
+                }
+
+            });
+            mb.add(print_item);
+
+            add(mb, BorderLayout.NORTH);
+            setJMenuBar(mb);
 			
 			//Get Help
 			JPanel panel_getHelp = new JPanel();
@@ -2344,22 +2349,6 @@ public class Home extends JFrame implements KeyListener{
 			Reports report_sec = new Reports(); 
 			JPanel panel_reports = report_sec.getWindow();
 			tabbedPane.addTab("Reports", panel_reports);
-			
-			//Menu bar added by Gaurav
-            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
-            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
-            print_item.addActionListener((ActionEvent ae) -> {
-                int selected = tabbedPane.getSelectedIndex();
-                if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
-                    report_sec.printReport();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports tab.");
-                }
-            });
-            mb.add(print_item);
-
-            add(mb, BorderLayout.NORTH);
-            setJMenuBar(mb);
             
 			//Staff
 			Employees staff = new Employees();
@@ -2378,6 +2367,25 @@ public class Home extends JFrame implements KeyListener{
 			Inventory inv = new Inventory();
 			tabbedPane.addTab("Inventory",inv);
 			inv.initiateInventory();
+			
+			//Menu bar added by Gaurav
+            javax.swing.JMenuBar mb = new javax.swing.JMenuBar();
+            javax.swing.JMenuItem print_item = new javax.swing.JMenuItem("Print");
+            print_item.addActionListener((ActionEvent ae) -> {
+            	int selected = tabbedPane.getSelectedIndex();
+            	if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Reports")){
+                	report_sec.printReport();
+            	} else if(tabbedPane.getTitleAt(selected).equalsIgnoreCase("Inventory")){
+                	inv.printOrderSheet();
+                } else {
+                	JOptionPane.showMessageDialog(null, "Nothing to print, only works with reports and inventory tab.");
+                }
+
+            });
+            mb.add(print_item);
+
+            add(mb, BorderLayout.NORTH);
+            setJMenuBar(mb);
 		}
 			
 		//BackupAndRestore br = new BackupAndRestore();  
