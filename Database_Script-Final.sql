@@ -93,11 +93,12 @@ create table PriceHistory
 	EffectiveDate	timestamp		DEFAULT current_timestamp,
 	ProductID		int(8)			not null,
 	NewPrice		double			not null,
+    Reason			varchar(100),
 	
 	PRIMARY KEY(EffectiveDate, ProductID),
 	CONSTRAINT CK_PriceHistory_NewPrice check(NewPrice > 0)
 );
-
+/*
 DELIMITER $$
 CREATE TRIGGER Product_Price_Updated 
     BEFORE UPDATE ON Product
@@ -107,10 +108,12 @@ IF (NEW.SalePrice != OLD.SalePrice) THEN
     INSERT INTO PriceHistory
     SET EffectiveDate = NOW(),
 		ProductID = OLD.ID,
-        NewPrice = NEW.SalePrice; 
+        NewPrice = NEW.SalePrice
+        Reason = :reason; 
 END IF;
 END$$
 DELIMITER ;
+*/
 
 /*-------------------------- QUALITY_ADJUSTMENT -----------------------------*/
 create table QAdjustment
@@ -118,7 +121,7 @@ create table QAdjustment
 	ID			int				not null	AUTO_INCREMENT,
 	ProductID	int(8)			not null,
 	Quantity	int 			not null,
-	Reason		varchar(25),
+	Reason		varchar(100),
 	ChangeDate	DATE			not null,
 	
 	PRIMARY KEY(ID),
@@ -239,6 +242,7 @@ create table Invoice
 	AmountPaid		double						DEFAULT 0,
 	ReceivedDate	timestamp		DEFAULT current_timestamp,
 	SupplierID		int 			not null,
+    Sup_InvoiceID	int 			not null	Default 0,
 	
 	PRIMARY KEY(ID),
 	FOREIGN KEY (SupplierID) REFERENCES Supplier(ID),
@@ -825,10 +829,8 @@ INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`Uni
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 24,10000022,5, saleprice from product where product.ID = 10000022;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 13,10000013,5, saleprice from product where product.ID = 10000013;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 21,10000012,2, saleprice from product where product.ID = 10000012;
-INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 61,10000018,1, saleprice from product where product.ID = 10000018;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 41,10000009,1, saleprice from product where product.ID = 10000009;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 28,10000006,4, saleprice from product where product.ID = 10000006;
-INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 92,10000014,5, saleprice from product where product.ID = 10000014;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 47,10000017,3, saleprice from product where product.ID = 10000017;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 98,10000012,2, saleprice from product where product.ID = 10000012;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 52,10000022,2, saleprice from product where product.ID = 10000022;
@@ -837,7 +839,6 @@ INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`Uni
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 78,10000003,2, saleprice from product where product.ID = 10000003;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 56,10000015,3, saleprice from product where product.ID = 10000015;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 98,10000022,3, saleprice from product where product.ID = 10000022;
-INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 55,10000023,3, saleprice from product where product.ID = 10000023;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 57,10000022,3, saleprice from product where product.ID = 10000022;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 12,10000005,1, saleprice from product where product.ID = 10000005;
 INSERT INTO `TransactionRecord` (`TransactionID`,`ProductID`,`QuantitySold`,`UnitPrice`) Select 1,10000020,2, saleprice from product where product.ID = 10000020;
@@ -897,6 +898,10 @@ insert into Invoice (ID, ReceivedDate, SupplierID) values (30, '2015-11-21 09:24
 insert into Invoice (ID, ReceivedDate, SupplierID) values (31, '2016-01-21 10:27:04', 13);
 insert into Invoice (ID, ReceivedDate, SupplierID) values (32, '2015-11-25 18:04:47', 14);
 insert into Invoice (ID, ReceivedDate, SupplierID) values (33, '2015-09-30 13:52:56', 15);
+
+update Invoice
+set Sup_InvoiceID = ID
+where ID <> 0;
 
 insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, AmountPaid) values (13, 2, '2015-10-30 11:22:04', Date_Add(CreateDate, INTERVAL 2 WEEK), 952.84, null);
 insert into `Order` (SupplierID, EmployeeID, CreateDate, ReceivedDate, Cost, AmountPaid) values (8, 21, '2015-09-17 07:14:15', Date_Add(CreateDate, INTERVAL 2 WEEK), 1036.41, 985.89);
