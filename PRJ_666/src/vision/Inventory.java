@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,18 +17,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
@@ -37,6 +44,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -68,21 +76,23 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DefaultStyledDocument;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
+import vision.Reports.DateLabelFormatter;
+
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.border.Border;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 import java.awt.SystemColor;
-import java.sql.DriverManager;
 import javax.swing.BoxLayout;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperPrintManager;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.design.JRDesignQuery;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import java.awt.CardLayout;
+import javax.swing.JMenuBar;
 
 
 
@@ -162,11 +172,17 @@ private JTable inv_priceHisTable;
 private JComboBox<CbSupItem> simpleSupList;
 
 private DefaultStyledDocument doc;
-private JTable inv_orderListTable;
-private JTable inv_orderDetailTable;
+private static JTable inv_orderListTable;
+private static JTable inv_orderDetailTable;
 private JTextField dataDeliveryCost;
 private JTextField dataInvoiceNumber;
 private final JPanel panel_3 = new JPanel();
+private JTextField dataSupInvoiceID;
+private JTextField dataAmountDue;
+private static JTable invoice_Table;
+private static JTable pickOrderTable;
+private JTextField dataAmountPaid;
+private static JScrollPane scrollP_Panel_Invoice_Center;
 
 
 public Inventory() {
@@ -981,97 +997,8 @@ add(panel, BorderLayout.NORTH);
 			
 			btnAdd.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					
-					
 					addProduct();
-					/*
-					try{
-						int flag = 0;
-						String prodID = add_prodID_tf.getText();
-						String prodName = add_prodName_tf.getText();
-						String prodDesc = add_prodDesc_tf.getText();
-						String prodQty = add_prodQty_tf.getText();
-						String prodSalePrice = add_prodSalePrice_tf.getText();
-						CbCategoryItem catItem = (CbCategoryItem) add_prodCat_cb.getSelectedItem();
-						CbCategoryItem subCatItem = (CbCategoryItem) add_prodSubCat_cb.getSelectedItem();
-						
-						
-						int catID = catItem.getID();
-						int subCatID = 0;
-						// if user does not select category, give error
-						if ( catID == 0 ) flag = 2;
-						System.out.println("category ID is /" + catID);
-						//sub category throws exception if user does not select category
-						System.out.println("sub category ID is /" + subCatID);
-						
-					    	//validate user input 
-					    if ( !validateProdID(prodID) ) flag = 1;
-					    if ( !validateStringSize(prodName, sizeProdName) ) flag = 1;
-					    
-					    if ( prodDesc.isEmpty()){
-					    	prodDesc = ""; //assign "" to product description if it is empty
-					    } else {  if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;}
-					    if ( !validateStringSize(prodDesc, sizeProdDesc) ) flag = 1;
-					    if ( prodQty.isEmpty()){
-					    	prodQty = "0"; //assign 0 to product quantity if it is empty
-					    } else {  if ( !validateIntSize(prodQty, sizeProdQty) ) flag = 1;}
-					    
-					    if ( !validateDouble(prodSalePrice) ) flag = 1;
-
-					    if (flag == 1){
-					    	JOptionPane.showMessageDialog(null, "Invalid input - try again");
-					    }
-					    else if (flag == 2 ){
-					    	JOptionPane.showMessageDialog(null, "Category is required");
-					    }
-					    else if ( flag == 0 )
-					    {
-							con_Inv = Connect.connectionSetup();
-							//update product table
-							String query = "insert into product (ID, Name, Description, Quantity, CategoryID, SubCategoryID, SalePrice, Notes)"
-									+ "values ( ?,?,?,?,?,?,?,?)";
-							PreparedStatement pst = con_Inv.prepareStatement(query);		 
-							pst.setInt(1, Integer.parseInt( prodID ));
-							pst.setString(2, prodName);
-							pst.setString(3, prodDesc);
-							pst.setInt(4, Integer.parseInt( prodQty ) );
-							pst.setInt(5, catID);
-							if (subCatID != 0){
-								pst.setInt(6, subCatID);
-							} else {
-								pst.setNull(6, java.sql.Types.INTEGER);
-							}
-							
-							pst.setDouble(7, Double.parseDouble(prodSalePrice));
-							pst.setString(8, add_prodNotes_tf.getText());
-							
-														
-							pst.executeUpdate();
-							JOptionPane.showMessageDialog(null, "New Product Added");
-								
-							for (int i= 0; i < table_inventoryList.getRowCount(); i++){
-								if( prodID.equals( table_inventoryList.getValueAt(i, 1) )){
-									table_inventoryList.setRowSelectionInterval(i, i);
-								}
-								refreshInventoryTable(1);
-								
-							}
-							
-							pst.close();
-							con_Inv.close();
-					    }// if - validate user input 
-					}
-					 catch (SQLException ex) {
-                    if (ex.getSQLState().startsWith("23")) {
-                          JOptionPane.showMessageDialog(null, "Duplicated Product ID - please try again");
-                    } 
-					 }catch (Exception e1) {
-						e1.printStackTrace();
-					 }
-					*/
-						
-					}
-						
+					}	
 			});
 		
 		JButton btnNewButton_1 = new JButton("Clear Form");
@@ -1443,15 +1370,15 @@ add(panel, BorderLayout.NORTH);
 		///der page =======================================================
 		// ========================================================================================
 		
-		JPanel jp_createOrder = new JPanel();
-		tabbedPane_Inventory.addTab("Create Order", null, jp_createOrder, null);
+		JPanel panel_createOrder = new JPanel();
+		tabbedPane_Inventory.addTab("Create Order", null, panel_createOrder, null);
 		tabbedPane_Inventory.setEnabledAt(3, false);
 		
-		jp_createOrder.setLayout(new BorderLayout(0, 0));
+		panel_createOrder.setLayout(new BorderLayout(0, 0));
 		
 		
 		JPanel jp_createOrder_north = new JPanel();
-		jp_createOrder.add(jp_createOrder_north, BorderLayout.NORTH);
+		panel_createOrder.add(jp_createOrder_north, BorderLayout.NORTH);
 		FlowLayout fl_jp_createOrder_north = (FlowLayout) jp_createOrder_north.getLayout();
 		fl_jp_createOrder_north.setAlignment(FlowLayout.LEFT);
 		
@@ -1466,7 +1393,7 @@ add(panel, BorderLayout.NORTH);
 		ord_Sup_cb.setRenderer(new CbSupListRenderer());
 		
 		JPanel jp_createOrder_center = new JPanel();
-		jp_createOrder.add(jp_createOrder_center, BorderLayout.CENTER);
+		panel_createOrder.add(jp_createOrder_center, BorderLayout.CENTER);
 		jp_createOrder_center.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_12 = new JPanel();
@@ -1480,7 +1407,7 @@ add(panel, BorderLayout.NORTH);
 		
 		
 		JPanel jp_createOrder_east = new JPanel();
-		jp_createOrder.add(jp_createOrder_east, BorderLayout.EAST);
+		panel_createOrder.add(jp_createOrder_east, BorderLayout.EAST);
 		jp_createOrder_east.setLayout(new BorderLayout(0, 0));
 		jp_createOrder_east.setPreferredSize(new Dimension(300, 100));
 		
@@ -1516,18 +1443,18 @@ add(panel, BorderLayout.NORTH);
 		
 		scrollPane_createOrderSummary.setPreferredSize(new Dimension(200,200));
 		
-		JPanel jp_orderList = new JPanel();
-		tabbedPane_Inventory.addTab("OrderList", null, jp_orderList, null);
-		jp_orderList.setLayout(new BorderLayout(0, 0));
+		JPanel panel_orderList = new JPanel();
+		tabbedPane_Inventory.addTab("OrderList", null, panel_orderList, null);
+		panel_orderList.setLayout(new BorderLayout(0, 0));
 		
 		JPanel jpOrderListNorth = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) jpOrderListNorth.getLayout();
-		jp_orderList.add(jpOrderListNorth, BorderLayout.NORTH);
+		panel_orderList.add(jpOrderListNorth, BorderLayout.NORTH);
 		jpOrderListNorth.setPreferredSize(new Dimension(50, 20));
 	
 		
 		JPanel jpOrderListWest = new JPanel();
-		jp_orderList.add(jpOrderListWest, BorderLayout.WEST);
+		panel_orderList.add(jpOrderListWest, BorderLayout.WEST);
 		jpOrderListWest.setLayout(new BorderLayout(5, 5));
 		
 		JPanel panel_6 = new JPanel();
@@ -1554,7 +1481,7 @@ add(panel, BorderLayout.NORTH);
 		scrollPane_2.setViewportView(inv_orderListTable);
 		
 		JPanel jpOrderListCenter = new JPanel();
-		jp_orderList.add(jpOrderListCenter, BorderLayout.CENTER);
+		panel_orderList.add(jpOrderListCenter, BorderLayout.CENTER);
 		jpOrderListCenter.setLayout(new BorderLayout(5, 5));
 		
 		JPanel panel_4 = new JPanel();
@@ -1675,6 +1602,192 @@ add(panel, BorderLayout.NORTH);
 		
 		inv_orderDetailTable = new JTable();
 		scrollPane_3.setViewportView(inv_orderDetailTable);
+		
+		JPanel panel_Invoice = new JPanel();
+		tabbedPane_Inventory.addTab("Invoice", null, panel_Invoice, null);
+		panel_Invoice.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_Invoice_North = new JPanel();
+		FlowLayout fl_panel_Invoice_North = (FlowLayout) panel_Invoice_North.getLayout();
+		fl_panel_Invoice_North.setAlignment(FlowLayout.LEFT);
+		panel_Invoice.add(panel_Invoice_North, BorderLayout.NORTH);
+		
+		
+		
+		JButton btn_add_invoice = new JButton("Add Invoice");
+		panel_Invoice_North.add(btn_add_invoice);
+		
+		JButton btn_invoice_help = new JButton("Help");
+		btn_invoice_help.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				JOptionPane.showMessageDialog(null, "To add new invoice, click \"Add Invoice\"\nTo update existing invoice, double click a invoice in the list");
+			}
+		});
+		panel_Invoice_North.add(btn_invoice_help);
+		
+		scrollP_Panel_Invoice_Center = new JScrollPane();
+		panel_Invoice.add(scrollP_Panel_Invoice_Center, BorderLayout.CENTER);
+		
+		//invoice_Table = new JTable();
+		//scrollP_Panel_Invoice_Center.setViewportView(invoice_Table);
+		btn_add_invoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+		        SwingUtilities.invokeLater(new Runnable() {
+		            @Override
+		            public void run() {
+		                new DialogAddNewInvoice(null).setVisible(true);
+		            }
+		        });
+
+			}
+		});
+		
+		JPanel TestingPanel = new JPanel();
+		tabbedPane_Inventory.addTab("Testing", null, TestingPanel, null);
+		TestingPanel.setLayout(new BorderLayout(0, 0));
+		
+		
+		JPanel jp_invoiceCreateDialog = new JPanel();
+		jp_invoiceCreateDialog.setBounds(382, 332, 326, 275);
+		
+		TestingPanel.add(jp_invoiceCreateDialog);
+		jp_invoiceCreateDialog.setLayout(null);
+		
+		JPanel panel_14 = new JPanel();
+		jp_invoiceCreateDialog.add(panel_14);
+		panel_14.setBounds(55, 78, 358, 389);
+		GridBagLayout gbl_panel_14 = new GridBagLayout();
+		gbl_panel_14.columnWidths = new int[]{150, 50, 50, 50, 0, 0};
+		gbl_panel_14.rowHeights = new int[]{0, 20, 25, 0, 0, 0, 150, 100, 0, 0};
+		gbl_panel_14.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_14.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		panel_14.setLayout(gbl_panel_14);
+		
+		JLabel lblNewInvoice = new JLabel("Add New Invoice");
+		GridBagConstraints gbc_lblNewInvoice = new GridBagConstraints();
+		gbc_lblNewInvoice.anchor = GridBagConstraints.EAST;
+		gbc_lblNewInvoice.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewInvoice.gridx = 0;
+		gbc_lblNewInvoice.gridy = 0;
+		panel_14.add(lblNewInvoice, gbc_lblNewInvoice);
+		lblNewInvoice.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		
+		JLabel lblInvoiceId = new JLabel("Supplier Invoice #/ ID");
+		lblInvoiceId.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		GridBagConstraints gbc_lblInvoiceId = new GridBagConstraints();
+		gbc_lblInvoiceId.anchor = GridBagConstraints.EAST;
+		gbc_lblInvoiceId.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInvoiceId.gridx = 0;
+		gbc_lblInvoiceId.gridy = 2;
+		panel_14.add(lblInvoiceId, gbc_lblInvoiceId);
+		
+		dataSupInvoiceID = new JTextField();
+		GridBagConstraints gbc_dataSupInvoiceID = new GridBagConstraints();
+		gbc_dataSupInvoiceID.fill = GridBagConstraints.BOTH;
+		gbc_dataSupInvoiceID.gridwidth = 3;
+		gbc_dataSupInvoiceID.insets = new Insets(0, 0, 5, 5);
+		gbc_dataSupInvoiceID.gridx = 1;
+		gbc_dataSupInvoiceID.gridy = 2;
+		panel_14.add(dataSupInvoiceID, gbc_dataSupInvoiceID);
+		dataSupInvoiceID.setColumns(10);
+		
+		JLabel lblSupplier = new JLabel("Supplier");
+		GridBagConstraints gbc_lblSupplier = new GridBagConstraints();
+		gbc_lblSupplier.anchor = GridBagConstraints.EAST;
+		gbc_lblSupplier.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSupplier.gridx = 0;
+		gbc_lblSupplier.gridy = 3;
+		panel_14.add(lblSupplier, gbc_lblSupplier);
+		
+		JComboBox<vision.CbCategoryItem> dataSupCb = new JComboBox();
+		GridBagConstraints gbc_dataSupCb = new GridBagConstraints();
+		gbc_dataSupCb.fill = GridBagConstraints.BOTH;
+		gbc_dataSupCb.gridwidth = 3;
+		gbc_dataSupCb.insets = new Insets(0, 0, 5, 5);
+		gbc_dataSupCb.gridx = 1;
+		gbc_dataSupCb.gridy = 3;
+		panel_14.add(dataSupCb, gbc_dataSupCb);
+		
+		JLabel lblAmountDue = new JLabel("Amount Due");
+		GridBagConstraints gbc_lblAmountDue = new GridBagConstraints();
+		gbc_lblAmountDue.anchor = GridBagConstraints.EAST;
+		gbc_lblAmountDue.insets = new Insets(0, 0, 5, 5);
+		gbc_lblAmountDue.gridx = 0;
+		gbc_lblAmountDue.gridy = 4;
+		panel_14.add(lblAmountDue, gbc_lblAmountDue);
+		
+		dataAmountDue = new JTextField();
+		GridBagConstraints gbc_dataAmountDue = new GridBagConstraints();
+		gbc_dataAmountDue.fill = GridBagConstraints.BOTH;
+		gbc_dataAmountDue.gridwidth = 2;
+		gbc_dataAmountDue.insets = new Insets(0, 0, 5, 5);
+		gbc_dataAmountDue.gridx = 1;
+		gbc_dataAmountDue.gridy = 4;
+		panel_14.add(dataAmountDue, gbc_dataAmountDue);
+		dataAmountDue.setColumns(10);
+		
+		JLabel lblAmountPaid = new JLabel("Amount  Paid");
+		GridBagConstraints gbc_lblAmountPaid = new GridBagConstraints();
+		gbc_lblAmountPaid.anchor = GridBagConstraints.EAST;
+		gbc_lblAmountPaid.insets = new Insets(0, 0, 5, 5);
+		gbc_lblAmountPaid.gridx = 0;
+		gbc_lblAmountPaid.gridy = 5;
+		panel_14.add(lblAmountPaid, gbc_lblAmountPaid);
+		
+		dataAmountPaid = new JTextField();
+		GridBagConstraints gbc_dataAmountPaid = new GridBagConstraints();
+		gbc_dataAmountPaid.gridwidth = 2;
+		gbc_dataAmountPaid.anchor = GridBagConstraints.NORTH;
+		gbc_dataAmountPaid.insets = new Insets(0, 0, 5, 5);
+		gbc_dataAmountPaid.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dataAmountPaid.gridx = 1;
+		gbc_dataAmountPaid.gridy = 5;
+		panel_14.add(dataAmountPaid, gbc_dataAmountPaid);
+		dataAmountPaid.setColumns(10);
+		
+		
+		
+		JLabel lblSelectOrdersTo = new JLabel("Orders to associate");
+		GridBagConstraints gbc_lblSelectOrdersTo = new GridBagConstraints();
+		gbc_lblSelectOrdersTo.anchor = GridBagConstraints.NORTHEAST;
+		gbc_lblSelectOrdersTo.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSelectOrdersTo.gridx = 0;
+		gbc_lblSelectOrdersTo.gridy = 6;
+		panel_14.add(lblSelectOrdersTo, gbc_lblSelectOrdersTo);
+		
+		JScrollPane scrollPane_6 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_6 = new GridBagConstraints();
+		gbc_scrollPane_6.gridwidth = 3;
+		gbc_scrollPane_6.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPane_6.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_6.gridx = 1;
+		gbc_scrollPane_6.gridy = 6;
+		panel_14.add(scrollPane_6, gbc_scrollPane_6);
+		
+		pickOrderTable = new JTable();
+		scrollPane_6.setViewportView(pickOrderTable);
+		
+		JLabel lblMessage = new JLabel("Message");
+		GridBagConstraints gbc_lblMessage = new GridBagConstraints();
+		gbc_lblMessage.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMessage.anchor = GridBagConstraints.NORTHEAST;
+		gbc_lblMessage.gridx = 0;
+		gbc_lblMessage.gridy = 7;
+		panel_14.add(lblMessage, gbc_lblMessage);
+		
+		JTextArea textArea = new JTextArea();
+		textArea.setBackground(SystemColor.control);
+		textArea.setEditable(false);
+		textArea.setLineWrap(true);
+		GridBagConstraints gbc_textArea = new GridBagConstraints();
+		gbc_textArea.gridwidth = 3;
+		gbc_textArea.insets = new Insets(0, 0, 5, 5);
+		gbc_textArea.fill = GridBagConstraints.BOTH;
+		gbc_textArea.gridx = 1;
+		gbc_textArea.gridy = 7;
+		panel_14.add(textArea, gbc_textArea);
 
 		
 
@@ -1682,7 +1795,7 @@ add(panel, BorderLayout.NORTH);
 //======================================================================================================================================
 // Begining of inventory class functions
  
-    public boolean validateStrToInt(String s){
+    public static boolean validateStrToInt(String s){
         try { 
             Integer.parseInt(s); 
         } catch(NumberFormatException e) { 
@@ -1692,7 +1805,7 @@ add(panel, BorderLayout.NORTH);
         }
         return true;
     }
-    public boolean validateStrToDouble(String s){
+    public static boolean validateStrToDouble(String s){
         try { 
             Double.parseDouble(s); 
         } catch(NumberFormatException e) { 
@@ -1816,6 +1929,10 @@ add(panel, BorderLayout.NORTH);
 			refreshInventoryTable(2);
 
 		} else if (step == 2){
+			stopEditing(table_inventoryList);
+			//if(table_inventoryList.isEditing()){
+				//table_inventoryList.getCellEditor().stopCellEditing();
+			
 			//next step is to update database based on the user input
 			
 		    int response = JOptionPane.showConfirmDialog(null, "Do you want to update sale price?", "Confirm Update",
@@ -1829,26 +1946,31 @@ add(panel, BorderLayout.NORTH);
 		        
 		    int count=0;
 		    Vector<Integer> prodIDs = new Vector<Integer>();
-			for(int i = 0; i < table_inventoryList.getRowCount(); i++){
+			
 
 				try {
 					con_Inv = Connect.connectionSetup();
 					String query = "";
+					
+					for(int i = 0; i < table_inventoryList.getRowCount(); i++){
 				
 						if ( table_inventoryList.getValueAt(i, 11) != null){
 							
-						double newSalPrice = Double.parseDouble( (String) table_inventoryList.getValueAt(i, 11) );
-						double curUniPrice = (double) table_inventoryList.getValueAt(i, 9)  ;
-						int prodID = (int)table_inventoryList.getValueAt(i, 1);
-					
-							if (newSalPrice > curUniPrice){
+							double newSalPrice = Double.parseDouble( (String) table_inventoryList.getValueAt(i, 11) );
+							double curUniPrice = (double) table_inventoryList.getValueAt(i, 9)  ;
+							int prodID = (int)table_inventoryList.getValueAt(i, 1);
+								
+							System.out.println("new sale price" + newSalPrice + " / curUnitPrice" + curUniPrice);
+								if (newSalPrice > curUniPrice){
 								query = "Update Product Set SalePrice = " + newSalPrice + " WHERE ID = " + prodID ;
 								PreparedStatement pst = con_Inv.prepareStatement(query);
 								pst.executeUpdate();
 								count++;
 								prodIDs.addElement(prodID);
-							}
+								}
 						} // end of If new sale price is not Null 
+						
+						} // end of for loop	
 						
 						con_Inv.close();
 						
@@ -1856,13 +1978,13 @@ add(panel, BorderLayout.NORTH);
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			} // end of for loop
+		
 			
 				if(count > 0) { 
 				JOptionPane.showMessageDialog(null, "Sale Price updated");
-			}else {
-				JOptionPane.showMessageDialog(null, "No data has been updated");
-			}
+					}else {
+						JOptionPane.showMessageDialog(null, "No data has been updated");
+					}
 			
 				
 				refreshInventoryTable(1);
@@ -1878,7 +2000,6 @@ add(panel, BorderLayout.NORTH);
 			
 			} // end of Yes Option
 						
-
 			}// end of step 2
 
 	}// end of function
@@ -1937,11 +2058,202 @@ add(panel, BorderLayout.NORTH);
 		}
 		
 	}
+	
 	public void initiateInventory(){
 		refreshInventoryTable(1);
 		updateInv_orderListTable();
+		createInvoiceTable();
 	}
 	
+	public static void createInvoiceTable(){ //===============================================
+		
+		Connection con; 
+		try {
+			con = Connect.connectionSetup();
+			
+			String query = "Select i.ID, s.Name as supplier, i.ReceivedDate, i.AmountDue, i.AmountPaid, i.AmountDue - i.AmountPaid, GROUP_CONCAT(o.id SEPARATOR ', ')  "
+					+ "FROM invoice i "
+					+ "LEFT JOIN Supplier s ON i.SupplierID = s.ID "
+					+ "LEFT JOIN `order` o  ON i.ID = o.invoiceID "
+					+ "Group by i.ID ORDER BY i.ID DESC";
+			
+			 PreparedStatement pst = con.prepareStatement(query);
+			 ResultSet rs = pst.executeQuery();
+		 
+			Vector<Object> columnNames = new Vector<Object>();
+		    Vector<Object> data = new Vector<Object>();
+		    
+		    columnNames.addElement("Invoice ID");
+		    columnNames.addElement("Supplier");
+		    columnNames.addElement("Received Date");
+		    columnNames.addElement("Amount Due");
+		    columnNames.addElement("Amount Paid");
+		    columnNames.addElement("Outstanding");
+		    columnNames.addElement("Orders");
+		    
+		    while(rs.next()){
+		    	Vector<Object> row = new Vector<Object>();
+		    	for (int i = 1; i <= 7; i++){
+		    		row.addElement(rs.getObject(i));
+		    	}
+		    	data.addElement(row);
+		    }
+		    
+			 con.close();
+			 pst.close();
+		    
+		    TM_basic modelForInvoice = new TM_basic(data, columnNames);
+		    invoice_Table = new JTable(modelForInvoice);
+		    scrollP_Panel_Invoice_Center.setViewportView(invoice_Table);
+		    //invoice_Table.setModel(modelForInvoice);
+		    invoice_Table.setRowHeight(30);
+		    		
+			Dimension tableSize = invoice_Table.getPreferredSize();
+			TableColumnModel tcm = invoice_Table.getColumnModel();
+		
+			tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //ID
+			tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); //Supplier
+			tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //ReceivedDate
+			tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //AmountDue
+			tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //AmountPaid
+			tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //Outstanding
+			tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //# of orders
+			
+			/*				
+			TableModelListener tml_invoiceTable = new TableModelListener(){
+			TableModel model = invoice_Table.getModel();
+			
+				@Override 
+				public void tableChanged(TableModelEvent e){
+					if(e.getType() == TableModelEvent.UPDATE){
+						
+						int row = e.getFirstRow();
+						int col = e.getColumn();
+						//boolean validPrice = true;
+						
+						if (col == 11 && model.getValueAt(row, col) != null ){ //=====
+							String newPrice =  (String) model.getValueAt(row, 11);
+							if (!validateDouble(newPrice)){ //----
+								JOptionPane.showMessageDialog(null, "new sale price must be a number");
+								model.setValueAt(null, row, col);
+
+								//validPrice = false;
+							}//----
+						}//=======
+					}
+				} // end of tableChanged(TableModelEvent e)
+			}; //end of tml_
+			
+			invoice_Table.getModel().addTableModelListener(tml_invoiceTable);
+			invoice_Table.getColumnModel().getColumn(11).setCellRenderer(new TCellRend_newSalePrice());
+			*/
+		
+			invoice_Table.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent mouseE) {
+				if (mouseE.getClickCount() == 2) {
+				    JTable target = (JTable)mouseE.getSource();
+				    int row = target.getSelectedRow();
+				    int invoiceID = (int) target.getValueAt(row, 0);
+				    
+			        SwingUtilities.invokeLater(new Runnable() {
+			            @Override
+			            public void run() {
+			                new DialogEditInvoice(null,invoiceID).setVisible(true);
+			            }
+			        });
+				    
+
+					}
+				}
+			});	
+			
+			
+		 //crate invoice table
+		
+		
+		//add to scroll pane
+		
+				
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+}
+
+//==============================================
+	/*
+public void updateInv_orderListTable(){
+	
+	try {
+		con_Inv = Connect.connectionSetup();
+
+	String query = "Select o.ID, CreateDate, s.Name as 'Supplier Name', ReceivedDate, InvoiceID "
+			+ "FROM `order` o "
+			+ "Inner JOIN Supplier s ON s.ID = o.SupplierID "
+			+ "ORDER BY ID DESC;";
+	
+	PreparedStatement pst = con_Inv.prepareStatement(query);
+	ResultSet rs = pst.executeQuery();
+	
+Vector<Object> columnNames = new Vector<Object>();
+Vector<Object> data = new Vector<Object>();
+
+columnNames.addElement("Order ID");
+columnNames.addElement("Created");
+columnNames.addElement("Supplier");
+columnNames.addElement("Received Date");
+columnNames.addElement("Invoice ID");
+
+
+while(rs.next()){
+	Vector<Object> row = new Vector<Object>();
+	for (int i = 1; i <= 5; i++){
+		row.addElement(rs.getObject(i));
+	}
+	data.addElement(row);
+}
+
+TM_basic orderModel = new TM_basic(data, columnNames);
+inv_orderListTable.setModel(orderModel);
+inv_orderListTable.setRowHeight(30);
+
+Dimension tableSize = inv_orderListTable.getPreferredSize();
+tcm = inv_orderListTable.getColumnModel();
+
+
+	tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //check
+	tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //ID
+	tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); //Category
+	tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Sub Category
+	tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Name
+	//tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Description
+	//tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Quantity
+	//tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //TO be delivered
+	//tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Sale Price
+	//tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Unit Cost
+
+	inv_orderListTable.addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent mouseE) {
+		if (mouseE.getClickCount() == 2) {
+		    JTable target = (JTable)mouseE.getSource();
+		    int row = target.getSelectedRow();
+		    int orderID = (int) target.getValueAt(row, 0);
+		    
+		    updateInv_orderDetailTable(orderID);
+
+		}
+	}
+});	
+	
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+}
+*/	
 	public void addProduct(){//=======================================
 		try{
 			
@@ -2081,11 +2393,7 @@ add(panel, BorderLayout.NORTH);
 			}
 		}
 		
-		
-		
 
-	
-	
 	//===================================================================================================
 	public void createOrderTable(StringBuilder mySelection){
 		
@@ -2451,11 +2759,13 @@ add(panel, BorderLayout.NORTH);
 			}
 	}
 	
+
+	
 	//==============================================
-	public void updateInv_orderListTable(){
+	public static void updateInv_orderListTable(){
 		
 		try {
-			con_Inv = Connect.connectionSetup();
+			Connection con_Inv = Connect.connectionSetup();
 
 		String query = "Select o.ID, CreateDate, s.Name as 'Supplier Name', ReceivedDate, InvoiceID "
 				+ "FROM `order` o "
@@ -2488,7 +2798,7 @@ add(panel, BorderLayout.NORTH);
     inv_orderListTable.setRowHeight(30);
     
 	Dimension tableSize = inv_orderListTable.getPreferredSize();
-	tcm = inv_orderListTable.getColumnModel();
+	TableColumnModel tcm = inv_orderListTable.getColumnModel();
 	
 	
 		tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.10f)); //check
@@ -2496,11 +2806,7 @@ add(panel, BorderLayout.NORTH);
 		tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); //Category
 		tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Sub Category
 		tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.20f)); //Name
-		//tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.15f)); //Description
-		//tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Quantity
-		//tcm.getColumn(7).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //TO be delivered
-		//tcm.getColumn(8).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Sale Price
-		//tcm.getColumn(9).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); //Unit Cost
+
     
 		inv_orderListTable.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseE) {
@@ -2511,9 +2817,9 @@ add(panel, BorderLayout.NORTH);
 			    
 			    updateInv_orderDetailTable(orderID);
 
+				}
 			}
-		}
-	});	
+		});	
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -2522,10 +2828,14 @@ add(panel, BorderLayout.NORTH);
     
 	}//-------------------------------------------------------
 	
-	public void updateInv_orderDetailTable(int orderID){
+	public void stopEditing(JTable table){
+		table.getCellEditor().stopCellEditing();
+	}
+	
+	public static void updateInv_orderDetailTable(int orderID){
 		try {
 			
-		con_Inv = Connect.connectionSetup();
+		Connection con_Inv = Connect.connectionSetup();
 
 		String query = "Select od.OrderID, od.ProductID,  p.Name as 'Product Name', od.OrderedQuantity, od.ReceivedQuantity, od.Cost "
 				+ "FROM orderDetail od "
@@ -2606,7 +2916,7 @@ add(panel, BorderLayout.NORTH);
     inv_orderDetailTable.getModel().addTableModelListener(TListner);
     
 	Dimension tableSize = inv_orderDetailTable.getPreferredSize();
-	tcm = inv_orderDetailTable.getColumnModel();
+	TableColumnModel tcm = inv_orderDetailTable.getColumnModel();
 	
 	
 		tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); 
@@ -3392,50 +3702,6 @@ add(panel, BorderLayout.NORTH);
 		
 		
 	}// end of refreshInventoryTable()
-        
-    //Added by Gaurav
-    public void printOrderSheet() {
-    	if(tabbedPane_Inventory.getSelectedIndex() == 4){
-    		if(inv_orderDetailTable.getRowCount() != 0){
-    			int orderid = Integer.parseInt(inv_orderDetailTable.getModel().getValueAt(0, 0).toString());
-    			Thread thread = new Thread(new Runnable() {    
-    				public void run() {
-    					try {
-    	                	Connect connect = new Connect();
-    	                	Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-    						
-    	                	JasperDesign jd = JRXmlLoader.load("order.jrxml");
-    	                	String sql = "SELECT DATE_FORMAT(o.CreateDate, '%d-%M-%Y %H:%i')  as CreateDate, o.Cost, "
-    	                			+ " ROUND(o.Cost * 0.13, 2) as 'Tax', ROUND(o.Cost + (o.Cost * 0.13) + s.DeliveryCost, 2) as 'Total', "
-    	                            + " s.Name, s.Street, s.City, s.State_Province, s.PostalCode, s.PhoneNumber, s.Email, s.DeliveryCost, "
-    	                            + " od.ProductID, p.Name as 'ProductName', p.Description, od.OrderedQuantity, od.Cost as 'EstimateCost' " 
-    	                            + " FROM  StoreDB.Order o, StoreDB.Supplier s, StoreDB.OrderDetail od, StoreDB.Product p " 
-    	                            + " WHERE o.ID = od.OrderID AND od.ProductID = p.ID AND o.SupplierID = s.ID AND o.ID =" + orderid;
-    				
-    	                    JRDesignQuery jdq = new JRDesignQuery();
-    	                    jdq.setText(sql);
-    	                    jd.setQuery(jdq);
-    					
-    	                    JasperReport jr = JasperCompileManager.compileReport(jd);
-    	                    JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
-    						
-    	                    JasperPrintManager.printReport(jp, true);
-    						
-    	                } catch (Exception e) {
-    	                	JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
-    	                			"Error with printing", JOptionPane.ERROR_MESSAGE);
-    	                }
-    				}
-    			});
-    			
-                thread.start();                    
-    		} else {
-    			JOptionPane.showMessageDialog(null, "Order Details is empty, please view order details for print.");
-    		}
-    	} else {
-        	JOptionPane.showMessageDialog(null, "Only order details on OrderList tab is allowed to print.");
-    	}
-    }
 } // end of class inventory 
 //==============================================================================================
 //==============================================================================================
@@ -3693,6 +3959,7 @@ class ProdDetail {
 	private double salePrice;
 	private double unitCost;
 	private String note;
+
 	
 	public ProdDetail(int pid, String c, String sc, String n, String d, int qt, int tobe, double sp, double uc, String not){
 		prodID = pid;
@@ -3717,8 +3984,788 @@ class ProdDetail {
 	public double getSaleP() {return salePrice;}
 	public double getUnitC(){ return unitCost;}
 	public String getNote(){ return note;}
-        
+	
 }
 
+//==========================================================
+class JPanelAddNewPanel extends JPanel{
+		
+		JTextField dataSupInvoiceID;
+		JComboBox<vision.CbSupItem> dataSupCb;
+		JTextField dataAmountDue;
+		JTextField dataAmountPaid;
+		JTextField dataOrderID;
+		JTextArea dataMessage;
+		static JTable pickOrderTable;
+		JDatePickerImpl datePicker;
+		
+		JPanelAddNewPanel(){
+			//JPanel contents = new JPanel();
 
+
+
+			super.setBounds(0, 0, 350, 500);
+			GridBagLayout gbl_super = new GridBagLayout();
+			gbl_super.columnWidths = new int[]{150, 50, 50, 50, 0, 0};
+			gbl_super.rowHeights = new int[]{0, 20, 25, 0, 0, 0, 0, 110, 100, 0, 0};
+			gbl_super.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+			gbl_super.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+			super.setLayout(gbl_super);
+			
+			
+
+			
+			JLabel lblNewInvoice = new JLabel("Add New Invoice");
+			GridBagConstraints gbc_lblNewInvoice = new GridBagConstraints();
+			gbc_lblNewInvoice.anchor = GridBagConstraints.EAST;
+			gbc_lblNewInvoice.insets = new Insets(0, 0, 5, 5);
+			gbc_lblNewInvoice.gridx = 0;
+			gbc_lblNewInvoice.gridy = 0;
+			super.add(lblNewInvoice, gbc_lblNewInvoice);
+			lblNewInvoice.setFont(new Font("Tahoma", Font.PLAIN, 17));
+			
+			JLabel lblInvoiceId = new JLabel("Supplier Invoice #/ ID");
+			GridBagConstraints gbc_lblInvoiceId = new GridBagConstraints();
+			gbc_lblInvoiceId.anchor = GridBagConstraints.EAST;
+			gbc_lblInvoiceId.insets = new Insets(0, 0, 5, 5);
+			gbc_lblInvoiceId.gridx = 0;
+			gbc_lblInvoiceId.gridy = 2;
+			super.add(lblInvoiceId, gbc_lblInvoiceId);
+			lblInvoiceId.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			dataSupInvoiceID = new JTextField();
+			GridBagConstraints gbc_dataSupInvoiceID = new GridBagConstraints();
+			gbc_dataSupInvoiceID.fill = GridBagConstraints.BOTH;
+			gbc_dataSupInvoiceID.gridwidth = 2;
+			gbc_dataSupInvoiceID.insets = new Insets(0, 0, 5, 5);
+			gbc_dataSupInvoiceID.gridx = 1;
+			gbc_dataSupInvoiceID.gridy = 2;
+			super.add(dataSupInvoiceID, gbc_dataSupInvoiceID);
+			dataSupInvoiceID.setColumns(10);
+			dataSupInvoiceID.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			JLabel lblSupplier = new JLabel("Supplier");
+			GridBagConstraints gbc_lblSupplier = new GridBagConstraints();
+			gbc_lblSupplier.anchor = GridBagConstraints.EAST;
+			gbc_lblSupplier.insets = new Insets(0, 0, 5, 5);
+			gbc_lblSupplier.gridx = 0;
+			gbc_lblSupplier.gridy = 3;
+			super.add(lblSupplier, gbc_lblSupplier);
+			lblSupplier.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			dataSupCb = new JComboBox();
+			GridBagConstraints gbc_dataSubCb = new GridBagConstraints();
+			gbc_dataSubCb.fill = GridBagConstraints.BOTH;
+			gbc_dataSubCb.gridwidth = 2;
+			gbc_dataSubCb.insets = new Insets(0, 0, 5, 5);
+			gbc_dataSubCb.gridx = 1;
+			gbc_dataSubCb.gridy = 3;
+			super.add(dataSupCb, gbc_dataSubCb);
+			dataSupCb.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			
+			
+			JLabel lblAmountDue = new JLabel("Amount Due");
+			GridBagConstraints gbc_lblAmountDue = new GridBagConstraints();
+			gbc_lblAmountDue.anchor = GridBagConstraints.EAST;
+			gbc_lblAmountDue.insets = new Insets(0, 0, 5, 5);
+			gbc_lblAmountDue.gridx = 0;
+			gbc_lblAmountDue.gridy = 4;
+			super.add(lblAmountDue, gbc_lblAmountDue);
+			lblAmountDue.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			
+			dataAmountDue = new JTextField();
+			GridBagConstraints gbc_dataAmountDue = new GridBagConstraints();
+			gbc_dataAmountDue.fill = GridBagConstraints.BOTH;
+			gbc_dataAmountDue.gridwidth = 1;
+			gbc_dataAmountDue.insets = new Insets(0, 0, 5, 5);
+			gbc_dataAmountDue.gridx = 1;
+			gbc_dataAmountDue.gridy = 4;
+			super.add(dataAmountDue, gbc_dataAmountDue);
+			dataAmountDue.setColumns(10);
+			dataAmountDue.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			JLabel lblAmountPaid = new JLabel("Amount Paid");
+			GridBagConstraints gbc_lblAmountPaid = new GridBagConstraints();
+			gbc_lblAmountPaid.anchor = GridBagConstraints.EAST;
+			gbc_lblAmountPaid.insets = new Insets(0, 0, 5, 5);
+			gbc_lblAmountPaid.gridx = 0;
+			gbc_lblAmountPaid.gridy = 5;
+			super.add(lblAmountPaid, gbc_lblAmountPaid);
+			lblAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			dataAmountPaid = new JTextField();
+			GridBagConstraints gbc_dataAmountPaid = new GridBagConstraints();
+			gbc_dataAmountPaid.gridwidth = 1;
+			gbc_dataAmountPaid.anchor = GridBagConstraints.NORTH;
+			gbc_dataAmountPaid.insets = new Insets(0, 0, 5, 5);
+			gbc_dataAmountPaid.fill = GridBagConstraints.HORIZONTAL;
+			gbc_dataAmountPaid.gridx = 1;
+			gbc_dataAmountPaid.gridy = 5;
+			super.add(dataAmountPaid, gbc_dataAmountPaid);
+			dataAmountPaid.setColumns(10);
+			dataAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			//------date picker components -----------
+			UtilDateModel model = new UtilDateModel();
+	        Properties p = new Properties();
+	        p.put("text.today", "Today");
+	        p.put("text.month", "Month");
+	        p.put("text.year", "Year");
+	        
+	        class DateLabelFormatter extends AbstractFormatter {
+	            private final String datePattern = "yyyy-MM-dd";
+	            private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+	            @Override
+	            public Object stringToValue(String text) throws ParseException {
+	                return dateFormatter.parseObject(text);
+	            }
+
+	            @Override
+	            public String valueToString(Object value) throws ParseException {
+	                if (value != null) {
+	                    Calendar cal = (Calendar) value;
+	                    return dateFormatter.format(cal.getTime());
+	                }
+
+	                return "";
+	            }
+	        }
+			JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+			datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+			//------end of datepicker components ---------
+			
+			
+			GridBagConstraints dateConstraints = new GridBagConstraints();
+			dateConstraints.anchor = GridBagConstraints.NORTHEAST;
+			dateConstraints.insets = new Insets(0, 0, 5, 5);
+			dateConstraints.gridx = 1;
+			dateConstraints.gridy = 6;
+			super.add(datePicker, dateConstraints);
+			//lblSelectOrdersTo.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			JLabel lbldate = new JLabel("Received Date");
+			GridBagConstraints dateConstraints2 = new GridBagConstraints();
+			dateConstraints2.anchor = GridBagConstraints.NORTHEAST;
+			dateConstraints2.insets = new Insets(0, 0, 5, 5);
+			dateConstraints2.gridx = 0;
+			dateConstraints2.gridy = 6;
+			super.add(lbldate, dateConstraints2);
+			lbldate.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			
+			JLabel lblSelectOrdersTo = new JLabel("Orders to associate");
+			GridBagConstraints gbc_lblSelectOrdersTo = new GridBagConstraints();
+			gbc_lblSelectOrdersTo.anchor = GridBagConstraints.NORTHEAST;
+			gbc_lblSelectOrdersTo.insets = new Insets(0, 0, 5, 5);
+			gbc_lblSelectOrdersTo.gridx = 0;
+			gbc_lblSelectOrdersTo.gridy = 7;
+			super.add(lblSelectOrdersTo, gbc_lblSelectOrdersTo);
+			lblSelectOrdersTo.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			JScrollPane scrollPane_6 = new JScrollPane();
+			GridBagConstraints gbc_scrollPane_6 = new GridBagConstraints();
+			gbc_scrollPane_6.gridwidth = 3;
+			gbc_scrollPane_6.insets = new Insets(0, 0, 5, 5);
+			gbc_scrollPane_6.fill = GridBagConstraints.BOTH;
+			gbc_scrollPane_6.gridx = 1;
+			gbc_scrollPane_6.gridy = 7;
+			super.add(scrollPane_6, gbc_scrollPane_6);
+			
+			
+
+			
+			JLabel lblMessage = new JLabel("Message:");
+			GridBagConstraints gbc_lblMessage = new GridBagConstraints();
+			gbc_lblMessage.insets = new Insets(0, 0, 5, 5);
+			gbc_lblMessage.anchor = GridBagConstraints.NORTHEAST;
+			gbc_lblMessage.gridx = 0;
+			gbc_lblMessage.gridy = 8;
+			super.add(lblMessage, gbc_lblMessage);
+			lblMessage.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			dataMessage = new JTextArea();
+			dataMessage.setBackground(SystemColor.control);
+			dataMessage.setEditable(false);
+			dataMessage.setLineWrap(true);
+			GridBagConstraints gbc_textArea = new GridBagConstraints();
+			gbc_textArea.gridwidth = 3;
+			gbc_textArea.insets = new Insets(0, 0, 5, 5);
+			gbc_textArea.fill = GridBagConstraints.BOTH;
+			gbc_textArea.gridx = 1;
+			gbc_textArea.gridy = 8;
+			super.add(dataMessage, gbc_textArea);
+			dataMessage.setFont(new Font("Tahoma", Font.PLAIN, 15));
+
+			
+			//----------------------
+			try{
+				Connection con_Inv = Connect.connectionSetup();
+				String query = "Select ID, Name FROM Supplier Order BY Name";
+				PreparedStatement pst = con_Inv.prepareStatement(query);
+				ResultSet rs = pst.executeQuery();
+				
+				//fill supplier combobox
+				CbSupItem firstItem = new CbSupItem(0, "-- Please select Supplier --",0, 0);
+				dataSupCb.addItem(firstItem);
+					while(rs.next()){
+					int id = rs.getInt("ID");	
+					String str = rs.getString("Name").trim();
+					CbSupItem item = new CbSupItem(id, str,0,0);
+					dataSupCb.addItem(item);	
+				} 
+				
+				con_Inv.close();
+				pst.close();
+				rs.close();
+				
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			
+			//add action listener for supplier combo box
+			dataSupCb.addActionListener(
+					new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							JComboBox combo =  (JComboBox) e.getSource();
+							CbSupItem item= (CbSupItem) combo.getSelectedItem();
+							int supID = item.getID();
+							
+							//populate pickup table based on the supplier ID
+							pickOrderTable = new JTable();
+							createTablePickOrder(supID);
+							scrollPane_6.setViewportView(pickOrderTable);
+						}
+					}
+					);
+
+		}// end of JPanelAddNewInvoice
+		 
+		public String getSupInvoiceID() {
+				if(dataSupInvoiceID.getText() != null){
+					return dataSupInvoiceID.getText();
+				}else {return "0";}
+			}
+		
+		public CbSupItem getSupCb(){
+			if(dataSupCb.getSelectedItem() != null ){
+				return (CbSupItem) dataSupCb.getSelectedItem(); 
+				}else {return new CbSupItem(0, "notSelected",0,0);}
+			}
+		public String getAmountDue() {
+				//if(dataAmountDue.getText().equals("")){
+					return dataAmountDue.getText(); 
+				//}else {return "0";}
+			}
+		public String getAmountPaid() {
+			//if(dataAmountPaid.getText().equals("")){
+				return dataAmountDue.getText(); 
+			//}else {return "0";}
+		}
+		public Date getReceivedDate(){
+			if(datePicker.getModel().getValue() != null ){
+				return (Date) datePicker.getModel().getValue(); 
+			}else {return new Date();}
+		}
+		public void setMessage(String str){
+			dataMessage.setText(str);
+		}
+		
+		
+		public static void createTablePickOrder(int supID){
+			try {
+				Connection con_Inv = Connect.connectionSetup();
+				String query = "Select o.ID, o.InvoiceID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate "
+					+ "FROM `order` o "
+					+ "Inner JOIN Supplier s ON s.ID = o.SupplierID "
+					+ "WHERE s.ID = " + supID + " AND o.InvoiceID IS NULL ORDER BY ID DESC;";
+			
+				PreparedStatement pst = con_Inv.prepareStatement(query);
+				ResultSet rs = pst.executeQuery();
+				
+				Vector<Object> columnNames = new Vector<Object>();
+			    Vector<Object> data = new Vector<Object>();
+			    
+			    columnNames.addElement("Check");
+			    columnNames.addElement("Order ID");
+			    columnNames.addElement("Invoice ID");
+			    columnNames.addElement("Supplier");
+			    columnNames.addElement("Created Date");
+			    columnNames.addElement("Received Date");
+
+		    while(rs.next()){
+		    	Vector<Object> row = new Vector<Object>();
+		    	boolean check = false;
+		    	row.addElement(check);
+		    	for (int i = 1; i <= 5; i++){
+		    		row.addElement(rs.getObject(i));
+		    	}
+		    	data.addElement(row);
+		    }
+		    
+		    con_Inv.close();
+		    //-----
+		    
+		    class TMforOrderPick extends DefaultTableModel{ //********************************************
+		    	public TMforOrderPick(Vector<Object> data, Vector<Object> columnNames) {
+		    		super(data,columnNames);
+		    	}
+		    	@Override //tells table model that columns contain object ?
+		    	public Class getColumnClass(int column)	{
+		    		 for (int row = 0; row < getRowCount(); row++){
+		    		     Object o = getValueAt(row, column);
+		    		     if (o != null) {
+		    		         return o.getClass();
+		    		     }
+		    		 }
+		    	return Object.class;
+		    	}
+		    	@Override
+		    	public boolean isCellEditable(int rowIndex, int columnIndex){
+		    		
+		    		switch (columnIndex){
+		    		case 0: return true;
+		    		default: return false;
+		    		}
+		    	}
+		    }
+		    //-----
+		    TMforOrderPick orderPickModel = new TMforOrderPick(data, columnNames);
+		    pickOrderTable.setModel(orderPickModel);
+		    pickOrderTable.setRowHeight(30);
+		    
+			Dimension tableSize = pickOrderTable.getPreferredSize();
+			TableColumnModel tcm = pickOrderTable.getColumnModel();
+			
+		
+			tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); 
+			tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.05f));
+			tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.10f));
+			tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); 
+			tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.25f));
+			tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.25f));
+
+			/*
+			inv_orderListTable.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent mouseE) {
+				if (mouseE.getClickCount() == 2) {
+				    JTable target = (JTable)mouseE.getSource();
+				    int row = target.getSelectedRow();
+				    int orderID = (int) target.getValueAt(row, 0);
+				    
+				    updateInv_orderDetailTable(orderID);
+
+					}
+				}
+			});	
+			*/
+			
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    
+		}// end of createTableOrderPick-------------------------------------------------------
+
+	}
+	
+//===========================================================================================
+class DialogAddNewInvoice extends JDialog implements ActionListener, PropertyChangeListener{
+	
+	private JOptionPane optionPane; 
+	//JPanelAddNewPanel panel;
+	InventoryInvoiceAddNewPanel panel;
+	
+	public DialogAddNewInvoice(Frame aFrame){
+		super(aFrame, true);
+		super.setTitle("Add Invoice");
+		
+		
+	   //panel = new JPanelAddNewPanel();
+		panel = new InventoryInvoiceAddNewPanel();
+		//
+		Object[] options = {"Add", "Cancel"};
+		
+		//create the JOptionPane
+		optionPane = new JOptionPane(
+				panel, /*the object to display*/
+				JOptionPane.QUESTION_MESSAGE, /*type of mesage to be displayed*/
+				JOptionPane.YES_NO_OPTION,/*options to display in the pane*/
+				null,/*Icon - the icon image to display*/
+				options,/*Object[] - the choices the user can select*/
+				null /*Object - initially selected value inside the choice*/
+				);
+		
+			//make this dialog display in CustomDialog
+		setContentPane(optionPane);
+		
+			//Handle window closing correctly 
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+        //Register an event handler that puts the text into the option pane
+        //textField.addActionListener(this);
+
+			//Register an event handler that reacts to option pane state changes
+        optionPane.addPropertyChangeListener(this);
+        pack();
+        
+        	//set the dialog at the center
+        super.setLocationRelativeTo(null);
+
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		String prop = evt.getPropertyName();
+        if (	isVisible() && 
+        		(evt.getSource() == optionPane) && 
+        		(JOptionPane.VALUE_PROPERTY.equals(prop) || JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))
+            ) {
+                   Object value = optionPane.getValue();  //return the value user has selected 
+                   if (value == JOptionPane.UNINITIALIZED_VALUE) {
+                       //ignore reset
+                       return;
+                   }
+        
+                   //Reset the JOptionPane's value.
+                   //If you don't do this, then if the user
+                   //presses the same button next time, no
+                   //property change event will be fired.
+                   optionPane.setValue(
+                           JOptionPane.UNINITIALIZED_VALUE);
+        
+                   if (value == "Add") {
+                	   
+                	   panel.setMessage("");
+                	   boolean success = true;
+                	   String error = "";
+                	   CbSupItem sup; 
+                	   
+                	   //check if supplier is selected
+                	   String supInvoiceID = panel.getSupInvoiceID();
+                	   if(panel.getSupCb().getID() != 0){
+                		   sup = panel.getSupCb();
+                		   }else{
+                			   error = error.concat("Please select supplier \n");      
+                			   };		   
+                	   
+                	   	//check if amount due is valid
+                	   String dueAmount = panel.getAmountDue();
+                	   String paidAmount = panel.getAmountPaid();
+                	   Date pickedDate = panel.getReceivedDate();
+                	   //System.out.println("picked date is " + pickedDate);
+                	  // System.out.println("amountPaid is/" + paidAmount + "/");
+                	   //System.out.println("amountdue is/" + dueAmount + "/");
+
+            		   if( ! Inventory.validateStrToDouble(dueAmount) && !dueAmount.equals("")){
+            		   error = error.concat("Amount Due must be a valid number\n");
+            		   }
+                	   	
+            		   if(! Inventory.validateDouble(paidAmount) && ! paidAmount.equals("") ){ //if conversion fails
+            	   				error = error.concat("Amount Paid must be a valid number\n");
+            		   }
+            	   		if( Inventory.validateDouble(paidAmount) && ! paidAmount.equals("") &&
+            	   				Double.parseDouble(paidAmount) > Double.parseDouble(dueAmount)){
+            	   			error = error.concat("Amount paid cannot exceed due amount \n");
+            	   		}
+            	   		
+            	   		
+                	    	// if "error" string is empty, operation is successful
+	                	    if(error.length() < 1){
+	                	    	
+	                	    	//if dueAmount and paidAmount is empty, assign 0
+	                	    	if(dueAmount.equals(""))dueAmount = "0";
+	                	    	if(paidAmount.equals(""))paidAmount = "0";
+	                	    	
+	                	    	//insert new invoice to invoice table 
+	                	    	try {
+	                				Connection con = Connect.connectionSetup();
+	                				String query = "Insert Into invoice (AmountDue, AmountPaid, ReceivedDate, SupplierID) "
+	                						+ " Values (?, ?, ?, ?)"; 
+	                						
+	                				PreparedStatement pst = con.prepareStatement(query);
+	                				pst.setDouble(1, Double.parseDouble(dueAmount));
+	                				pst.setDouble(2, Double.parseDouble(paidAmount));
+	                				pst.setDate(3, new java.sql.Date(pickedDate.getTime()));
+	                				pst.setInt(4, panel.getSupCb().getID());
+	                				
+	                				pst.executeUpdate();
+	                				
+								
+	                				//get newly created invoice ID and associate it with selected orders
+	                				int newInvoiceID = 0;
+									query = "Select max(ID) from Invoice";
+	                				pst = con.prepareStatement(query);
+	                				ResultSet rs = pst.executeQuery(query);
+	                				while(rs.next()){
+	                					newInvoiceID = rs.getInt(1);
+	                				}
+	                				
+
+	                					//now update orders loop through pickOrder table and update orders that was selected
+		                				//if no order was selected, simply create a new invoice without associating any order	 
+		                				int rowCount = panel.pickOrderTable.getModel().getRowCount();
+										for(int j = 0; j < rowCount; j++){  //#loop through pickOrder Table-----
+											if((boolean)panel.pickOrderTable.getValueAt(j, 0) == true ){
+												
+												int orderID = (int) panel.pickOrderTable.getValueAt(j, 1);
+												query = "Update `order` set InvoiceID = " + newInvoiceID + ""
+														+ " WHERE ID = " + orderID ;
+												pst = con.prepareStatement(query);
+												pst.executeUpdate();
+
+											}
+										} // end of #loop through pickOrder Table----
+									
+									//inform user that an invoice has been created
+									JOptionPane.showMessageDialog(null, "New Invoice (ID: " + newInvoiceID + ") Added");	
+									
+									//refresh tables and close the dialog
+									Inventory.updateInv_orderListTable();
+									Inventory.createInvoiceTable();
+									clearPanel();
+									
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+	                	    	
+	                	    	}else {
+	                	    		//otherwise display error message in dataMessage
+	                	    		panel.setMessage(error);
+	                	    	}
+
+                       } else if (value =="Cancel") {
+                    	   clearPanel();
+                       }
+                           //textField.requestFocusInWindow();
+               }
+        }
+	
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+    public void clearPanel() {
+        setVisible(false);
+    }
+
+
+} //end of DialogAddNewInvoice ---------------------------------
+
+
+//=======================================================================================
+class DialogEditInvoice extends JDialog implements ActionListener, PropertyChangeListener{
+	
+	private JOptionPane optionPane; 
+	//JPanelAddNewPanel panel;
+	InventoryInvoiceEditPanel panel;
+	private int invoiceID; 
+	
+	public DialogEditInvoice(Frame aFrame, int invoiceID){
+		
+		super(aFrame, true);
+		super.setTitle("Edit Invoice");
+		this.invoiceID = invoiceID;
+		
+	   //panel = new JPanelAddNewPanel();
+		panel = new InventoryInvoiceEditPanel(invoiceID);
+		//
+		Object[] options = {"Update", "Delete", "Cancel"};
+		
+		//create the JOptionPane
+		optionPane = new JOptionPane(
+				panel, /*the object to display*/
+				JOptionPane.QUESTION_MESSAGE, /*type of mesage to be displayed*/
+				JOptionPane.YES_NO_OPTION,/*options to display in the pane*/
+				null,/*Icon - the icon image to display*/
+				options,/*Object[] - the choices the user can select*/
+				null /*Object - initially selected value inside the choice*/
+				);
+		
+			//make this dialog display in CustomDialog
+		setContentPane(optionPane);
+		
+			//Handle window closing correctly 
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+        //Register an event handler that puts the text into the option pane
+        //textField.addActionListener(this);
+
+			//Register an event handler that reacts to option pane state changes
+        optionPane.addPropertyChangeListener(this);
+        pack();
+        
+        	//set the dialog at the center
+        super.setLocationRelativeTo(null);
+
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		String prop = evt.getPropertyName();
+        if (	isVisible() && 
+        		(evt.getSource() == optionPane) && 
+        		(JOptionPane.VALUE_PROPERTY.equals(prop) || JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))
+            ) {
+                   Object value = optionPane.getValue();  //return the value user has selected 
+                   if (value == JOptionPane.UNINITIALIZED_VALUE) {
+                       //ignore reset
+                       return;
+                   }
+        
+                   //Reset the JOptionPane's value.
+                   //If you don't do this, then if the user
+                   //presses the same button next time, no
+                   //property change event will be fired.
+                   optionPane.setValue(
+                           JOptionPane.UNINITIALIZED_VALUE);
+        
+                   if (value == "Update") {
+                	   
+                	   panel.setMessage("");
+                	   boolean success = true;
+                	   String error = "";
+                	   CbSupItem sup; 		   
+                	   
+                	   	//check if amount due is valid
+                	   int invoiceID = panel.getInvoiceID();
+                	   String dueAmount = panel.getAmountDue();
+                	   String paidAmount = panel.getAmountPaid();
+                	   Date pickedDate = panel.getReceivedDate();
+                	   //System.out.println("picked date is " + pickedDate);
+                	  // System.out.println("amountPaid is/" + paidAmount + "/");
+                	   //System.out.println("amountdue is/" + dueAmount + "/");
+
+            		   if( ! Inventory.validateStrToDouble(dueAmount) && !dueAmount.equals("")){
+            		   error = error.concat("Amount Due must be a valid number\n");
+            		   }
+                	   	
+            		   if(! Inventory.validateDouble(paidAmount) && ! paidAmount.equals("") ){ //if conversion fails
+            	   				error = error.concat("Amount Paid must be a valid number\n");
+            		   }
+            	   		if( Inventory.validateDouble(paidAmount) && ! paidAmount.equals("") &&
+            	   				Double.parseDouble(paidAmount) > Double.parseDouble(dueAmount)){
+            	   			error = error.concat("Amount paid cannot exceed due amount \n");
+            	   		}
+            	   		
+            	   		
+                	    	// if "error" string is empty, operation is successful
+	                	    if(error.length() < 1){
+	                	    	
+	                	    	//if dueAmount and paidAmount is empty, assign 0
+	                	    	if(dueAmount.equals(""))dueAmount = "0";
+	                	    	if(paidAmount.equals(""))paidAmount = "0";
+	                	    	
+	                	    	//insert new invoice to invoice table 
+	                	    	try {
+	                				Connection con = Connect.connectionSetup();
+	                				String query = "Update invoice Set "
+	                						+ "AmountDue = ?, "
+	                						+ "AmountPaid =?, "
+	                						+ "ReceivedDate = ?, "
+	                						+ "SupplierID = ? "
+	                						+ "WHERE ID = ? " ;
+	                						
+	                				PreparedStatement pst = con.prepareStatement(query);
+	                				pst.setDouble(1, Double.parseDouble(dueAmount));
+	                				pst.setDouble(2, Double.parseDouble(paidAmount));
+	                				pst.setDate(3, new java.sql.Date(pickedDate.getTime()));
+	                				pst.setInt(4, panel.getSupIDInt());
+	                				pst.setInt(5, invoiceID);
+	                				
+	                				pst.executeUpdate();
+	                				
+	                				/*get newly created invoice ID and associate it with selected orders
+	                				int newInvoiceID = 0;
+									query = "Select max(ID) from Invoice";
+	                				pst = con.prepareStatement(query);
+	                				ResultSet rs = pst.executeQuery(query);
+	                				while(rs.next()){
+	                					newInvoiceID = rs.getInt(1);
+	                				}*/
+
+                					//now loop through pickOrder table and update orders 
+	                				//if no order was selected, simply create a new invoice without associating any order	 
+	                				int rowCount = panel.pickOrderTable.getModel().getRowCount();
+									for(int j = 0; j < rowCount; j++){  //#loop through pickOrder Table-----
+										
+										boolean selected = (boolean) panel.pickOrderTable.getValueAt(j, 0); 
+										//if check is marked, associate it to this invoice
+										if(selected){
+											int orderID = (int) panel.pickOrderTable.getValueAt(j, 1);
+											query = "Update `order` set InvoiceID = " + invoiceID + ""
+													+ " WHERE ID = " + orderID ;
+											pst = con.prepareStatement(query);
+											pst.executeUpdate();
+										}else{
+											int orderID = (int) panel.pickOrderTable.getValueAt(j, 1);
+											query = "Update `order` set InvoiceID = NULL "
+													+ " WHERE ID = " + orderID ;
+											pst = con.prepareStatement(query);
+											pst.executeUpdate();
+										}
+										
+									} // end of #loop through pickOrder Table----
+									
+									//inform user that an invoice has been created
+									JOptionPane.showMessageDialog(null, "Invoice (ID: " + invoiceID + ") Updated");	
+									
+									//refresh tables and close the dialog
+									Inventory.updateInv_orderListTable();
+									Inventory.createInvoiceTable();
+									clearPanel();
+									
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+	                	    	
+	                	    	}else {
+	                	    		//otherwise display error message in dataMessage
+	                	    		panel.setMessage(error);
+	                	    	}
+
+                       } else if (value =="Cancel") {
+                    	   clearPanel();
+                       } else if (value == "Delete"){
+                    	   
+                    	    int response = JOptionPane.showConfirmDialog(null, "Are you sure to delete this invoice?", "Confirm",
+                    	            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    	        if (response == JOptionPane.NO_OPTION) {
+                    	        } else if (response == JOptionPane.YES_OPTION) {
+                    	        	String check  = panel.deleteInvoice(invoiceID);
+                             	   
+                    	        	if(check.equals("Success")){
+                    	        		clearPanel();
+                    	        		}else{
+                    	        			//do not close panel
+                    	        			}
+                    	        	
+                    	        } else if (response == JOptionPane.CLOSED_OPTION) {
+                    	        }
+                    	   
+                       }
+                           //textField.requestFocusInWindow();
+               }
+        }
+	
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+    public void clearPanel() {
+        setVisible(false);
+    }
+
+
+}
 
