@@ -227,11 +227,16 @@ public class Transaction extends JFrame {
 		}
 	}
 
-	public JPanel getTransactionInfo(int id) {
+    public JPanel getTransactionInfo(int id) {
         JPanel panel_transactiondetails = new JPanel();
         JLabel jLabel1 = new JLabel();
         JScrollPane jScrollPane1 = new JScrollPane();
-        JTable jTable1 = new JTable();
+        JTable jTable1 = new JTable(){
+            @Override
+            public boolean isCellEditable(int row, int column){
+                return false;
+            }
+        };
         JLabel jLabel2 = new JLabel();
         JPanel jPanel1 = new JPanel();
         JLabel jLabel3 = new JLabel();
@@ -252,7 +257,17 @@ public class Transaction extends JFrame {
         JTextField payment_method = new JTextField();
         JTextField promotion_id = new JTextField();
         JTextField employee_name = new JTextField();
-
+        
+        transaction_id.setEditable(false);
+        create_date.setEditable(false);
+        sub_total.setEditable(false);
+        tax.setEditable(false);
+        total.setEditable(false);
+        transaction_type.setEditable(false);
+        payment_method.setEditable(false);
+        promotion_id.setEditable(false);
+        employee_name.setEditable(false);
+        
         jLabel1.setText("List of purchased items:");
         
         boolean check = getTransactionDetails(id);
@@ -261,7 +276,7 @@ public class Transaction extends JFrame {
         }
         
         transaction_id.setText(Integer.toString(id));
-        create_date.setText(createDate);
+        //create_date.setText(createDate);
         sub_total.setText(Double.toString(subTotal));
         tax.setText(Double.toString(this.tax));
         total.setText(Double.toString(this.total));
@@ -304,6 +319,11 @@ public class Transaction extends JFrame {
                     model.setColumnCount(1);
                     model.addRow(new Object[]{"Searched Transaction does not exits."});
                 }
+            }
+            sql = "select DATE_FORMAT(CreateDate, '%d-%M-%Y %H:%i') from StoreDB.Transaction where ID = '" + id + "'";
+            rs = state.executeQuery(sql);
+            if(rs.next()) {
+                create_date.setText(rs.getString(1));
             }
         }catch (Exception e){
             e.printStackTrace();

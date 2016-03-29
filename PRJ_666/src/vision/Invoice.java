@@ -201,12 +201,12 @@ public class Invoice extends JPanel {
 
         btn_update.setText("Update");
         btn_update.addActionListener((java.awt.event.ActionEvent evt) -> {
-            double amountdue = Double.parseDouble(amount_due.getText());
-            double amountpaid = Double.parseDouble(amount_paid.getText());
-            
             Statement s = null;
             ResultSet r = null;
             try {
+                double amountdue = Double.parseDouble(amount_due.getText());
+                double amountpaid = Double.parseDouble(amount_paid.getText());
+                
                 s = c.createStatement();
                 String sql = "select sum(Cost), sum(AmountPaid) from `Order` where InvoiceID = " + id;
                 r = s.executeQuery(sql);
@@ -227,12 +227,16 @@ public class Invoice extends JPanel {
                         
                         PreparedStatement ps = c.prepareStatement(sql);
                         int dump = ps.executeUpdate();
+                        
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "No orders found that is paid by invoice id " + id + ".",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 
+            } catch (NumberFormatException e) {
+            	JOptionPane.showMessageDialog(null, "Amount Due or Amount Paid is not a number.", 
+            			"Error", JOptionPane.ERROR_MESSAGE);
             } catch (Exception sql){
                 JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
             }
