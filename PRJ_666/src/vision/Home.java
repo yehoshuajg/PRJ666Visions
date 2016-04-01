@@ -145,7 +145,6 @@ public class Home extends JFrame implements KeyListener{
 	private double total = 0;
 	private int c = 0;
 	private String stringTempPrice = null;
-	private double tempTotal = 0;
 	private String transactionType = null;
 	private String transactionMethod = null;
 	private int promotionID = 0;
@@ -1579,7 +1578,7 @@ public class Home extends JFrame implements KeyListener{
 		table = new JTable(data, columnName){
 			public boolean isCellEditable(int row, int column) {
 				//Return true if the column (number) is editable, else false
-		        if(column == 3 || column == 6){ 
+				if(column == 3 || column == 6){ 
 		        	return true;
 		        }
 		        else{
@@ -1628,24 +1627,25 @@ public class Home extends JFrame implements KeyListener{
 	   
 		model = (DefaultTableModel) table.getModel();
 		
-		table.addKeyListener(this);
+		//table.addKeyListener(this);
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				//Changes which product is selected in product details
 				int row = table.getSelectionModel().getLeadSelectionIndex();
-	        	if(productBySearch.size() > 0){
-	        		for(int i = 0; i < productBySearch.size(); i++){
-	        			if(String.valueOf(model.getValueAt(row, id_column)).equals(String.valueOf(productBySearch.get(i).getID()))){
-	        				textField_name_input.setText(productBySearch.get(i).getName());
-	        				textField_description_input.setText(productBySearch.get(i).getDescription());
-	        				textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
-	        				break;
-	        			}
-	        		}
-	        	}
+				if (e.getClickCount() == 1) {
+					if(productBySearch.size() > 0){
+		        		for(int i = 0; i < productBySearch.size(); i++){
+		        			if(String.valueOf(model.getValueAt(row, id_column)).equals(String.valueOf(productBySearch.get(i).getID()))){
+		        				textField_name_input.setText(productBySearch.get(i).getName());
+		        				textField_description_input.setText(productBySearch.get(i).getDescription());
+		        				textField_quantity_input.setText(String.valueOf(productBySearch.get(i).getQuantity()));
+		        				break;
+		        			}
+		        		}
+		        	}
+				}
 			}
 		});
-		/*
 		table.getModel().addTableModelListener(new TableModelListener() {
 			public void tableChanged(TableModelEvent e) {
 				if(model.getRowCount() > 0){
@@ -1654,18 +1654,11 @@ public class Home extends JFrame implements KeyListener{
 			        int row = table.getSelectionModel().getLeadSelectionIndex();
 			        if(row > -1 && col > -1){
 			        	if(col == productQuantity_column){
-							Runnable run1 = new Runnable() {
+			        		Runnable run1 = new Runnable() {
 								@Override
 								public void run() {
-									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
-									//System.out.println("tempQuantity: " + tempQuantity);
-									char c = 0;
-									char c2 = 0;
-									if(!tempQuantity.isEmpty()){
-										c = tempQuantity.charAt(0);
-										c2 = tempQuantity.charAt(tempQuantity.length()-1);
-									}
-									//Previous Quantity
+									boolean check = true;
+					        		//Previous Quantity
 									int previousQuantity = 0;
 									String nID = model.getValueAt(row, id_column).toString();
 									for(int i = 0; i < productBySearch.size(); i++){
@@ -1673,46 +1666,112 @@ public class Home extends JFrame implements KeyListener{
 											previousQuantity = previousValue.get(i);
 										}
 									}
-									if(validateEmpty(tempQuantity) == false){
-										JOptionPane.showMessageDialog(null,"Quantity field cannot be left empty. "
-												+ "Please enter a quantity above 0 for row #" + (row+1) + ".");
-										model.setValueAt(previousQuantity, row, col);
+					        		if(model.getValueAt(row, col).equals("") || model.getValueAt(row, col) == null){
+					        			JOptionPane.showMessageDialog(null,"The input for row #" + (row+1) + " is empty. Please enter a valid quantity.");
+					        			check = false;
+					        			model.setValueAt(previousQuantity, row, col);
 										table.setRowSelectionInterval(row, row);
 										table.setColumnSelectionInterval(0, 0);
-									}
-									else if(checkForNumbers(tempQuantity) == false){
-										JOptionPane.showMessageDialog(null,"Quantity entered for row #" + (row+1) + 
-												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-										model.setValueAt(previousQuantity, row, col);
-										table.setRowSelectionInterval(row, row);
-										table.setColumnSelectionInterval(0, 0);
-									}
-									else if(c == '0' && c2 >= '0'){
-										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
-										model.setValueAt(previousQuantity, row, col);
-										table.setRowSelectionInterval(row, row);
-										table.setColumnSelectionInterval(0, 0);
-									}
-									else{
-										boolean spaceCheck = true;
-										for(int i = 0; i < tempQuantity.length(); i++){
-											if(tempQuantity.charAt(i) == ' '){
-												spaceCheck = true;
-											}
-											JOptionPane.showMessageDialog(null,"Please enter a quantity that does contain space in it for row #" + (row+1) + ".");
+					        		}
+					        		else{
+					        			String stringQuantity = model.getValueAt(row, col).toString();
+					        			if(stringQuantity.length() > 8){
+					        				JOptionPane.showMessageDialog(null,"The input '" + stringQuantity + "' for row #" + (row+1) + " is too long. Please enter a valid quantity.");
+					        				model.setValueAt(previousQuantity, row, col);
 											table.setRowSelectionInterval(row, row);
 											table.setColumnSelectionInterval(0, 0);
-											break;
-										}
-										if(spaceCheck == false){
-											String tempPrice = model.getValueAt(row, productPrice_column).toString();
-											System.out.println(tempPrice);
-											
-											table.setRowSelectionInterval(row, row);
-											table.setColumnSelectionInterval(0, 0);
-											//textField_productID_input.requestFocusInWindow();
-										}
-									}
+					        				check = false;
+					        			}
+					        			else{
+						        			for(int i = 0; i < stringQuantity.length(); i++){
+						        				char c = stringQuantity.charAt(i);
+						        				if(c == ' '){
+						        					JOptionPane.showMessageDialog(null,"The input '" + stringQuantity + "' for row #" + (row+1) + " contains space. Please enter a valid quantity.");
+						        					model.setValueAt(previousQuantity, row, col);
+													table.setRowSelectionInterval(row, row);
+													table.setColumnSelectionInterval(0, 0);
+						        					check = false;
+						        					break;
+						        				}
+						        			}
+						        			if(check){
+						        				stringQuantity = stringQuantity.trim();
+						        				//Check if numbers only
+						        				String regexStr = "^[0-9]+$";
+						        				if(!stringQuantity.trim().matches(regexStr)){
+						        					JOptionPane.showMessageDialog(null,"The input '" + stringQuantity + "' for row #" + (row+1) + " must contain numbers only. Please enter a valid quantity.");
+						        					model.setValueAt(previousQuantity, row, col);
+													table.setRowSelectionInterval(row, row);
+													table.setColumnSelectionInterval(0, 0);
+						        					check = false;
+						        				}
+						        				//Valid
+						        				else{
+						        					//Checking for first digit as 0
+						        					char c = stringQuantity.charAt(0);
+						        					char c2 = stringQuantity.charAt(stringQuantity.length()-1);
+						        					if(c == '0' && c2 >= '0'){
+						        						JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
+							        					model.setValueAt(previousQuantity, row, col);
+														table.setRowSelectionInterval(row, row);
+														table.setColumnSelectionInterval(0, 0);
+						        						check = false;
+						        					}
+						        					// Doesn't contain 0 as first element
+						        					else{
+						        						int intQuantity = Integer.parseInt(stringQuantity);
+						        						if(intQuantity > 0){
+						        							//System.out.println("more than 0");
+						        							//
+						        							String stringProductPrice = model.getValueAt(row, productPrice_column).toString();
+						        							
+						        							double doubleProductPrice = Double.parseDouble(stringProductPrice);
+						        							//doubleProductPrice = Math.round(doubleProductPrice * 100.0) / 100;
+						        							
+						        							//System.out.println("Price: " + doubleProductPrice);
+						        							
+						        							double tempTotal = (intQuantity * doubleProductPrice);
+						        							tempTotal = Math.round(tempTotal * 100.0) / 100.0;
+						        							
+						        							//System.out.println("Sum: " + tempTotal);
+						        							
+						        							boolean valid = calculateInventoryQuantity();
+						        							if(valid == true){
+						        								model.setValueAt(tempTotal, row, productQuantityAndPrice_column); // causes it to call twice
+						        							}
+						        							
+						        							if(tableListenerCount == 1){
+						        								if(valid == true){
+						        									//System.out.println("Sum: " + tempTotal);
+						        									calculateSubtotal();
+						        								}
+															}
+															else if(tableListenerCount == 0){
+																stringTempPrice = model.getValueAt(row, productQuantityAndPrice_column).toString();
+																tableListenerCount = 0;
+															}
+															else{
+																tableListenerCount = 0;
+															}
+															tableListenerCount++;
+						        						}
+						        						//Enter amount more than 0
+						        						else{
+						        							JOptionPane.showMessageDialog(null,"Please enter a quantity above 0 for row #" + (row+1) + ".");
+															model.setValueAt(1, row, col);
+															table.setRowSelectionInterval(row, row);
+															table.setColumnSelectionInterval(0, 0);
+						        							check = false;
+						        						}
+						        					}
+						        				}
+						        			}
+					        			}
+					        		}
+					        		//After entering value, movies selection to next column (does not leave user in same colum)
+									table.setRowSelectionInterval(row, row);
+									table.setColumnSelectionInterval(0, 0);
+									textField_productID_input.requestFocusInWindow();
 								}
 							};
 							SwingUtilities.invokeLater(run1);
@@ -1721,102 +1780,7 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		});
-		*/
-		/*
-		table.getModel().addTableModelListener(new TableModelListener() {
-			public void tableChanged(TableModelEvent e) {
-				if(model.getRowCount() > 0){
-					//Sales Total
-					int col = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-			        int row = table.getSelectionModel().getLeadSelectionIndex();
-			        if(row > -1 && col > -1){
-			        	if(col == productQuantity_column){
-							Runnable run1 = new Runnable() {
-								@Override
-								public void run() {
-									String tempQuantity = model.getValueAt(row, productQuantity_column).toString();
-									//System.out.println("tempQuantity: " + tempQuantity);
-									char c = 0;
-									char c2 = 0;
-									if(!tempQuantity.isEmpty()){
-										c = tempQuantity.charAt(0);
-										c2 = tempQuantity.charAt(tempQuantity.length()-1);
-									}
-									//Previous Quantity
-									int previousQuantity = 0;
-									String nID = model.getValueAt(row, id_column).toString();
-									for(int i = 0; i < productBySearch.size(); i++){
-										if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
-											previousQuantity = previousValue.get(i);
-										}
-									}
-									if(validateEmpty(tempQuantity) == false){
-										JOptionPane.showMessageDialog(null,"Quantity field cannot be left empty. "
-												+ "Please enter a quantity above 0 for row #" + (row+1) + ".");
-										model.setValueAt(previousQuantity, row, col);
-										table.setRowSelectionInterval(row, row);
-										table.setColumnSelectionInterval(0, 0);
-									}
-									else if(checkForNumbers(tempQuantity) == false){
-										JOptionPane.showMessageDialog(null,"Quantity entered for row #" + (row+1) + 
-												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-										model.setValueAt(previousQuantity, row, col);
-										table.setRowSelectionInterval(row, row);
-										table.setColumnSelectionInterval(0, 0);
-									}
-									else if(c == '0' && c2 >= '0'){
-										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row+1) + ".");
-										model.setValueAt(previousQuantity, row, col);
-										table.setRowSelectionInterval(row, row);
-										table.setColumnSelectionInterval(0, 0);
-									}
-									else{
-										String tempPrice = model.getValueAt(row, productPrice_column).toString();
-										int tQ = Integer.parseInt(tempQuantity);
-										if(tQ > 0){
-											double tP = Double.parseDouble(tempPrice);
-											tP = Math.round(tP * 100.0) / 100.0;
-											
-											tempTotal = tQ * tP;
-											tempTotal = Math.round(tempTotal * 100.0) / 100.0;
-											
-											model.setValueAt(tempTotal, row, productQuantityAndPrice_column);
-										
-											if(tableListenerCount == 1){
-												//calculateSubtotal();
-												//calculateInventoryQuantity();
-												//calculateSalePrice(row,model.getValueAt(row, id_column));
-											}
-											else if(tableListenerCount == 0){
-												stringTempPrice = model.getValueAt(row, productQuantityAndPrice_column).toString();
-												tableListenerCount = 0;
-											}
-											else{
-												tableListenerCount = 0;
-											}
-											tableListenerCount++;
-											
-											//After entering value, movies selection to next column (does not leave user in same colum)
-											//table.setRowSelectionInterval(row, row);
-											//table.setColumnSelectionInterval(0, 0);
-											//textField_productID_input.requestFocusInWindow();
-										}
-										else if(tQ < 1){
-											JOptionPane.showMessageDialog(null,"Please enter a quantity above 0 for row #" + (row+1) + ".");
-											model.setValueAt(1, row, col);
-											table.setRowSelectionInterval(row, row);
-											table.setColumnSelectionInterval(0, 0);
-										}
-									}
-								}
-							};
-							SwingUtilities.invokeLater(run1);
-						}
-					}
-				}
-		   }
-		});
-		*/
+		
 		tabbedPane_7 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_7.setBounds(961, 0, 279, 416);
 		cashier_submenu.add(tabbedPane_7);
@@ -3108,7 +3072,6 @@ public class Home extends JFrame implements KeyListener{
 				}
 			});
 			
-			
 			JButton checkout_keypad_decimal = new JButton(".");
 			checkout_keypad_decimal.setBounds(0, 278, 87, 93);
 			checkout_keypad_decimal.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -3167,7 +3130,7 @@ public class Home extends JFrame implements KeyListener{
 		
 	}
 	public void calculateSubtotal(){
-		System.out.println("CalculateSubtotal()");
+		//System.out.println("CalculateSubtotal()");
 		double sub = 0;
 		for(int i = 0; i < model.getRowCount(); i++){
 			sub += Double.parseDouble(model.getValueAt(i, productQuantityAndPrice_column).toString());
@@ -3184,7 +3147,8 @@ public class Home extends JFrame implements KeyListener{
 		total = Math.round(total * 100.0) / 100.0;
 		total_textField.setText("Total: $" + total);	
 	}
-	public void calculateInventoryQuantity(){
+	public boolean calculateInventoryQuantity(){
+		boolean check = true;
 		if(model.getRowCount() > 0 && productBySearch.size() > 0 && !table.isEditing()){
 			for(int i = 0; i < model.getRowCount(); i++){
 				for(int j = 0; j < productBySearch.size(); j++){
@@ -3213,17 +3177,25 @@ public class Home extends JFrame implements KeyListener{
 							previousValue.insertElementAt(p2, j);
 
 							model.setValueAt(p2, j, productQuantity_column);
+							//System.out.println("Everything not fine Check: " + check);
+							check = false;
+						}
+						else{
+							//System.out.println("Everything fine Check: " + check);
 						}
 						
 						int row = table.getSelectionModel().getLeadSelectionIndex();
 						textField_name_input.setText(productBySearch.get(row).getName());
 						textField_description_input.setText(productBySearch.get(row).getDescription());		
 						textField_quantity_input.setText(String.valueOf(productBySearch.get(row).getQuantity()));
+						//System.out.println("end2");
 						break;
 					}	
 				}
 			}
+			//System.out.println("End2");
 		}
+		return check;
 	}
 	public void loadTransactionTable(){
 		JTabbedPane tabbedPane_refund_table = new JTabbedPane(JTabbedPane.TOP);
@@ -3487,10 +3459,13 @@ public class Home extends JFrame implements KeyListener{
 										table_refund.setColumnSelectionInterval(0, 0);
 									}
 									else if(c == '0' && c2 >= '0'){
-										//JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
+										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
 										model_refund.setValueAt(previousQuantity2, row2, col2);
 										table_refund.setRowSelectionInterval(row2, row2);
 										table_refund.setColumnSelectionInterval(0, 0);
+									}
+									else if(tempQuantity.length() > 8){
+										JOptionPane.showMessageDialog(null,"The input '" + tempQuantity + "' for row #" + (row2+1) + " is too long. Please enter a valid quantity.");
 									}
 									else{
 										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
