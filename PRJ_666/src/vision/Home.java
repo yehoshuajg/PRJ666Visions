@@ -508,7 +508,7 @@ public class Home extends JFrame implements KeyListener{
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();
 		tabbedPane.addTab("Cashier", null, panel_cashier, null);
-		panel_cashier.setLayout(null);
+		panel_cashier.setLayout(new BorderLayout(0,0));
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.setBounds(0, 0, 1260, 650); //cashier tab

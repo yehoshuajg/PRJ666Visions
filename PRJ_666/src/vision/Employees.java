@@ -195,10 +195,10 @@ public class Employees extends JFrame{
 		//Close connection when done using it. Add try/catch rather than throw exception in function prototype.
 		//Look at fetchLogin() to get an idea.
 		super();
-		jPanel1 = new javax.swing.JPanel();
+		jPanel1 = new JPanel();
         jPanel1 = (JPanel) getContentPane();
         jPanel1.setBounds(0, 0, 1280, 690);
-        jPanel1.setLayout(null);
+        jPanel1.setLayout(new BorderLayout(0, 0));
         
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setBounds(6, 6, 1250, 648);
