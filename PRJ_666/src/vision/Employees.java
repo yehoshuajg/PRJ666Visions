@@ -17,6 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.swing.AbstractButton;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -67,6 +69,7 @@ import javax.swing.Timer;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 
 public class Employees extends JFrame{
@@ -114,7 +117,6 @@ public class Employees extends JFrame{
 	//End Windowbuilder vars
     //Color
     private String defaultColor = "#eeeeee";
-	
 	
 	private ArrayList<String> table_headings = new ArrayList<>();
 	private JTextField textField_firstName;
@@ -189,6 +191,9 @@ public class Employees extends JFrame{
 	private String[] provinces = {"Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador",
 			"Northwest Territories","Nova Scotia","Nunavut","Ontario","Prince Edward Island","Quebec","Saskatchewan","Yukon Territory"};
 	private JComboBox comboBox_province;
+	
+	//Checkbox for termination
+	private JCheckBox terminateBox;
 	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
@@ -305,6 +310,7 @@ public class Employees extends JFrame{
 									//System.exit(0);
 								}
 								else{
+									String tDate = getDate();
 									JPanel staffDetails = new JPanel();
 									staffDetails.setLayout(null);
 									
@@ -501,12 +507,18 @@ public class Employees extends JFrame{
 							        textPane_details_hireDate.setEditable(false);
 							        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_hireDate);
-							        
+							       
 							        JTextField textPane_details_terminateDate = new JTextField();
-							        textPane_details_terminateDate.setBounds(110, 455, 160, 20);
+							        textPane_details_terminateDate.setBounds(140, 455, 160, 20);
 							        textPane_details_terminateDate.setEditable(false);
 							        textPane_details_terminateDate.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_terminateDate);
+							        
+							        //Checkbox for termination
+							        terminateBox = new JCheckBox();
+							        terminateBox.setEnabled(false);
+							        terminateBox.setBounds(110, 455, 160, 20);
+							        panel_employeeDetails.add(terminateBox);
 							        
 							        //Error message fields
 							        JTextPane textPane_edit_error_firstName = new JTextPane();
@@ -589,39 +601,46 @@ public class Employees extends JFrame{
 									btn_edit.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
+											if(terminateBox.isSelected() == true){
+												textPane_details_terminateDate.setText(parseDate(tDate));
+											}
+											else{
+												textPane_details_terminateDate.setText(null);
+											}
+											
 											//First name
-												textPane_details_firstName.setBackground(null);
-												textPane_details_firstName.setEditable(true);
+											textPane_details_firstName.setBackground(null);
+											textPane_details_firstName.setEditable(true);
+											
+											//Last name
+											textPane_details_lastName.setBackground(null);
+											textPane_details_lastName.setEditable(true);
+											
+											//Street
+											textPane_details_street.setBackground(null);
+											textPane_details_street.setEditable(true);
+											
+											//City
+											textPane_details_city.setBackground(null);
+											textPane_details_city.setEditable(true);
+											
+											//State/Province
+											comboBox_detail_province.setEnabled(true);
+											
+											//Postal code
+											textPane_details_postalCode.setBackground(null);
+											textPane_details_postalCode.setEditable(true);
 												
-												//Last name
-												textPane_details_lastName.setBackground(null);
-												textPane_details_lastName.setEditable(true);
-												
-												//Street
-												textPane_details_street.setBackground(null);
-												textPane_details_street.setEditable(true);
-												
-												//City
-												textPane_details_city.setBackground(null);
-												textPane_details_city.setEditable(true);
-			
-												//State/Province
-												comboBox_detail_province.setEnabled(true);
-												
-												//Postal code
-												textPane_details_postalCode.setBackground(null);
-												textPane_details_postalCode.setEditable(true);
-												
-												//Home phone
-												textPane_details_homePhone.setBackground(null);
-												textPane_details_homePhone.setEditable(true);
-												
-												//Cell phone
-												textPane_details_cellPhone.setBackground(null);
-												textPane_details_cellPhone.setEditable(true);
-												
-												//Email
-												textPane_details_email.setBackground(null);
+											//Home phone
+											textPane_details_homePhone.setBackground(null);
+											textPane_details_homePhone.setEditable(true);
+											
+											//Cell phone
+											textPane_details_cellPhone.setBackground(null);
+											textPane_details_cellPhone.setEditable(true);
+											
+											//Email
+											textPane_details_email.setBackground(null);
 											textPane_details_email.setEditable(true);
 												
 											if(currentEmployee.getPositionID() == 4){
@@ -642,21 +661,39 @@ public class Employees extends JFrame{
 											//Manager and Cashier
 							        		if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
 												textPane_details_terminateDate.setBackground(null);
-												textPane_details_terminateDate.setEditable(true);
+												//terminateBox.setEnabled(true);
+												textPane_details_terminateDate.setEditable(false);
 											}
 							        		//Owner and Manager <=
 							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 3 && btn_save.isVisible()){
 							        			textPane_details_terminateDate.setBackground(null);
-												textPane_details_terminateDate.setEditable(true);
+							        			//terminateBox.setEnabled(true);
+							        			textPane_details_terminateDate.setEditable(false);
 							        		}
 							        		//Owner and accountant
 							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 5){
 							        			textPane_details_terminateDate.setBackground(null);
-												textPane_details_terminateDate.setEditable(true);
+							        			//terminateBox.setEnabled(true);
+							        			textPane_details_terminateDate.setEditable(false);
 							        		}
-											
-											
-											
+							        		if(currentEmployee.getPositionID() == 5){
+							        			terminateBox.setVisible(false);
+							        			textPane_details_terminateDate.setVisible(false);
+											}
+							        		
+							        		terminateBox.addActionListener(new ActionListener() {
+												@Override
+												public void actionPerformed(ActionEvent e) {
+													AbstractButton abstractButton = (AbstractButton) e.getSource();
+											        boolean selected = abstractButton.getModel().isSelected();
+											        if(selected){
+											        	textPane_details_terminateDate.setText(parseDate(tDate));
+											        }
+											        else{
+											        	textPane_details_terminateDate.setText("");
+											        }
+												}
+											});
 											
 											btn_edit.setVisible(false);
 											btn_save.setVisible(true);
@@ -865,6 +902,9 @@ public class Employees extends JFrame{
 																//textPane_details_username.setBackground(Color.decode(defaultColor));
 																//textPane_details_username.setEditable(false);
 																
+																//Termination
+																//terminateBox.setEnabled(false);
+																
 																btn_save.setVisible(false);
 																btn_edit.setVisible(true);
 																
@@ -873,7 +913,7 @@ public class Employees extends JFrame{
 																try {
 																	Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 																	
-																	if(textPane_details_terminateDate.getText().trim().isEmpty()){
+																	if(terminateBox.isSelected() == false){
 																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, AlteredBy = ? where ID = ?";
 																		PreparedStatement ps = con.prepareStatement(sql);
 																		ps.setString(1, textPane_details_firstName.getText().trim());
@@ -887,12 +927,13 @@ public class Employees extends JFrame{
 																		ps.setString(9, textPane_details_email.getText().trim());
 																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
 																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
-																		ps.setString(12, textPane_details_id.getText().trim());
+																		ps.setString(12, currentEmployee.getUsername().trim());
 																		ps.setString(13, currentEmployee.getUsername().trim());
 																		ps.executeUpdate();
 																	}
-																	else if(!textPane_details_terminateDate.getText().trim().isEmpty()){
-																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, AlteredBy = ?, TerminatedBy = ? where ID = ?";
+																	
+																	else if(terminateBox.isSelected() == true){
+																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, TerminationDate = ?, AlteredBy = ?, TerminatedBy = ? where ID = ?";
 																		PreparedStatement ps = con.prepareStatement(sql);
 																		ps.setString(1, textPane_details_firstName.getText().trim());
 																		ps.setString(2, textPane_details_lastName.getText().trim());
@@ -905,10 +946,12 @@ public class Employees extends JFrame{
 																		ps.setString(9, textPane_details_email.getText().trim());
 																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
 																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
-																		ps.setString(12, textPane_details_id.getText().trim());
+																		ps.setString(12, tDate); // Termination date
 																		ps.setString(13, currentEmployee.getUsername().trim());
-																	    ps.setString(14, textPane_details_terminateDate.getText().trim());
+																		ps.setString(14, currentEmployee.getUsername().trim());
+																		ps.setString(15, textPane_details_id.getText().trim());
 																	    ps.executeUpdate();
+																	    terminateBox.setEnabled(false);
 																	}
 																	
 																	//Clean-up environment
@@ -953,13 +996,17 @@ public class Employees extends JFrame{
 														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
 														//System.exit(0);
 													}
+													if(terminateBox.isSelected() && !textPane_details_terminateDate.getText().isEmpty()){
+														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
+														//System.exit(0);
+													}
 												}
 											}
 										}
 									});
 							        
 									//Print button
-							        JButton btn_print = new JButton("Print");
+							        /*JButton btn_print = new JButton("Print");
 							        btn_print.setBounds(485, 570, 150, 40);
 							        btn_print.setFont(new Font("Tahoma", Font.PLAIN, 20));
 							        btn_print.setFocusable(false);
@@ -972,7 +1019,8 @@ public class Employees extends JFrame{
 											}
 										}
 									});
-							        
+							        */
+									
 									//Cancel button
 							        JButton btn_cancel = new JButton("Cancel");
 							        btn_cancel.setBounds(670, 570, 150, 40);
@@ -1218,9 +1266,13 @@ public class Employees extends JFrame{
 								        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
 								        		if(staffList.get(i).getTerminationDate() != null){
 								        			textPane_details_terminateDate.setText(parseDate(staffList.get(i).getTerminationDate()));
+								        			terminateBox.setSelected(true);
+								        			terminateBox.setEnabled(false);
 								        		}
 								        		else{
 								        			textPane_details_terminateDate.setText(staffList.get(i).getTerminationDate());
+								        			terminateBox.setSelected(false);
+								        			terminateBox.setEnabled(true);
 								        		}
 								        		break;
 								        	}
@@ -1430,6 +1482,8 @@ public class Employees extends JFrame{
         
         textField_hireDate = new JTextField();
         textField_hireDate.setBounds(78, 418, 150, 26);
+        textField_hireDate.setText(parseDate(getDate()));
+        textField_hireDate.setEditable(false);
         panel_add_employee.add(textField_hireDate);
         textField_hireDate.setColumns(10);
         
@@ -1447,7 +1501,7 @@ public class Employees extends JFrame{
         		}
         	}
         });
-        btnSubmit.setBounds(10, 488, 441, 75);
+        btnSubmit.setBounds(10, 450, 441, 75);
         panel_add_employee.add(btnSubmit);
         
         JButton btnClear = new JButton("Clear");
@@ -1457,7 +1511,7 @@ public class Employees extends JFrame{
         		textField_firstName.requestFocus();
         	}
         });
-        btnClear.setBounds(508, 488, 441, 75);
+        btnClear.setBounds(508, 450, 441, 75);
         panel_add_employee.add(btnClear);
         
         textPane_error_firstName = new JTextPane();
@@ -2498,7 +2552,7 @@ public class Employees extends JFrame{
 	private String parseDate(String date) {
 		String finalOutput = null;
 		date = date.trim();
-		if(!date.isEmpty()){
+		if(!date.isEmpty() && date.length() > 0){
 			String[] splited = date.split("\\s+");
 			String newDate = splited[0];
 			String year = null;
@@ -2513,6 +2567,36 @@ public class Employees extends JFrame{
 				//Month
 				newDate = newDate.substring(first+1, newDate.length());
 				int second = newDate.indexOf("-");
+				month = newDate.substring(0, second);
+				if(month.charAt(0) == '0'){
+					char c = month.charAt(1);
+					month = Character.toString(c);
+				}
+				if(Integer.parseInt(month) >= 1 && Integer.parseInt(month) <= 12){
+					DateFormatSymbols dfs = new DateFormatSymbols();
+					String[] allMonths = dfs.getMonths();
+					int newMonth = Integer.valueOf(month) - 1;
+					month = allMonths[newMonth];
+				}
+				//Day
+				newDate = newDate.substring(second+1, newDate.length());
+				day = newDate.substring(0, newDate.length());
+				if(day.charAt(0) == '0'){
+					char c = day.charAt(1);
+					day = Character.toString(c);
+				}
+				//New output: dd/MM/yyyy
+				finalOutput = day + dateDelimiter + month + dateDelimiter + year;
+			}
+			else if(newDate.contains("/")){
+				//yyyy/MM/dd HH:mm:ss
+				//Year
+				int first = newDate.indexOf("/");
+				year = newDate.substring(0, first);
+				
+				//Month
+				newDate = newDate.substring(first+1, newDate.length());
+				int second = newDate.indexOf("/");
 				month = newDate.substring(0, second);
 				if(month.charAt(0) == '0'){
 					char c = month.charAt(1);
@@ -2602,6 +2686,13 @@ public class Employees extends JFrame{
 			e.printStackTrace();
 		}
 	}
+	public String getDate(){
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		String dateString = dateFormat.format(date);
+		//System.out.println("Date: " + dateString);
+		return dateString;
+	}
 	public void createEmployee(){
 		Connect connect = new Connect();
 		Hashing hash = new Hashing();
@@ -2627,10 +2718,7 @@ public class Employees extends JFrame{
 			ps.setString(11, jobtypes[comboBox_jobType.getSelectedIndex()]);
 			ps.setString(12, textField_userName.getText().trim());
 			ps.setString(13, hashedPassword);
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date date = new Date();
-			String dateString = dateFormat.format(date);
-			ps.setString(14, dateString);
+			ps.setString(14, getDate());
 			ps.setString(15, salt);
 			ps.setString(16, currentEmployee.getUsername());
 			ps.execute();
@@ -2990,7 +3078,7 @@ public class Employees extends JFrame{
 			3.) Set values to "?" by using setString(parameter#,value) 
 			4.) Execute the query using prepared statement, not String sql.
 			*/
-			String sql = "SELECT * FROM Employee where UserName = ? AND TerminationDate IS NULL";
+			String sql = "SELECT * FROM Employee where UserName = ? AND HireDate IS NOT NULL AND TerminationDate IS NULL";
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setString(1, userID);
 			ResultSet rs = ps.executeQuery();
