@@ -3466,6 +3466,9 @@ public class Home extends JFrame implements KeyListener{
 									}
 									else if(tempQuantity.length() > 8){
 										JOptionPane.showMessageDialog(null,"The input '" + tempQuantity + "' for row #" + (row2+1) + " is too long. Please enter a valid quantity.");
+										model_refund.setValueAt(previousQuantity2, row2, col2);
+										table_refund.setRowSelectionInterval(row2, row2);
+										table_refund.setColumnSelectionInterval(0, 0);
 									}
 									else{
 										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
