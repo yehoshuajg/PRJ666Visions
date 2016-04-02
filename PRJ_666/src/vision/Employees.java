@@ -193,7 +193,8 @@ public class Employees extends JFrame{
 	private JComboBox comboBox_province;
 	
 	//Checkbox for termination
-	private JCheckBox terminateBox;
+	//private JCheckBox terminateBox;
+	private JCheckBox terminateCheckbox;
 	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
@@ -304,7 +305,6 @@ public class Employees extends JFrame{
 						int column = employeeTable.getSelectedColumn();
 						if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
 							if(row > -1){
-								//Positions position = new Positions();
 								if(position.checkPosition(currentEmployee.getPositionID()) == false){
 									JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
 									//System.exit(0);
@@ -514,11 +514,18 @@ public class Employees extends JFrame{
 							        textPane_details_terminateDate.setBackground(Color.decode(defaultColor));
 							        panel_employeeDetails.add(textPane_details_terminateDate);
 							        
-							        //Checkbox for termination
-							        terminateBox = new JCheckBox();
-							        terminateBox.setEnabled(false);
-							        terminateBox.setBounds(110, 455, 160, 20);
-							        panel_employeeDetails.add(terminateBox);
+							        terminateCheckbox = new JCheckBox();
+							        terminateCheckbox.setBounds(110, 455, 160, 20);
+							        terminateCheckbox.setEnabled(false);
+							        panel_employeeDetails.add(terminateCheckbox);
+							        
+							        if(currentEmployee.getPositionID() == 5){
+							        	terminateCheckbox.setVisible(false);
+							        }
+							        else if(currentEmployee.getPositionID() == 4 || currentEmployee.getPositionID() == 3){
+							        	terminateCheckbox.setVisible(true);
+							        	terminateCheckbox.setEnabled(false);
+							        }
 							        
 							        //Error message fields
 							        JTextPane textPane_edit_error_firstName = new JTextPane();
@@ -601,13 +608,6 @@ public class Employees extends JFrame{
 									btn_edit.addActionListener(new ActionListener() {
 										@Override
 										public void actionPerformed(ActionEvent e) {
-											if(terminateBox.isSelected() == true){
-												textPane_details_terminateDate.setText(parseDate(tDate));
-											}
-											else{
-												textPane_details_terminateDate.setText(null);
-											}
-											
 											//First name
 											textPane_details_firstName.setBackground(null);
 											textPane_details_firstName.setEditable(true);
@@ -658,44 +658,73 @@ public class Employees extends JFrame{
 							        			comboBox_detail_jobtypes.setEnabled(true);
 							        		}
 											
-											//Manager and Cashier
-							        		if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
-												textPane_details_terminateDate.setBackground(null);
-												//terminateBox.setEnabled(true);
-												textPane_details_terminateDate.setEditable(false);
-											}
-							        		//Owner and Manager <=
-							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 3 && btn_save.isVisible()){
-							        			textPane_details_terminateDate.setBackground(null);
-							        			//terminateBox.setEnabled(true);
-							        			textPane_details_terminateDate.setEditable(false);
-							        		}
-							        		//Owner and accountant
-							        		else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 5){
-							        			textPane_details_terminateDate.setBackground(null);
-							        			//terminateBox.setEnabled(true);
-							        			textPane_details_terminateDate.setEditable(false);
-							        		}
-							        		if(currentEmployee.getPositionID() == 5){
-							        			terminateBox.setVisible(false);
-							        			textPane_details_terminateDate.setVisible(false);
-											}
-							        		
-							        		terminateBox.addActionListener(new ActionListener() {
-												@Override
-												public void actionPerformed(ActionEvent e) {
-													AbstractButton abstractButton = (AbstractButton) e.getSource();
-											        boolean selected = abstractButton.getModel().isSelected();
-											        if(selected){
-											        	textPane_details_terminateDate.setText(parseDate(tDate));
-											        }
-											        else{
-											        	textPane_details_terminateDate.setText("");
-											        }
+											if(textPane_details_terminateDate.getText().isEmpty()){
+												// Position ID - 4 == 4
+												if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) == 4){
+													textPane_details_terminateDate.setBackground(null);
+													//ID - 1 = 1
+													if(currentEmployee.getID() == Integer.parseInt(textPane_details_id.getText())){
+														terminateCheckbox.setEnabled(true);
+													}
+													else{
+														terminateCheckbox.setEnabled(false);
+													}
+								        			textPane_details_terminateDate.setEditable(false);
+								        		}
+												//Position ID 4 <= 3
+												else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) <= 3){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(false);
+													terminateCheckbox.setEnabled(true);
 												}
-											});
-											
-											btn_edit.setVisible(false);
+												else if(currentEmployee.getPositionID() == 4 && (comboBox_detail_positions.getSelectedIndex()+1) == 5){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(false);
+													terminateCheckbox.setEnabled(true);
+												}
+												
+												// Position ID - 3 >= 4
+												if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) >= 4){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(false);
+													terminateCheckbox.setEnabled(false);
+												}
+												//Position ID - 3 <= 2
+												else if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(false);
+													terminateCheckbox.setEnabled(true);
+												}
+												else if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) == 3){
+													textPane_details_terminateDate.setBackground(null);
+													textPane_details_terminateDate.setEditable(false);
+													//ID - 1 = 1
+													if(currentEmployee.getID() == Integer.parseInt(textPane_details_id.getText())){
+														terminateCheckbox.setEnabled(true);
+													}
+													else{
+														terminateCheckbox.setEnabled(false);
+													}
+												}
+												
+								        		terminateCheckbox.addActionListener(new ActionListener() {
+													@Override
+													public void actionPerformed(ActionEvent e) {
+														AbstractButton abstractButton = (AbstractButton) e.getSource();
+												        boolean selected = abstractButton.getModel().isSelected();
+												        if(selected){
+												        	textPane_details_terminateDate.setText(parseDate(tDate));
+												        }
+												        else{
+												        	textPane_details_terminateDate.setText("");
+												        }
+													}
+												});
+											}
+											else{
+												terminateCheckbox.setEnabled(false);
+											}
+							        		btn_edit.setVisible(false);
 											btn_save.setVisible(true);
 										}
 									});
@@ -902,9 +931,6 @@ public class Employees extends JFrame{
 																//textPane_details_username.setBackground(Color.decode(defaultColor));
 																//textPane_details_username.setEditable(false);
 																
-																//Termination
-																//terminateBox.setEnabled(false);
-																
 																btn_save.setVisible(false);
 																btn_edit.setVisible(true);
 																
@@ -913,7 +939,7 @@ public class Employees extends JFrame{
 																try {
 																	Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
 																	
-																	if(terminateBox.isSelected() == false){
+																	if(terminateCheckbox.isSelected() == false){
 																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, AlteredBy = ? where ID = ?";
 																		PreparedStatement ps = con.prepareStatement(sql);
 																		ps.setString(1, textPane_details_firstName.getText().trim());
@@ -928,11 +954,11 @@ public class Employees extends JFrame{
 																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
 																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
 																		ps.setString(12, currentEmployee.getUsername().trim());
-																		ps.setString(13, currentEmployee.getUsername().trim());
+																		ps.setString(13, textPane_details_id.getText().trim());
 																		ps.executeUpdate();
 																	}
 																	
-																	else if(terminateBox.isSelected() == true){
+																	else if(terminateCheckbox.isSelected() == true){
 																		String sql = "UPDATE `Employee` SET FirstName = ?, LastName = ?, Street = ?, City = ?, State_Province = ?, PostalCode = ?, HomePhone = ?, CellPhone = ?, Email = ?, PositionID = ?, JobType = ?, TerminationDate = ?, AlteredBy = ?, TerminatedBy = ? where ID = ?";
 																		PreparedStatement ps = con.prepareStatement(sql);
 																		ps.setString(1, textPane_details_firstName.getText().trim());
@@ -951,7 +977,7 @@ public class Employees extends JFrame{
 																		ps.setString(14, currentEmployee.getUsername().trim());
 																		ps.setString(15, textPane_details_id.getText().trim());
 																	    ps.executeUpdate();
-																	    terminateBox.setEnabled(false);
+																	    terminateCheckbox.setEnabled(false);
 																	}
 																	
 																	//Clean-up environment
@@ -982,6 +1008,12 @@ public class Employees extends JFrame{
 																}
 																//Update current employee
 																updateCurrentEmployee();
+																
+																if(terminateCheckbox.isSelected() && !textPane_details_terminateDate.getText().isEmpty() && 
+																	currentEmployee.getID() == Integer.parseInt(textPane_details_id.getText())){
+																	JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
+																	//System.exit(0);
+																}
 																go = true;
 															}
 															else{
@@ -993,10 +1025,6 @@ public class Employees extends JFrame{
 														}
 													}while(go == false);
 													if(position.checkPosition(currentEmployee.getPositionID()) == false){
-														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
-														//System.exit(0);
-													}
-													if(terminateBox.isSelected() && !textPane_details_terminateDate.getText().isEmpty()){
 														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
 														//System.exit(0);
 													}
@@ -1226,7 +1254,7 @@ public class Employees extends JFrame{
 									}
 							        
 							        //Filling fields
-							        if(staffList.size() > 0){
+									if(staffList.size() > 0){
 								        for(int i = 0; i < staffList.size(); i++){
 								        	String tempID = String.valueOf(employeeModel.getValueAt(row, 0));
 								        	if(tempID.equals(String.valueOf(staffList.get(i).getID()))){
@@ -1259,20 +1287,18 @@ public class Employees extends JFrame{
 								        				comboBox_detail_jobtypes.setSelectedIndex(2);
 								        			}
 								        			else{
-								        				System.out.println("Else");
+								        				//System.out.println("Else");
 								        			}
 								        		}
 								        		textPane_details_username.setText(staffList.get(i).getUsername());
 								        		textPane_details_hireDate.setText(parseDate(staffList.get(i).getHireDate()));
 								        		if(staffList.get(i).getTerminationDate() != null){
 								        			textPane_details_terminateDate.setText(parseDate(staffList.get(i).getTerminationDate()));
-								        			terminateBox.setSelected(true);
-								        			terminateBox.setEnabled(false);
+								        			terminateCheckbox.setSelected(true);
+								        			
 								        		}
 								        		else{
 								        			textPane_details_terminateDate.setText(staffList.get(i).getTerminationDate());
-								        			terminateBox.setSelected(false);
-								        			terminateBox.setEnabled(true);
 								        		}
 								        		break;
 								        	}
@@ -1616,6 +1642,7 @@ public class Employees extends JFrame{
         JPanel panel_details = new JPanel();
         tabbedPane.addTab("Details", null, panel_details, null);
         panel_details.setLayout(null);
+        
         /*
         JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane_chgpwd.setBounds(301, 38, 790, 220);
