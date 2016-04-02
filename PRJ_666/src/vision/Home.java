@@ -2251,6 +2251,37 @@ public class Home extends JFrame implements KeyListener{
             });
             mb.add(print_item);
 
+            javax.swing.JMenuItem tax = new javax.swing.JMenuItem("Change Tax");
+            tax.addActionListener((ActionEvent ae) -> {
+            	String update_tax = JOptionPane.showInputDialog(null, 
+            			"Enter updated tax amount (no symbols)", "Update Tax", 
+            	        JOptionPane.WARNING_MESSAGE);
+            	
+            	String error = "";
+            	try {
+            		Double tax_amount = Double.parseDouble(update_tax);
+            		
+            		if(tax_amount > 100 || tax_amount < 1){
+            			error = "Entered tax amount is invalid";
+            			JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            		} else {
+            			Connect c = new Connect();
+            			boolean b = c.updateTax(tax_amount);
+            			if(b){
+            				error = "Sucessfully changed tax amount. For new tax to take effect program must be restarted!";
+            				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.INFORMATION_MESSAGE);
+            			} else {
+            				error = "An error occured while updating tax amount.";
+            				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            			}
+            		}
+            	} catch(NumberFormatException ex){
+            		error = "Entered tax amount not recognize.";
+            		JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            	}
+            });
+            mb.add(tax);
+
             add(mb, BorderLayout.NORTH);
             setJMenuBar(mb);
 			
@@ -2301,6 +2332,37 @@ public class Home extends JFrame implements KeyListener{
             });
             mb.add(print_item);
 
+            javax.swing.JMenuItem tax = new javax.swing.JMenuItem("Change Tax");
+            tax.addActionListener((ActionEvent ae) -> {
+            	String update_tax = JOptionPane.showInputDialog(null, 
+            			"Enter updated tax amount (no symbols)", "Update Tax", 
+            	        JOptionPane.WARNING_MESSAGE);
+            	
+            	String error = "";
+            	try {
+            		Double tax_amount = Double.parseDouble(update_tax);
+            		
+            		if(tax_amount > 100 || tax_amount < 1){
+            			error = "Entered tax amount is invalid";
+            			JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            		} else {
+            			Connect c = new Connect();
+            			boolean b = c.updateTax(tax_amount);
+            			if(b){
+            				error = "Sucessfully changed tax amount. For new tax to take effect program must be restarted!";
+            				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.INFORMATION_MESSAGE);
+            			} else {
+            				error = "An error occured while updating tax amount.";
+            				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            			}
+            		}
+            	} catch(NumberFormatException ex){
+            		error = "Entered tax amount not recognize.";
+            		JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
+            	}
+            });
+            mb.add(tax);
+            
             add(mb, BorderLayout.NORTH);
             setJMenuBar(mb);
 			
