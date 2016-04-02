@@ -596,6 +596,10 @@ public class Employees extends JFrame{
 							        
 							        //Edit button
 							        JButton btn_edit = new JButton("Edit");
+							        if(currentEmployee.getPositionID() == 5){
+							        	btn_edit.setVisible(false);
+							        	btn_edit.setEnabled(false);
+							        }
 							        
 							        //Save button initialize
 							        JButton btn_save = new JButton("Save");
@@ -1104,7 +1108,6 @@ public class Employees extends JFrame{
 																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
 																}
 																else{
-																	//System.out.println("match");
 																	loadPasswordFrame(e,tID,tUserName);
 																}
 															}
@@ -1145,6 +1148,28 @@ public class Employees extends JFrame{
 													else{
 														//Owners and Managers
 														if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() == 3){
+															//Change Password button
+													        JButton btn_chgpwd = new JButton("Reset Password");
+													        btn_chgpwd.setBounds(90, 570, 200, 40);
+													        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+													        btn_chgpwd.setFocusable(false);
+															staffDetails.add(btn_chgpwd);
+															int tID = staffList.get(i).getID();
+															String tUserName = staffList.get(i).getUsername();
+															btn_chgpwd.addActionListener(new ActionListener() {
+																@Override
+																public void actionPerformed(ActionEvent e) {
+																	if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																		JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																	}
+																	else{
+																		loadResetPasswordFrame(e,tID,tUserName);
+																	}
+																}
+															});
+														}
+														//Manager and accountant
+														if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() == 5){
 															//Change Password button
 													        JButton btn_chgpwd = new JButton("Reset Password");
 													        btn_chgpwd.setBounds(90, 570, 200, 40);
