@@ -142,6 +142,7 @@ public class Home extends JFrame implements KeyListener{
 	//Sales Total
 	private double subTotal = 0;
 	private double tax = 0;
+	private double taxValue = 0;
 	private double total = 0;
 	private int c = 0;
 	private String stringTempPrice = null;
@@ -503,7 +504,7 @@ public class Home extends JFrame implements KeyListener{
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
-		//loadCashier();
+		loadCashier();
 	}
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();
@@ -574,7 +575,7 @@ public class Home extends JFrame implements KeyListener{
 		textField_productID_input.setBounds(85, 9, 141, 20);;
 		item_info.add(textField_productID_input);
 		textField_productID_input.setColumns(10);
-		textField_productID_input.setText(String.valueOf(1000000));
+		//textField_productID_input.setText(String.valueOf(1000000));
 		
 		//Places cursor in ID field as soon as page loads, like focus in html
 		textField_productID_input.addAncestorListener(new AncestorListener() {
@@ -1561,7 +1562,7 @@ public class Home extends JFrame implements KeyListener{
 		sales_total.add(separator_6);
 		
 		JTabbedPane tabbedPane_4 = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane_4.setBounds(0, 205, 965, 405);
+		tabbedPane_4.setBounds(0, 205, 965, 404);
 		cashier_submenu.add(tabbedPane_4);
 		
 		JPanel panel_table = new JPanel(new BorderLayout());
@@ -2282,7 +2283,7 @@ public class Home extends JFrame implements KeyListener{
             });
             mb.add(tax);
 
-            add(mb, BorderLayout.NORTH);
+            getContentPane().add(mb, BorderLayout.NORTH);
             setJMenuBar(mb);
 			
 			//Get Help
@@ -2363,7 +2364,7 @@ public class Home extends JFrame implements KeyListener{
             });
             mb.add(tax);
             
-            add(mb, BorderLayout.NORTH);
+            getContentPane().add(mb, BorderLayout.NORTH);
             setJMenuBar(mb);
 			
 			//Get Help
@@ -2410,7 +2411,7 @@ public class Home extends JFrame implements KeyListener{
             });
             mb.add(print_item);
 
-            add(mb, BorderLayout.NORTH);
+            getContentPane().add(mb, BorderLayout.NORTH);
             setJMenuBar(mb);
 		}
 			

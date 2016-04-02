@@ -292,8 +292,8 @@ public class Employees extends JFrame{
 			public void mouseClicked(MouseEvent e) {
 				Positions position = new Positions();
 				if(position.checkPosition(currentEmployee.getPositionID()) == false){
-					JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-					//System.exit(0);
+					JOptionPane.showMessageDialog(null,"This account does not have access to this panel. The program will now exit.");
+					System.exit(0);
 				}
 				else{
 				if (e.getClickCount() == 1) {
@@ -306,8 +306,8 @@ public class Employees extends JFrame{
 						if(column == 0 || column == 1 || column == 2 || column == 3 || column == 4 || column == 5 || column == 6){
 							if(row > -1){
 								if(position.checkPosition(currentEmployee.getPositionID()) == false){
-									JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-									//System.exit(0);
+									JOptionPane.showMessageDialog(null,"This account does not have access to this panel. The program will now exit.");
+									System.exit(0);
 								}
 								else{
 									String tDate = getDate();
@@ -859,8 +859,8 @@ public class Employees extends JFrame{
 												}
 											}
 											if(position.checkPosition(currentEmployee.getPositionID()) == false){
-												JOptionPane.showMessageDialog(null,"This account does not have access to this panel.");
-												//System.exit(0);
+												JOptionPane.showMessageDialog(null,"This account does not have access to this panel. The program will now exit.");
+												System.exit(0);
 											}
 											else{
 												if(check && ok){
@@ -1012,7 +1012,7 @@ public class Employees extends JFrame{
 																if(terminateCheckbox.isSelected() && !textPane_details_terminateDate.getText().isEmpty() && 
 																	currentEmployee.getID() == Integer.parseInt(textPane_details_id.getText())){
 																	JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
-																	//System.exit(0);
+																	System.exit(0);
 																}
 																go = true;
 															}
@@ -1026,7 +1026,7 @@ public class Employees extends JFrame{
 													}while(go == false);
 													if(position.checkPosition(currentEmployee.getPositionID()) == false){
 														JOptionPane.showMessageDialog(null,"This account no longer has access to this panel. The program will now exit.");
-														//System.exit(0);
+														System.exit(0);
 													}
 												}
 											}
@@ -1666,295 +1666,6 @@ public class Employees extends JFrame{
         JPanel panel_details = new JPanel();
         tabbedPane.addTab("Details", null, panel_details, null);
         panel_details.setLayout(null);
-        
-        /*
-        JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_chgpwd.setBounds(301, 38, 790, 220);
-        panel_details.add(tabbedPane_chgpwd);
-        
-        JPanel panel_chgpwd = new JPanel();
-        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
-        panel_chgpwd.setLayout(null);
-        
-        JTextPane txtpnCurrentPassword = new JTextPane();
-        txtpnCurrentPassword.setText("Current Password:");
-        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
-        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
-        panel_chgpwd.add(txtpnCurrentPassword);
-        
-        JTextPane txtpnNewPassword = new JTextPane();
-        txtpnNewPassword.setText("New Password:");
-        txtpnNewPassword.setBackground(Color.decode(defaultColor));
-        txtpnNewPassword.setBounds(10, 45, 94, 20);
-        panel_chgpwd.add(txtpnNewPassword);
-        
-        JTextPane txtpnConfirmNewPassword = new JTextPane();
-        txtpnConfirmNewPassword.setText("Confirm New Password:");
-        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
-        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
-        panel_chgpwd.add(txtpnConfirmNewPassword);
-        
-        textField_input_currentPassword = new JPasswordField();
-        textField_input_currentPassword.setBounds(136, 6, 150, 26);
-        panel_chgpwd.add(textField_input_currentPassword);
-        textField_input_currentPassword.setColumns(10);
-        
-        textField_input_newPassword = new JPasswordField();
-        textField_input_newPassword.setBounds(116, 42, 150, 26);
-        panel_chgpwd.add(textField_input_newPassword);
-        textField_input_newPassword.setColumns(10);
-        
-        textField_input_confirmNewPassword = new JPasswordField();
-        textField_input_confirmNewPassword.setBounds(171, 77, 150, 26);
-        panel_chgpwd.add(textField_input_confirmNewPassword);
-        textField_input_confirmNewPassword.setColumns(10);
-        
-        JTextPane textPane_error_currentPassword = new JTextPane();
-        textPane_error_currentPassword.setBounds(298, 10, 465, 20);
-        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textPane_error_currentPassword);
-        
-        textField_error_newPassword = new JTextField();
-        textField_error_newPassword.setBounds(274, 42, 489, 26);
-        textField_error_newPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textField_error_newPassword);
-        textField_error_newPassword.setColumns(10);
-        
-        textField_error_confirmNewPassword = new JTextField();
-        textField_error_confirmNewPassword.setBounds(333, 77, 430, 26);
-        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textField_error_confirmNewPassword);
-        textField_error_confirmNewPassword.setColumns(10);
-        
-        JButton btnChgPassword = new JButton("Change Password");
-        btnChgPassword.setBounds(10, 120, 350, 38);
-        panel_chgpwd.add(btnChgPassword);
-        
-        JButton btnCancel_chgpwd = new JButton("Cancel");
-        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
-        panel_chgpwd.add(btnCancel_chgpwd);
-        */
-        /*
-        JTabbedPane tabbedPane_details = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_details.setBounds(85, 15, 740, 551);
-        panel_details.add(tabbedPane_details);
-        
-        JPanel panel_employeeDetails = new JPanel();
-        tabbedPane_details.addTab("Employee details:", null, panel_employeeDetails, null);
-        panel_employeeDetails.setLayout(null);
-        
-        JTextPane txtpnId_details_id = new JTextPane();
-        txtpnId_details_id.setText("ID:");
-        txtpnId_details_id.setBounds(6, 10, 18, 20);
-        txtpnId_details_id.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(txtpnId_details_id);
-        
-        JTextPane txtpn_details_FirstName = new JTextPane();
-        txtpn_details_FirstName.setText("First Name:");
-        txtpn_details_FirstName.setBounds(6, 42, 72, 20);
-        txtpn_details_FirstName.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(txtpn_details_FirstName);
-        
-        JTextPane txtpn_details_lastName = new JTextPane();
-        txtpn_details_lastName.setText("Last Name:");
-        txtpn_details_lastName.setBackground(Color.decode(defaultColor));
-        txtpn_details_lastName.setBounds(6, 74, 72, 20);
-        panel_employeeDetails.add(txtpn_details_lastName);
-        
-        JTextPane txtpn_details_Street = new JTextPane();
-        txtpn_details_Street.setText("Street:");
-        txtpn_details_Street.setBackground(Color.decode(defaultColor));
-        txtpn_details_Street.setBounds(6, 106, 40, 20);
-        panel_employeeDetails.add(txtpn_details_Street);
-        
-        JTextPane txtpn_details_City = new JTextPane();
-        txtpn_details_City.setText("City:");
-        txtpn_details_City.setBackground(Color.decode(defaultColor));
-        txtpn_details_City.setBounds(6, 138, 29, 20);
-        panel_employeeDetails.add(txtpn_details_City);
-        
-        JTextPane txtpn_details_Stateprovince = new JTextPane();
-        txtpn_details_Stateprovince.setText("State/Province:");
-        txtpn_details_Stateprovince.setBackground(Color.decode(defaultColor));
-        txtpn_details_Stateprovince.setBounds(6, 170, 95, 20);
-        panel_employeeDetails.add(txtpn_details_Stateprovince);
-        
-        JTextPane txtpn_details_PostalCode = new JTextPane();
-        txtpn_details_PostalCode.setText("Postal Code:");
-        txtpn_details_PostalCode.setBackground(Color.decode(defaultColor));
-        txtpn_details_PostalCode.setBounds(6, 202, 78, 20);
-        panel_employeeDetails.add(txtpn_details_PostalCode);
-        
-        JTextPane txtpn_details_HomePhone = new JTextPane();
-        txtpn_details_HomePhone.setText("Home Phone:");
-        txtpn_details_HomePhone.setBackground(Color.decode(defaultColor));
-        txtpn_details_HomePhone.setBounds(6, 234, 83, 20);
-        panel_employeeDetails.add(txtpn_details_HomePhone);
-        
-        JTextPane txtpn_details_CellPhone = new JTextPane();
-        txtpn_details_CellPhone.setText("Cell Phone:");
-        txtpn_details_CellPhone.setBackground(Color.decode(defaultColor));
-        txtpn_details_CellPhone.setBounds(6, 266, 72, 20);
-        panel_employeeDetails.add(txtpn_details_CellPhone);
-        
-        JTextPane txtpn_details_Email = new JTextPane();
-        txtpn_details_Email.setText("Email:");
-        txtpn_details_Email.setBackground(Color.decode(defaultColor));
-        txtpn_details_Email.setBounds(6, 298, 40, 20);
-        panel_employeeDetails.add(txtpn_details_Email);
-        
-        JTextPane txtpn_details_PositionId = new JTextPane();
-        txtpn_details_PositionId.setText("Position ID:");
-        txtpn_details_PositionId.setBackground(Color.decode(defaultColor));
-        txtpn_details_PositionId.setBounds(6, 330, 75, 20);
-        panel_employeeDetails.add(txtpn_details_PositionId);
-        
-        JTextPane txtpn_details_JobType = new JTextPane();
-        txtpn_details_JobType.setText("Job Type:");
-        txtpn_details_JobType.setBackground(Color.decode(defaultColor));
-        txtpn_details_JobType.setBounds(6, 362, 58, 20);
-        panel_employeeDetails.add(txtpn_details_JobType);
-        
-        JTextPane txtpn_details_Username = new JTextPane();
-        txtpn_details_Username.setText("Username:");
-        txtpn_details_Username.setBackground(Color.decode(defaultColor));
-        txtpn_details_Username.setBounds(6, 394, 70, 20);
-        panel_employeeDetails.add(txtpn_details_Username);
-        
-        JTextPane txtpn_details_HireDate = new JTextPane();
-        txtpn_details_HireDate.setText("Hire Date:");
-        txtpn_details_HireDate.setBackground(Color.decode(defaultColor));
-        txtpn_details_HireDate.setBounds(6, 426, 70, 20);
-        panel_employeeDetails.add(txtpn_details_HireDate);
-        
-        JTextField textPane_details_id = new JTextField();
-        textPane_details_id.setBounds(30, 10, 150, 20);
-        textPane_details_id.setEditable(false);
-        textPane_details_id.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_id);
-        
-        JTextField textPane_details_firstName = new JTextField();
-        textPane_details_firstName.setBounds(90, 42, 150, 20);
-        textPane_details_firstName.setEditable(false);
-        textPane_details_firstName.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_firstName);
-        
-        JTextField textPane_details_lastName = new JTextField();
-        textPane_details_lastName.setBounds(90, 74, 150, 20);
-        textPane_details_lastName.setEditable(false);
-        textPane_details_lastName.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_lastName);
-        
-        JTextField textPane_details_street = new JTextField();
-        textPane_details_street.setBounds(58, 106, 150, 20);
-        textPane_details_street.setEditable(false);
-        textPane_details_street.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_street);
-        
-        JTextField textPane_details_city = new JTextField();
-        textPane_details_city.setBounds(47, 138, 150, 20);
-        textPane_details_city.setEditable(false);
-        textPane_details_city.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_city);
-        
-        JTextField textPane_details_stateProvince = new JTextField();
-        textPane_details_stateProvince.setBounds(113, 170, 150, 20);
-        textPane_details_stateProvince.setEditable(false);
-        textPane_details_stateProvince.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_stateProvince);
-        
-        JTextField textPane_details_postalCode = new JTextField();
-        textPane_details_postalCode.setBounds(96, 201, 150, 20);
-        textPane_details_postalCode.setEditable(false);
-        textPane_details_postalCode.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_postalCode);
-        
-        JTextField textPane_details_homePhone = new JTextField();
-        textPane_details_homePhone.setBounds(100, 234, 150, 20);
-        textPane_details_homePhone.setEditable(false);
-        textPane_details_homePhone.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_homePhone);
-        
-        JTextField textPane_details_cellPhone = new JTextField();
-        textPane_details_cellPhone.setBounds(90, 266, 150, 20);
-        textPane_details_cellPhone.setEditable(false);
-        textPane_details_cellPhone.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_cellPhone);
-        
-        JTextField textPane_details_email = new JTextField();
-        textPane_details_email.setBounds(58, 298, 150, 20);
-        textPane_details_email.setEditable(false);
-        textPane_details_email.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_email);
-        
-        JTextField textPane_positionID = new JTextField();
-        textPane_positionID.setBounds(90, 330, 150, 20);
-        textPane_positionID.setEditable(false);
-        textPane_positionID.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_positionID);
-        
-        JTextField textPane_details_JobType = new JTextField();
-        textPane_details_JobType.setBounds(76, 362, 150, 20);
-        textPane_details_JobType.setEditable(false);
-        textPane_details_JobType.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_JobType);
-        
-        JTextField textPane_details_username = new JTextField();
-        textPane_details_username.setBounds(90, 394, 150, 20);
-        textPane_details_username.setEditable(false);
-        textPane_details_username.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_username);
-        
-        JTextField textPane_details_hireDate = new JTextField();
-        textPane_details_hireDate.setBounds(90, 426, 150, 20);
-        textPane_details_hireDate.setEditable(false);
-        textPane_details_hireDate.setBackground(Color.decode(defaultColor));
-        panel_employeeDetails.add(textPane_details_hireDate);
-        
-        JTextPane textPane_edit_error_firstName = new JTextPane();
-        textPane_edit_error_firstName.setBounds(252, 42, 461, 20);
-        panel_employeeDetails.add(textPane_edit_error_firstName);
-        
-        JTextPane textPane_edit_error_lastName = new JTextPane();
-        textPane_edit_error_lastName.setBounds(252, 74, 461, 20);
-        panel_employeeDetails.add(textPane_edit_error_lastName);
-        
-        JTextPane textPane_edit_error_street = new JTextPane();
-        textPane_edit_error_street.setBounds(220, 106, 493, 20);
-        panel_employeeDetails.add(textPane_edit_error_street);
-        
-        JTextPane textPane_edit_error_city = new JTextPane();
-        textPane_edit_error_city.setBounds(209, 138, 504, 20);
-        panel_employeeDetails.add(textPane_edit_error_city);
-        
-        JTextPane textPane_edit_error_stateProvince = new JTextPane();
-        textPane_edit_error_stateProvince.setBounds(275, 170, 438, 20);
-        panel_employeeDetails.add(textPane_edit_error_stateProvince);
-        
-        JTextPane textPane_edit_error_postalCode = new JTextPane();
-        textPane_edit_error_postalCode.setBounds(258, 202, 455, 20);
-        panel_employeeDetails.add(textPane_edit_error_postalCode);
-        
-        JTextPane textPane_edit_error_homePhone = new JTextPane();
-        textPane_edit_error_homePhone.setBounds(262, 234, 451, 20);
-        panel_employeeDetails.add(textPane_edit_error_homePhone);
-        
-        JTextPane textPane_error_edit_cellPhone = new JTextPane();
-        textPane_error_edit_cellPhone.setBounds(252, 266, 461, 20);
-        panel_employeeDetails.add(textPane_error_edit_cellPhone);
-        
-        JTextPane textPane_edit_error_email = new JTextPane();
-        textPane_edit_error_email.setBounds(220, 298, 493, 20);
-        panel_employeeDetails.add(textPane_edit_error_email);
-        
-        JTextPane textPane_edit_error_positionID = new JTextPane();
-        textPane_edit_error_positionID.setBounds(252, 330, 461, 20);
-        panel_employeeDetails.add(textPane_edit_error_positionID);
-        
-        JTextPane textPane_error_edit_jobType = new JTextPane();
-        textPane_error_edit_jobType.setBounds(238, 362, 475, 20);
-        panel_employeeDetails.add(textPane_error_edit_jobType);
-        */
 	}
 	public void updateCurrentEmployee(){
 		Connect connect = new Connect();
@@ -1997,14 +1708,13 @@ public class Employees extends JFrame{
 		}
 	}
 	
-	
 	public HashMap getResetUserEmail() {
 		return resetUserEmail;
 	}
 	public void setResetUserEmail(HashMap resetUserEmail) {
 		this.resetUserEmail = resetUserEmail;
 	}
-	//Not working
+	//Reset
 	private void loadResetPasswordFrame(ActionEvent e, int employeeID, String username){
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -2016,57 +1726,39 @@ public class Employees extends JFrame{
         JPanel panel_chgpwd = new JPanel();
         tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
         panel_chgpwd.setLayout(null);
-        /*
-        JTextPane txtpnCurrentPassword = new JTextPane();
-        txtpnCurrentPassword.setText("Current Password:");
-        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
-        txtpnCurrentPassword.setEditable(false);
-        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
-        panel_chgpwd.add(txtpnCurrentPassword);
-        */
+        
         JTextPane txtpnNewPassword = new JTextPane();
         txtpnNewPassword.setText("New Password:");
         txtpnNewPassword.setBackground(Color.decode(defaultColor));
         txtpnNewPassword.setEditable(false);
-        txtpnNewPassword.setBounds(10, 45, 94, 20);
+        txtpnNewPassword.setBounds(10, 25, 94, 20);
         panel_chgpwd.add(txtpnNewPassword);
         
         JTextPane txtpnConfirmNewPassword = new JTextPane();
         txtpnConfirmNewPassword.setText("Confirm New Password:");
         txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
         txtpnConfirmNewPassword.setEditable(false);
-        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
+        txtpnConfirmNewPassword.setBounds(10, 70, 149, 20);
         panel_chgpwd.add(txtpnConfirmNewPassword);
-        /*
-        textField_input_currentPassword = new JPasswordField();
-        textField_input_currentPassword.setBounds(130, 4, 150, 26);
-        panel_chgpwd.add(textField_input_currentPassword);
-        textField_input_currentPassword.setColumns(10);
-        */
+        
         textField_input_newPassword = new JPasswordField();
-        textField_input_newPassword.setBounds(110, 38, 150, 26);
+        textField_input_newPassword.setBounds(110, 23, 150, 26);
         panel_chgpwd.add(textField_input_newPassword);
         textField_input_newPassword.setColumns(10);
         
         textField_input_confirmNewPassword = new JPasswordField();
-        textField_input_confirmNewPassword.setBounds(165, 73, 150, 26);
+        textField_input_confirmNewPassword.setBounds(165, 68, 150, 26);
         panel_chgpwd.add(textField_input_confirmNewPassword);
         textField_input_confirmNewPassword.setColumns(10);
-        /*
-        JTextPane textPane_error_currentPassword = new JTextPane();
-        textPane_error_currentPassword.setBounds(290, 10, 465, 20);
-        textPane_error_currentPassword.setEditable(false);
-        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textPane_error_currentPassword);
-        */
+        
         textField_error_newPassword = new JTextPane();
-        textField_error_newPassword.setBounds(270, 42, 489, 26);
+        textField_error_newPassword.setBounds(275, 25, 489, 35);
         textField_error_newPassword.setEditable(false);
         textField_error_newPassword.setBackground(Color.decode(defaultColor));
         panel_chgpwd.add(textField_error_newPassword);
         
         textField_error_confirmNewPassword = new JTextPane();
-        textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
+        textField_error_confirmNewPassword.setBounds(325, 70, 430, 35);
         textField_error_confirmNewPassword.setEditable(false);
         textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
         panel_chgpwd.add(textField_error_confirmNewPassword);
@@ -2087,8 +1779,7 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					//if(newPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
-					if(newPass.trim().matches("^[a-zA-Z0-9]*$")){
+					if(newPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 						textField_error_newPassword.setText(null);
 					}
 					else{
@@ -2105,8 +1796,7 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					if(cnewPass.trim().matches("^[a-zA-Z0-9]*$")){
-					//if(cnewPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
+					if(cnewPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 						textField_error_confirmNewPassword.setText(null);
 					}
 					else{
@@ -2118,8 +1808,7 @@ public class Employees extends JFrame{
 					if(newPass.equals(cnewPass)){
 						Hashing hash = new Hashing();
 						String salt;
-						System.out.println("EmployeeID: " +employeeID);
-						System.out.println("UserName: " + username);
+						
 						try {
 							salt = hash.getSalt();
 							String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
@@ -2175,7 +1864,7 @@ public class Employees extends JFrame{
 		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
 		d2.setVisible(true);
 	}
-	//Works
+	//Forgot
 	private void loadPasswordFrame(ActionEvent e, int employeeID, String username) {
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -2369,202 +2058,6 @@ public class Employees extends JFrame{
 		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
 		d2.setVisible(true);
 	}
-	/*
-	public void loadForgotPassword(ActionEvent e){
-		JPanel chgpwd_panel = new JPanel();
-		chgpwd_panel.setLayout(null);
-					
-		JTabbedPane tabbedPane_chgpwd = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane_chgpwd.setBounds(55, 25, 790, 220);
-        chgpwd_panel.add(tabbedPane_chgpwd);
-        
-        JPanel panel_chgpwd = new JPanel();
-        tabbedPane_chgpwd.addTab("Change Password:", null, panel_chgpwd, null);
-        panel_chgpwd.setLayout(null);
-        
-        JTextPane txtpnCurrentPassword = new JTextPane();
-        txtpnCurrentPassword.setText("Current Password:");
-        txtpnCurrentPassword.setBackground(Color.decode(defaultColor));
-        txtpnCurrentPassword.setEditable(false);
-        txtpnCurrentPassword.setBounds(10, 10, 114, 20);
-        panel_chgpwd.add(txtpnCurrentPassword);
-        
-        JTextPane txtpnNewPassword = new JTextPane();
-        txtpnNewPassword.setText("New Password:");
-        txtpnNewPassword.setBackground(Color.decode(defaultColor));
-        txtpnNewPassword.setEditable(false);
-        txtpnNewPassword.setBounds(10, 45, 94, 20);
-        panel_chgpwd.add(txtpnNewPassword);
-        
-        JTextPane txtpnConfirmNewPassword = new JTextPane();
-        txtpnConfirmNewPassword.setText("Confirm New Password:");
-        txtpnConfirmNewPassword.setBackground(Color.decode(defaultColor));
-        txtpnConfirmNewPassword.setEditable(false);
-        txtpnConfirmNewPassword.setBounds(10, 80, 149, 20);
-        panel_chgpwd.add(txtpnConfirmNewPassword);
-        
-        textField_input_currentPassword = new JPasswordField();
-        textField_input_currentPassword.setBounds(130, 4, 150, 26);
-        panel_chgpwd.add(textField_input_currentPassword);
-        textField_input_currentPassword.setColumns(10);
-        
-        textField_input_newPassword = new JPasswordField();
-        textField_input_newPassword.setBounds(110, 38, 150, 26);
-        panel_chgpwd.add(textField_input_newPassword);
-        textField_input_newPassword.setColumns(10);
-        
-        textField_input_confirmNewPassword = new JPasswordField();
-        textField_input_confirmNewPassword.setBounds(165, 73, 150, 26);
-        panel_chgpwd.add(textField_input_confirmNewPassword);
-        textField_input_confirmNewPassword.setColumns(10);
-        
-        JTextPane textPane_error_currentPassword = new JTextPane();
-        textPane_error_currentPassword.setBounds(290, 10, 465, 20);
-        textPane_error_currentPassword.setEditable(false);
-        textPane_error_currentPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textPane_error_currentPassword);
-        
-        textField_error_newPassword = new JTextPane();
-        textField_error_newPassword.setBounds(270, 42, 489, 26);
-        textField_error_newPassword.setEditable(false);
-        textField_error_newPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textField_error_newPassword);
-        
-        textField_error_confirmNewPassword = new JTextPane();
-        textField_error_confirmNewPassword.setBounds(325, 77, 430, 32);
-        textField_error_confirmNewPassword.setEditable(false);
-        textField_error_confirmNewPassword.setBackground(Color.decode(defaultColor));
-        panel_chgpwd.add(textField_error_confirmNewPassword);
-        
-        JButton btnChgPassword = new JButton("Change Password");
-        btnChgPassword.setBounds(10, 120, 350, 38);
-        panel_chgpwd.add(btnChgPassword);
-        btnChgPassword.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean check = true;
-				boolean ok = true;
-				//Current Password
-				char[] cpassword = textField_input_currentPassword.getPassword();
-				String currentPass = new String(cpassword);
-				if(validateEmpty(currentPass) == false){
-					textPane_error_currentPassword.setText("Password cannot be Empty.");
-					check = false;
-				}
-				else{
-					if(currentPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
-						textPane_error_currentPassword.setText(null);
-					}
-					else{
-						textPane_error_currentPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
-						ok = false;
-					}
-				}
-				
-				//New Password
-				char[] npassword = textField_input_newPassword.getPassword();
-				String newPass = new String(npassword);
-				if(validateEmpty(newPass) == false){
-					textField_error_newPassword.setText("Password cannot be Empty.");
-					check = false;
-				}
-				else{
-					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
-						textField_error_newPassword.setText(null);
-					}
-					else{
-						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
-						ok = false;
-					}
-				}
-				
-				//Confirm New Password
-				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
-				String cnewPass = new String(cnpassword);
-				if(validateEmpty(cnewPass) == false){
-					textField_error_confirmNewPassword.setText("Password cannot be Empty.");
-					check = false;
-				}
-				else{
-					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
-						textField_error_confirmNewPassword.setText(null);
-					}
-					else{
-						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
-						ok = false;
-					}
-				}
-				
-				System.out.println("Check: " + check);
-				System.out.println("ok: " + ok);
-				
-				if(check && ok){
-					//Current password
-					Employees tempEmployee = new Employees(username);
-					if(tempEmployee.fetchLogin(username, currentPass)){
-						if(newPass.equals(cnewPass)){
-							Hashing hash = new Hashing();
-							String salt;
-							try {
-								salt = hash.getSalt();
-								String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
-								Connect connect = new Connect();
-								try {
-									Connection con = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
-									String sql = "UPDATE `Employee` SET Password = ?, Salt = ? where ID = ? AND UserName = ?";
-									PreparedStatement ps = con.prepareStatement(sql);
-									ps.setString(1, hashedPassword);
-									ps.setString(2, salt);
-									//ps.setInt(3, employeeID);
-									//ps.setString(4, username);
-								    ps.executeUpdate();
-									
-									//Clean-up environment
-									con.close();
-								} catch (SQLException e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-							} catch (NoSuchAlgorithmException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							JOptionPane.showMessageDialog(null,"Password successfully changed for Employee '" + username + "'.");
-							d2.dispose();
-						}
-						else{
-							textField_error_newPassword.setText("Password entered does not match confirm password.");
-							textField_error_confirmNewPassword.setText("Confirm password entered does not match new password.");
-						}
-					}
-					else{
-						textPane_error_currentPassword.setText("Invalid Password");
-					}
-				}
-			}
-		});
-        
-        JButton btnCancel_chgpwd = new JButton("Cancel");
-        btnCancel_chgpwd.setBounds(405, 120, 350, 38);
-        panel_chgpwd.add(btnCancel_chgpwd);
-        btnCancel_chgpwd.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				d2.dispose();
-			}
-		});
-        
-		Component component = (Component) e.getSource();
-		//Call parent jframe/jdialog
-		JFrame topFrame2 = (JFrame)(d1.getParent());
-		d2 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
-		d2.getContentPane().add(chgpwd_panel);
-		d2.setSize(900, 300);
-		d2.setLocationRelativeTo(null);
-		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
-		d2.setVisible(true);
-	}
-	*/
 	public void setCurrentEmployee(Employees currentEmployee){
 		this.currentEmployee = currentEmployee;
 	}
