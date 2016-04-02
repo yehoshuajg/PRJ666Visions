@@ -1104,6 +1104,7 @@ public class Employees extends JFrame{
 																	JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
 																}
 																else{
+																	//System.out.println("match");
 																	loadPasswordFrame(e,tID,tUserName);
 																}
 															}
@@ -1142,6 +1143,29 @@ public class Employees extends JFrame{
 														}
 													}
 													else{
+														//Owners and Managers
+														if(currentEmployee.getPositionID() == 4 && staffList.get(i).getPositionID() == 3){
+															//Change Password button
+													        JButton btn_chgpwd = new JButton("Reset Password");
+													        btn_chgpwd.setBounds(90, 570, 200, 40);
+													        btn_chgpwd.setFont(new Font("Tahoma", Font.PLAIN, 20));
+													        btn_chgpwd.setFocusable(false);
+															staffDetails.add(btn_chgpwd);
+															int tID = staffList.get(i).getID();
+															String tUserName = staffList.get(i).getUsername();
+															btn_chgpwd.addActionListener(new ActionListener() {
+																@Override
+																public void actionPerformed(ActionEvent e) {
+																	if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
+																		JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
+																	}
+																	else{
+																		loadResetPasswordFrame(e,tID,tUserName);
+																	}
+																}
+															});
+														}
+														/*
 														JButton btn_forgot = new JButton("Forgot password?");
 														//For manager
 														if(currentEmployee.getPositionID() == 5){
@@ -1181,7 +1205,7 @@ public class Employees extends JFrame{
 																			}
 																			//Send Email
 																			else if(selection == JOptionPane.CANCEL_OPTION){
-																				/*
+																				//
 																				Random random = new Random();
 																				//random.nextInt(max - min + 1) + min
 																				int value = random.nextInt(9999 - 1000 + 1) + 1000;
@@ -1237,7 +1261,7 @@ public class Employees extends JFrame{
 																					//Reset to null, just to be safe
 																					tempResetUserEmail = null;
 																				}
-																			*/}
+																			//}
 																		}
 																		else{
 																			JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
@@ -1246,6 +1270,7 @@ public class Employees extends JFrame{
 																}
 															});
 														}
+													*/
 													}
 												}
 												break;
@@ -1295,7 +1320,6 @@ public class Employees extends JFrame{
 								        		if(staffList.get(i).getTerminationDate() != null){
 								        			textPane_details_terminateDate.setText(parseDate(staffList.get(i).getTerminationDate()));
 								        			terminateCheckbox.setSelected(true);
-								        			
 								        		}
 								        		else{
 								        			textPane_details_terminateDate.setText(staffList.get(i).getTerminationDate());
@@ -1980,6 +2004,7 @@ public class Employees extends JFrame{
 	public void setResetUserEmail(HashMap resetUserEmail) {
 		this.resetUserEmail = resetUserEmail;
 	}
+	//Not working
 	private void loadResetPasswordFrame(ActionEvent e, int employeeID, String username){
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -2062,11 +2087,12 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					if(newPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+					//if(newPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
+					if(newPass.trim().matches("^[a-zA-Z0-9]*$")){
 						textField_error_newPassword.setText(null);
 					}
 					else{
-						textField_error_newPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						textField_error_newPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character (@#$%^&+=) and no white space.");
 						ok = false;
 					}
 				}
@@ -2079,50 +2105,21 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
-					if(cnewPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
+					if(cnewPass.trim().matches("^[a-zA-Z0-9]*$")){
+					//if(cnewPass.trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
 						textField_error_confirmNewPassword.setText(null);
 					}
 					else{
-						textField_error_confirmNewPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
+						textField_error_confirmNewPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character (@#$%^&+=) and no white space.");
 						ok = false;
 					}
 				}
-				
-				boolean go = false;
-				do{
-					JPanel panel = new JPanel();
-					JLabel label = new JLabel("Enter a password:");
-					JPasswordField pass = new JPasswordField(10);
-					panel.add(label);
-					panel.add(pass);
-					String[] options1 = new String[]{"OK", "Cancel"};
-					int option = JOptionPane.showOptionDialog(null, panel, "Confirm:",
-					                         JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-					                         null, options1, options1[0]);
-					// pressing OK button
-					if(option == 0) {
-					    char[] password = pass.getPassword();
-					    String passwordInput = new String(password);
-
-						Employees tempEmployee = new Employees(currentEmployee.getUsername());
-						if(tempEmployee.fetchLogin(currentEmployee.getUsername(), passwordInput)){
-							ok = true;
-							go = true;
-						}
-						else{
-							JOptionPane.showMessageDialog(null,"Invalid Password.","Error",JOptionPane.ERROR_MESSAGE);
-							ok = false;
-						}
-					}
-					else{
-						go = true;
-					}
-				}while(go == false);
-				
 				if(check && ok){
 					if(newPass.equals(cnewPass)){
 						Hashing hash = new Hashing();
 						String salt;
+						System.out.println("EmployeeID: " +employeeID);
+						System.out.println("UserName: " + username);
 						try {
 							salt = hash.getSalt();
 							String hashedPassword = hash.get_SHA_512_SecurePassword(newPass, salt);
@@ -2135,7 +2132,7 @@ public class Employees extends JFrame{
 								ps.setString(2, salt);
 								ps.setInt(3, employeeID);
 								ps.setString(4, username);
-							    ps.executeUpdate();
+								ps.executeUpdate();
 								
 								//Clean-up environment
 								con.close();
@@ -2156,7 +2153,7 @@ public class Employees extends JFrame{
 					}
 				}
 			}
-		});
+        });
         
         JButton btnCancel_chgpwd = new JButton("Cancel");
         btnCancel_chgpwd.setBounds(405, 120, 350, 38);
@@ -2178,6 +2175,7 @@ public class Employees extends JFrame{
 		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
 		d2.setVisible(true);
 	}
+	//Works
 	private void loadPasswordFrame(ActionEvent e, int employeeID, String username) {
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -2260,10 +2258,12 @@ public class Employees extends JFrame{
 					check = false;
 				}
 				else{
+					//Add new regex
 					if(currentPass.trim().matches("^[A-Za-z0-9-+$_.@]*$")){
 						textPane_error_currentPassword.setText(null);
 					}
 					else{
+						//Add new message according to new regex
 						textPane_error_currentPassword.setText("Password can only contain alphabets, numberes, '-', '+', '$', '_', '.', '@'.");
 						ok = false;
 					}
@@ -2281,23 +2281,10 @@ public class Employees extends JFrame{
 						textField_error_newPassword.setText(null);
 					}
 					else{
-						textField_error_newPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
+						textField_error_newPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character (@#$%^&+=) and no white space.");
 						ok = false;
 					}
 				}
-				
-				
-				if(textField_password.getText().trim().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{3,}")){
-					textPane_error_password.setText(null);
-				}
-				else{
-					textPane_error_password.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
-					ok = false;
-				}
-				
-				
-				
-				
 				
 				//Confirm New Password
 				char[] cnpassword = textField_input_confirmNewPassword.getPassword();
@@ -2311,7 +2298,7 @@ public class Employees extends JFrame{
 						textField_error_confirmNewPassword.setText(null);
 					}
 					else{
-						textField_error_confirmNewPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
+						textField_error_confirmNewPassword.setText("Password must contain atleast one number, alphabet (lower & upper case), special character (@#$%^&+=) and no white space.");
 						ok = false;
 					}
 				}
@@ -2382,6 +2369,7 @@ public class Employees extends JFrame{
 		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
 		d2.setVisible(true);
 	}
+	/*
 	public void loadForgotPassword(ActionEvent e){
 		JPanel chgpwd_panel = new JPanel();
 		chgpwd_panel.setLayout(null);
@@ -2507,6 +2495,9 @@ public class Employees extends JFrame{
 					}
 				}
 				
+				System.out.println("Check: " + check);
+				System.out.println("ok: " + ok);
+				
 				if(check && ok){
 					//Current password
 					Employees tempEmployee = new Employees(username);
@@ -2573,6 +2564,7 @@ public class Employees extends JFrame{
 		d2.getRootPane().setDefaultButton(btnCancel_chgpwd);
 		d2.setVisible(true);
 	}
+	*/
 	public void setCurrentEmployee(Employees currentEmployee){
 		this.currentEmployee = currentEmployee;
 	}
@@ -2999,7 +2991,7 @@ public class Employees extends JFrame{
 				textPane_error_password.setText(null);
 			}
 			else{
-				textPane_error_password.setText("Password must contain atleast one number, alphabet (lower & upper case), special character and no white space.");
+				textPane_error_password.setText("Password must contain atleast one number, alphabet (lower & upper case), special character (@#$%^&+=) and no white space.");
 				ok = false;
 			}
 		}
