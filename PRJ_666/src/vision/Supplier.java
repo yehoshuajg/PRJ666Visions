@@ -125,6 +125,63 @@ public class Supplier extends JFrame implements AutoCloseable {
         JButton add_contact = new JButton();
         
         contacts.setRowHeight(30);
+        contacts.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+            	int row = contacts.rowAtPoint(e.getPoint());
+                int col = contacts.columnAtPoint(e.getPoint());
+                
+            	if (col == 5)
+            	{
+            		String fname = contacts.getValueAt(row, 0).toString();
+            		String lname = contacts.getValueAt(row, 1).toString();
+            		
+            		int response = JOptionPane.showConfirmDialog(null, 
+            			"Are you sure you want to remove contact " + fname + " " + lname, 
+            			"Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            	   
+            		if (response == JOptionPane.YES_OPTION) {
+            			String pnumber = contacts.getValueAt(row, 2).toString();
+
+            			String query = "DELETE FROM Contact where FirstName = '" + fname + "'"
+            					+ " and LastName = '" + lname + "' and PhoneNumber = '" + pnumber 
+            					+ "' and SupplierID = " + supplierID;
+
+            			Statement stmt = null;
+                        ResultSet rs = null;
+
+                        try {
+                        	stmt = c.createStatement();
+                            stmt.executeUpdate(query);
+                            
+                            query = "Select FirstName as 'First Name', LastName as 'Last Name', PhoneNumber as 'Phone Number', "
+                                    + " Email, Department, 'Delete' as '' from Contact where SupplierID = " + supplierID;
+                            rs = stmt.executeQuery(query);
+                            
+                            if(rs.next()) {
+                                rs.beforeFirst();
+                                contacts.setModel(DbUtils.resultSetToTableModel(rs));
+                            } else {
+                                DefaultTableModel model = (DefaultTableModel) contacts.getModel();
+                                model.setRowCount(0);
+                                model.setColumnCount(1);
+                                model.addRow(new Object[]{"No contacts found."});
+                            }
+                        } catch (SQLException ex) {
+                        	System.out.println(ex.getMessage()); 
+                        } finally {
+                        	try {
+                        		if(stmt != null) stmt.close();
+                                if(rs != null) rs.close();
+                        	} catch (SQLException ex) {
+                        		System.out.println(ex.getMessage());
+                        	}
+                        }
+            		}
+                }
+            }
+        });
+        
         JButton supplier_add = new JButton();
         JButton view_all = new JButton();
         
@@ -369,47 +426,93 @@ public class Supplier extends JFrame implements AutoCloseable {
         jButton1.setText("Update Details");
         jButton1.addActionListener((java.awt.event.ActionEvent evt) -> {
             if(supplierID > 0) {
-                PreparedStatement s = null;
-                ResultSet r = null;
+                String errors = "";
+                boolean keep = true;
                 
-                try {
-                    String sql = "Update Supplier SET Street = '" + details_streetAddress.getText().trim() + "', "
-                            + " City = '" + details_city.getText().trim() + "', State_Province = '"
-                            + details_state_province.getText().trim() + "', PostalCode = '" 
-                            + details_postalCode.getText().trim() + "', PhoneNumber = '" 
-                            + details_phoneNumber.getText().trim() + "', Email = '" + details_email.getText().trim() 
-                            + "', Status = '" + details_status.getSelectedItem().toString().trim() + "', "
-                            + " MinimumOrderCost = '" + details_orderCost.getText().trim() + "', "
-                            + " DeliveryCost = '" + details_deliveryCost.getText().trim() + "' where ID = " + supplierID;
-                    
-                    s = c.prepareStatement(sql);
-                    int dump = s.executeUpdate();
-                    
-                    sql = "select s.Name, s.Street as 'Address', s.City, s.PhoneNumber as 'Phone Number', "
-                        + " 'View Details' as '' from Supplier s";
-                    
-                    r = s.executeQuery(sql);
-                            
-                    if(r.next()) {
-                        r.beforeFirst();
-                        list_of_suppliers.setModel(DbUtils.resultSetToTableModel(r));
-                    } else {
-                        DefaultTableModel model = (DefaultTableModel) list_of_suppliers.getModel();
-                        model.setRowCount(0);
-                        model.setColumnCount(1);
-                        model.addRow(new Object[]{"No suppliers found."});
-                    }
-                    
-                } catch (Exception e){
-                    JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
-                } finally {
-                    try {
-                        if(s != null) s.close();
-                        if(r != null) r.close();
-                    } catch (SQLException ex) {
-                        System.out.println(ex.getMessage());
-                    }
+            	if(details_streetAddress.getText().trim().length() < 10 && keep){
+                    errors = "Error: Supplier address is invalid must be 10 characters long.";
+                    keep = false;
+                } else if(details_city.getText().trim().equals("") && keep){
+                    errors = "Error: City field is empty.";
+                    keep = false;
+                } else if(details_state_province.getText().trim().equals("") && keep){
+                    errors = "Error: State/Province field is empty.";
+                    keep = false;
+                } else if(!(details_postalCode.getText().trim().matches("^[0-9]{5}$") || 
+                		details_postalCode.getText().trim().matches("^[a-zA-Z][0-9][a-zA-Z][ ]{0,2}[0-9][a-zA-Z][0-9]$")) && keep){
+                    errors = "Error: Invalid Postal/Zip code, must be north american, EX: ##### or X#X #X#.";
+                    keep = false;
+                } else if(!details_phoneNumber.getText().trim().matches("^[1]-[0-9]{3}-[0-9]{3}-[0-9]{4}$") && keep){
+                    errors = "Error: Phone Number must be north american and numbers separated by - (Ex: 1-XXX-XXX-XXXX).";
+                    keep = false;
+                } else if(!details_email.getText().trim().matches("^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$") && keep){
+                    errors = "Error: Email field is invalid, Ex: example@example.com";
+                    keep = false;
+                } else if(details_orderCost.getText().trim().equals("") && keep){
+                    errors = "Error: Minimum Order Cost is empty.";
+                    keep = false;
+                } else if(details_deliveryCost.getText().trim().equals("") && keep){
+                    errors = "Error: Delivery Cost is empty.";
+                    keep = false;
                 }
+            	
+            	double ordercost = 0.0;
+            	double delivercost = 0.0;
+            	if(keep){
+	            	try {
+	            		ordercost = Double.parseDouble(details_orderCost.getText().trim());
+	            		delivercost = Double.parseDouble(details_deliveryCost.getText().trim());
+	            	} catch(NumberFormatException e) {
+	            		errors = "Error: Minimum order Cost or Delivery Cost is not a number, do not include symbols.";
+	            		keep = false;
+	            	}
+            	}
+            	
+            	if(keep){
+	            	PreparedStatement s = null;
+	                ResultSet r = null;
+	                
+	                try {
+	                    String sql = "Update Supplier SET Street = '" + details_streetAddress.getText().trim() + "', "
+	                            + " City = '" + details_city.getText().trim() + "', State_Province = '"
+	                            + details_state_province.getText().trim() + "', PostalCode = '" 
+	                            + details_postalCode.getText().trim() + "', PhoneNumber = '" 
+	                            + details_phoneNumber.getText().trim() + "', Email = '" + details_email.getText().trim() 
+	                            + "', Status = '" + details_status.getSelectedItem().toString().trim() + "', "
+	                            + " MinimumOrderCost = '" + ordercost + "', "
+	                            + " DeliveryCost = '" + delivercost + "' where ID = " + supplierID;
+	                    
+	                    s = c.prepareStatement(sql);
+	                    int dump = s.executeUpdate();
+	                    
+	                    sql = "select s.Name, s.Street as 'Address', s.City, s.PhoneNumber as 'Phone Number', "
+	                        + " 'View Details' as '' from Supplier s";
+	                    
+	                    r = s.executeQuery(sql);
+	                            
+	                    if(r.next()) {
+	                        r.beforeFirst();
+	                        list_of_suppliers.setModel(DbUtils.resultSetToTableModel(r));
+	                    } else {
+	                        DefaultTableModel model = (DefaultTableModel) list_of_suppliers.getModel();
+	                        model.setRowCount(0);
+	                        model.setColumnCount(1);
+	                        model.addRow(new Object[]{"No suppliers found."});
+	                    }
+	                    
+	                } catch (Exception e){
+	                    JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
+	                } finally {
+	                    try {
+	                        if(s != null) s.close();
+	                        if(r != null) r.close();
+	                    } catch (SQLException ex) {
+	                        System.out.println(ex.getMessage());
+	                    }
+	                }
+            	} else {
+            		JOptionPane.showMessageDialog(null, errors, "Error", JOptionPane.ERROR_MESSAGE);
+            	}
             } else {
                 JOptionPane.showMessageDialog(null, "Must have supplier details open "
                     + "(Go to: Suppliers list -> double click on supplier you wish to work with).",
@@ -438,7 +541,7 @@ public class Supplier extends JFrame implements AutoCloseable {
             if(supplierID > 0) {
                 JFrame f = new JFrame();
                 f.getContentPane().add(addContact(f));
-                f.setSize(350, 300);
+                f.setSize(415, 310);
                 f.setVisible(true);
                 f.setLocationRelativeTo(null);
             } else {
@@ -664,14 +767,15 @@ public class Supplier extends JFrame implements AutoCloseable {
             } else if(state_province.getText().trim().equals("") && keep){
                 errors.setText("Error: State/Province field is empty.");
                 keep = false;
-            } else if(postalCode.getText().trim().equals("") && keep){
-                errors.setText("Error: Postal/Zip code field is empty.");
+            } else if(!(postalCode.getText().trim().matches("^[0-9]{5}$") || 
+            		postalCode.getText().trim().matches("^[a-zA-Z][0-9][a-zA-Z][ ]{0,2}[0-9][a-zA-Z][0-9]$")) && keep){
+                errors.setText("Error: Invalid Postal/Zip code, must be north american, EX: ##### or X#X #X#.");
                 keep = false;
-            } else if(phoneNumber.getText().trim().length() < 10 && keep){
-                errors.setText("Error: Phone Number must be atleast 10 digits long.");
+            } else if(!phoneNumber.getText().trim().matches("^[1]-[0-9]{3}-[0-9]{3}-[0-9]{4}$") && keep){
+                errors.setText("Error: Phone Number must be north american and numbers separated by - (Ex: 1-XXX-XXX-XXXX).");
                 keep = false;
-            } else if((email.getText().trim().equals("") || !email.getText().contains("@") || !email.getText().contains(".")) && keep){
-                errors.setText("Error: Email field is invalid.");
+            } else if(!email.getText().trim().matches("^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$") && keep){
+                errors.setText("Error: Email field is invalid, Ex: example@example.com");
                 keep = false;
             } else if(orderCost.getText().trim().equals("") && keep){
                 errors.setText("Error: Minimum Order Cost is empty.");
@@ -888,7 +992,7 @@ public class Supplier extends JFrame implements AutoCloseable {
             
             if(supplierID != 0){
                 query = "Select FirstName as 'First Name', LastName as 'Last Name', PhoneNumber as 'Phone Number', "
-                        + " Email, Department from Contact where SupplierID = " + supplierID;
+                        + " Email, Department, 'Delete' as '' from Contact where SupplierID = " + supplierID;
                 rs = stmt.executeQuery(query);
                 
                 if(rs.next()) {
@@ -963,16 +1067,16 @@ public class Supplier extends JFrame implements AutoCloseable {
             } else if(lname.equals("") && keep){
                 error.setText("Please enter valid  last name.");
                 keep = false;
-            } else if(phonenumber.length() < 10 && keep){
-                error.setText("Error: Phone Number must be atleast 10 digits long.");
+            } else if(!phonenumber.matches("^[1]-[0-9]{3}-[0-9]{3}-[0-9]{4}$") && keep){
+                error.setText("Error: Phone Number must be in follwing format: 1-XXX-XXX-XXXX.");
                 keep = false;
-            } else if((Email.equals("") || !Email.contains("@") || !Email.contains(".")) && keep){
-                error.setText("Error: Email field is invalid.");
+            } else if(!Email.matches("^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$") && keep){
+                error.setText("Error: Email field is invalid, Ex: example@example.com");
                 keep = false;
             } else if(departmentt.equals("") && keep){
                 error.setText("Please enter department the person assist in most.");
                 keep = false;
-            } 
+            }
             
             if(keep) {
                 PreparedStatement s = null;
@@ -987,7 +1091,7 @@ public class Supplier extends JFrame implements AutoCloseable {
                     int r = s.executeUpdate();
                     
                     sql = "Select FirstName as 'First Name', LastName as 'Last Name', PhoneNumber as 'Phone Number', "
-                        + " Email, Department from Contact where SupplierID = " + supplierID;
+                        + " Email, Department, 'Delete' as '' from Contact where SupplierID = " + supplierID;
                     rs = s.executeQuery(sql);
 
                     if(rs.next()) {

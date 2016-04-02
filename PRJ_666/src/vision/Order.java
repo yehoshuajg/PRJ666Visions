@@ -64,8 +64,7 @@ public class Order extends JPanel {
         JTable jTable1 = new JTable(){
             @Override
             public boolean isCellEditable(int row, int column) {
-                //Return true if the column (number) is editable, else false
-                return column == 2;
+                return false; //no table data is editable.
             }
 	};
         jTable1.getTableHeader().setReorderingAllowed(false);
@@ -86,7 +85,7 @@ public class Order extends JPanel {
         JTextField amount_paid = new JTextField();
         JTextField invoice_id = new JTextField();
         JCheckBox received_date_box = new JCheckBox();
-        JButton btn_update = new JButton();
+        //JButton btn_update = new JButton();
         JButton btn_close = new JButton();
         
         order_id.setEditable(false);
@@ -107,7 +106,7 @@ public class Order extends JPanel {
         try {
             		
             state = c.createStatement();
-            String sql = "select p.Name,  o.OrderedQuantity as 'Ordered', o.ReceivedQuantity "
+            String sql = "select p.ID, p.Name,  o.OrderedQuantity as 'Ordered', o.ReceivedQuantity "
                     + " as 'Received', o.Cost as 'Total Cost' " 
                     + " from orderdetail o join Product p on o.ProductID = p.ID " 
                     + " where orderID = " + id + "";
@@ -259,7 +258,7 @@ public class Order extends JPanel {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         
-        //Storing data to update in Map/HashMap so, when update is pressed everything will be updated.
+/*        //Storing data to update in Map/HashMap so, when update is pressed everything will be updated.
         TableModel model = jTable1.getModel();
         
         model.addTableModelListener((TableModelEvent e) -> {
@@ -284,7 +283,7 @@ public class Order extends JPanel {
             }
         });
         
-        //Processing Order - Updating received products.
+/*     //Processing Order - Updating received products.
         btn_update.setText("Update");
         btn_update.addActionListener((java.awt.event.ActionEvent evt) -> {
             PreparedStatement s = null;
@@ -315,7 +314,7 @@ public class Order extends JPanel {
             }
             
         });
-        
+ */       
         btn_close.setText("Close");
         btn_close.addActionListener((java.awt.event.ActionEvent evt) -> {
             fr.dispose();
@@ -337,7 +336,7 @@ public class Order extends JPanel {
                     .addComponent(jLabel2)
                     .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_orderDetailsLayout.createSequentialGroup()
-                        .addComponent(btn_update, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
+//                        .addComponent(btn_update, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btn_close, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -356,7 +355,7 @@ public class Order extends JPanel {
                         .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                         .addGroup(panel_orderDetailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(btn_update)
+//                            .addComponent(btn_update)
                             .addComponent(btn_close))))
                 .addContainerGap())
         );
