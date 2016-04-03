@@ -88,29 +88,19 @@ import java.awt.SystemColor;
 
 public class Home extends JFrame implements KeyListener{
 	
-	//http://www.dreamincode.net/forums/topic/22739-message-dialogs-in-java/
-	
-	//Find Product by ID
 	private Vector<Product> productBySearch = new Vector<Product>();
-	//private Vector<Product> productByLike = new Vector<Product>();
 	private Vector<Product> productByRefund = new Vector<Product>();
 	private Vector<Product> productByLike;
 	private Vector<Integer> previousValue = new Vector<Integer>();
 	private Vector<Integer> previousRefundValue = new Vector<Integer>();
 	private Product tempProductSearch = new Product();
-	private Product productByName; // = new Product();
 	
 	private int idLength = 8;
 	
 	JTabbedPane tabbedPane;
 	private JPanel contentPane;
 	private Employees employee;
-	private int employeePositionID = 0;
 	private JTextPane welcome;
-	//private JTextPane productID;
-	//private JTextField productName;
-	//private JTextField productPrice;
-	//private JTextField productQuantityPurchased;
 	private JTextPane subtotal_textField;
 	private JTextPane tax_textField;
 	private JTextPane total_textField;
@@ -152,12 +142,10 @@ public class Home extends JFrame implements KeyListener{
 	
 	//Discount
 	private Vector<Discount> discount;
-	//private JTextPane textField_discount;
 	private int detail_discountID;
 	private String detail_discountType;
 	private boolean oneTimeDiscountCheck = false;
 	private JTextField discount_option;
-	private JFrame frame_discount;
 	private JButton btnDiscountDetails;
 	private JButton button_discount;
 	private double detail_discountValue;
@@ -186,7 +174,6 @@ public class Home extends JFrame implements KeyListener{
 	private String defaultColor = "#eeeeee";
 	
 	//Cashier Cash
-	private JFrame frame_cashCheckout;
 	private JTabbedPane tabbedPane_7;
 	private JPanel keypad_panel;
 	private JTextField checkout_amount_tender_input;
@@ -207,7 +194,6 @@ public class Home extends JFrame implements KeyListener{
 	//Refund Table
 	private Transaction t;
 	private Vector<TransactionRecord> tr = new Vector<TransactionRecord>();
-	private Vector<TransactionRecord> trecord = new Vector<TransactionRecord>();
 	private Vector<TransactionRecord> returning = new Vector<TransactionRecord>();
 	private int transactionRecordLength = 0;
 	private Vector<String> refund_column_name = new Vector<String>();
@@ -1093,9 +1079,6 @@ public class Home extends JFrame implements KeyListener{
 						textField_productID_input.requestFocusInWindow();
 					}
 				});
-
-				
-				
 				
 				Component component = (Component) e.getSource();
 		        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
@@ -1464,17 +1447,55 @@ public class Home extends JFrame implements KeyListener{
 		JButton btnNewTransaction = new JButton("New Transaction");
 		btnNewTransaction.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*setVisible(false);
-				dispose();
-				try {
-					Home home = new Home();
-					home.setVisible(true);
-					
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}*/
+				//Settings global variables to default
+				if(productBySearch.size() > 0){
+					productBySearch.clear();
+				}
+				if(productByLike.size() > 0){
+					previousValue.clear();
+				}
+				if(previousValue.size() > 0){
+					previousValue.clear();
+				}
 				
+				tempProductSearch = new Product();
+				subtotal_textField.setText("Subtotal: $");
+				tax_textField.setText("Tax: $");
+				total_textField.setText("Total: $");
+				
+				textField_productID_input.setText("");
+				textField_name_input.setText("");
+				textField_description_input.setText("");
+				textField_quantity_input.setText("");
+				textPane_productID_notFound.setText("");
+				
+				//Table
+				//private JTable table;
+				removeTableRows(model); //Clears table rows, model.
+				if(data.size() > 0){
+					data.clear();
+				}
+				tableListenerCount = 0;
+				
+				//Sales Total
+				subTotal = 0;
+				tax = 0;
+				//taxValue = 0;
+				total = 0;
+				c = 0;
+				stringTempPrice = null;
+				transactionType = null;
+				transactionMethod = null;
+				promotionID = 0;
+				
+				//Discount
+				detail_discountID = 0;
+				detail_discountType = null;
+				oneTimeDiscountCheck = false;
+				//discount_option.setText("");
+				detail_discountValue = 0;
+				
+				textField_productID_input.requestFocusInWindow();
 			}
 		});
 		btnNewTransaction.setBounds(6, 110, 120, 40);
@@ -1953,9 +1974,11 @@ public class Home extends JFrame implements KeyListener{
 							String tempInput = textField_transaction_input.getText();
 							if(validateEmpty(tempInput) == false){
 								JOptionPane.showMessageDialog(null,"Transaction ID field cannot be Empty.","Error",JOptionPane.ERROR_MESSAGE);
+								textField_transaction_input.requestFocusInWindow();
 							}
 							else if(checkForNumbers(tempInput) == false){
 								JOptionPane.showMessageDialog(null,"Transaction ID entered must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
+								textField_transaction_input.requestFocusInWindow();
 							}
 							else{
 								int tempTransactionID = Integer.parseInt(tempInput);
@@ -1971,8 +1994,12 @@ public class Home extends JFrame implements KeyListener{
 									textField_promotionID.setText(String.valueOf(t.getPromotionID()));
 									textField_employeeID.setText(String.valueOf(t.getEmployeeID()));
 									
-									productByRefund.clear();
-									tr.clear();
+									if(productByRefund.size() > 0){
+										productByRefund.clear();
+									}
+									if(tr.size() > 0){
+										tr.clear();
+									}
 									TransactionRecord temp = new TransactionRecord();
 									transactionRecordLength = temp.getTransactionCount(tempTransactionID);
 									if(transactionRecordLength > 0){
@@ -2186,11 +2213,13 @@ public class Home extends JFrame implements KeyListener{
 		
 		keypad_enter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/*
 				String i = e.getActionCommand();
 				if(textField_productID_input.hasFocus()){
 					String input = textField_productID_input.getText();
 					textField_productID_input.setText(input+i);
 				}
+				*/
 			}
 		});
 	}
@@ -2501,7 +2530,17 @@ public class Home extends JFrame implements KeyListener{
 				br.initialize();
 				br.backupDB();
 				*/
+				Object[] options = {"Yes","No"};
+				int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
+				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 				
+				if(cashCredit == JOptionPane.YES_OPTION){
+					System.out.println("yes");
+				}
+				else if(cashCredit == JOptionPane.NO_OPTION){
+					System.out.println("no");
+				}
+				/*
 				Thread t2 = new Thread(new Runnable() {
 					public void run() {
 						try {
@@ -2528,21 +2567,10 @@ public class Home extends JFrame implements KeyListener{
 					}
 				});
 				t2.start();
-				/*
-				Object[] options = {"Yes","No"};
-				int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
-				    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 				
-				//Cancel
-				if(cashCredit == JOptionPane.YES_OPTION){
-					
-				}
-				else if(cashCredit == JOptionPane.NO_OPTION){
-					
-				}
+				d4.dispose();
+				textField_productID_input.requestFocusInWindow();
 				*/
-				//d4.dispose();
-				//textField_productID_input.requestFocusInWindow();
 			}
 		}
 	}
@@ -2939,7 +2967,7 @@ public class Home extends JFrame implements KeyListener{
 						
 			//Checkout details
 			JTabbedPane tabbedPane_checkout = new JTabbedPane(JTabbedPane.TOP);
-			tabbedPane_checkout.setBounds(220, 10, 400, 175);
+			tabbedPane_checkout.setBounds(60, 10, 400, 175);
 			panel_checkout.add(tabbedPane_checkout);
 						
 			JPanel panel_checkout_details = new JPanel();
@@ -2993,7 +3021,7 @@ public class Home extends JFrame implements KeyListener{
 			});
 			
 			JTabbedPane tabbedPane_checkout_keypad = new JTabbedPane(JTabbedPane.TOP);
-			tabbedPane_checkout_keypad.setBounds(300, 180, 279, 416);
+			tabbedPane_checkout_keypad.setBounds(115, 180, 279, 416);
 			panel_checkout.add(tabbedPane_checkout_keypad);
 			
 			JPanel keypad_panel_checkout = new JPanel();
@@ -3182,7 +3210,7 @@ public class Home extends JFrame implements KeyListener{
 	        JFrame topFrame2 = (JFrame) SwingUtilities.getRoot(component);
 			d4 = new JDialog(topFrame2, "", Dialog.ModalityType.DOCUMENT_MODAL);
 			d4.getContentPane().add(panel_checkout);
-			d4.setSize(900, 650);
+			d4.setBounds(0, 0, 500, 650);
 			d4.setLocationRelativeTo(null);
 			d4.getRootPane().setDefaultButton(checkoutCash_btnEnter);
 			d4.setVisible(true);
@@ -3671,7 +3699,7 @@ public class Home extends JFrame implements KeyListener{
 	public void loadRefundInfo(){
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(685, 0, 279, 449);
+		tabbedPane.setBounds(685, 0, 279, 497);
 		panel_refund.add(tabbedPane);
 		
 		JPanel panel_transactionDetail = new JPanel();
@@ -3847,6 +3875,7 @@ public class Home extends JFrame implements KeyListener{
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							d7.dispose();
+							textField_transaction_input.requestFocusInWindow();
 						}
 					});
 						
@@ -3949,8 +3978,69 @@ public class Home extends JFrame implements KeyListener{
 				}
 			}
 		});
-		btnRefundHistory.setBounds(11, 365, 155, 29);
+		btnRefundHistory.setBounds(29, 365, 200, 35);
 		panel_transactionDetail.add(btnRefundHistory);
+		
+		JSeparator separator_9 = new JSeparator();
+		separator_9.setBounds(0, 400, 258, 12);
+		panel_transactionDetail.add(separator_9);
+		
+		JButton btnNewButton = new JButton("Clear All");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Refund
+				//JFrame/Dialog
+				textField_transaction_input.setText("");
+				
+				if(productByRefund.size() > 0){
+					productByRefund.clear();
+				}
+				if(previousRefundValue.size() > 0){
+					previousRefundValue.clear();
+				}
+				
+				//Table
+				if(tr.size() > 0){
+					tr.clear();
+				}
+				if(returning.size() > 0){
+					returning.clear();
+				}
+				transactionRecordLength = 0;
+				if(refund_row_data.size() > 0){
+					refund_row_data.clear();
+				}
+				//private JTable table_refund;
+				removeTableRows(model_refund);	
+				textField_refund_name.setText("");
+				textField_refund_description_input.setText("");
+				textField_refund_quantity_remaining_input.setText("");
+				textField_refund_product_unitPrice_input.setText("");
+				textField_refund_total_unitPrice_input.setText("");
+				
+				//Refund details:
+				textField_transactionID.setText("");
+				textField_createDate.setText("");
+				textField_transaction_subtotal.setText("");
+				textField_transaction_tax.setText("");
+				textField_transaction_total.setText("");
+				textField_transactionType.setText("");
+				textField_method.setText("");
+				textField_promotionID.setText("");
+				textField_employeeID.setText("");
+				
+				//Refund sales
+				remainingSubtotal = 0;
+				finalRefundSubtotal = 0;
+				finalRefundTax = 0;
+				finalRefundTotal = 0;
+				refundChange = 0;
+				
+				textField_transaction_input.requestFocusInWindow();
+			}
+		});
+		btnNewButton.setBounds(29, 412, 200, 35);
+		panel_transactionDetail.add(btnNewButton);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.setBounds(961, 428, 279, 81);
@@ -4094,7 +4184,7 @@ public class Home extends JFrame implements KeyListener{
 									@Override
 									public void actionPerformed(ActionEvent e) {
 										refund_confirm.dispose();
-										//textField_productID_input.requestFocusInWindow();
+										textField_transaction_input.requestFocusInWindow();
 									}
 								});
 								
@@ -4197,6 +4287,7 @@ public class Home extends JFrame implements KeyListener{
 					}
 					else{
 						JOptionPane.showMessageDialog(null,"No transaction is searched.");
+						textField_transaction_input.requestFocusInWindow();
 					}
 				}
 				else{
@@ -4216,6 +4307,17 @@ public class Home extends JFrame implements KeyListener{
 		panel_refund_keypad.setLayout(null);
 		
 		JButton refund_keypad_1 = new JButton("1");
+		refund_keypad_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				System.out.println("test");
+				if(textField_transaction_input.hasFocus()){
+					System.out.println("test2");
+					String input = textField_transaction_input.getText();
+					textField_transaction_input.setText(input+i);
+				}
+			}
+		});
 		refund_keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_1.setBounds(0, 0, 87, 93);
 		panel_refund_keypad.add(refund_keypad_1);
