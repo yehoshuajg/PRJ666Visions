@@ -561,7 +561,6 @@ public class Home extends JFrame implements KeyListener{
 		textField_productID_input.setBounds(85, 9, 141, 20);;
 		item_info.add(textField_productID_input);
 		textField_productID_input.setColumns(10);
-		//textField_productID_input.setText(String.valueOf(1000000));
 		
 		//Places cursor in ID field as soon as page loads, like focus in html
 		textField_productID_input.addAncestorListener(new AncestorListener() {
@@ -874,60 +873,64 @@ public class Home extends JFrame implements KeyListener{
 									JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 							
 							if (n == JOptionPane.YES_OPTION){
-								for (int i = model.getRowCount()-1; i >= 0; --i) {
-									try{
-										boolean b = (boolean) model.getValueAt(i, productRemove_column);
-										if (b == true){
-											//Sales Total
-											String s = table.getValueAt(i, productPrice_column).toString();
-											String qCancel = table.getValueAt(i, productQuantity_column).toString();
-											
-											double t = Double.parseDouble(s) * Integer.parseInt(qCancel);
-											
-											subTotal -= t;
-											subTotal = Math.round(subTotal * 100.0) / 100.0;
-											subtotal_textField.setText("Subtotal: $" + subTotal);
-		
-											tax = subTotal * 0.13;
-											tax = Math.round(tax * 100.0) / 100.0;
-											tax_textField.setText("Tax: $" + tax);
+								if(model.getRowCount() > 0){
+									for (int i = model.getRowCount()-1; i >= 0; --i) {
+										try{
+											boolean b = (boolean) model.getValueAt(i, productRemove_column);
+											if (b == true){
+												//Sales Total
+												String s = table.getValueAt(i, productPrice_column).toString();
+												String qCancel = table.getValueAt(i, productQuantity_column).toString();
 												
-											total = subTotal + tax;
-											total = Math.round(total * 100.0) / 100.0;
-											total_textField.setText("Total: $" + total);	
-											
-											if(productBySearch.size() > 0){
-												for(int j = 0; j < productBySearch.size(); j++){
-													//Convert to string, other values always cause problem due to object type
-													int idValue = (int) model.getValueAt(i, id_column);
-													String idValueString = String.valueOf(idValue);
-													String productTempID = String.valueOf(productBySearch.get(j).getID());
-													if(idValueString.equals(productTempID)){
-														//Removes product from vector and its previous value
-														productBySearch.remove(j);
-														previousValue.remove(j);
-														
+												double t = Double.parseDouble(s) * Integer.parseInt(qCancel);
+												
+												subTotal -= t;
+												subTotal = Math.round(subTotal * 100.0) / 100.0;
+												subtotal_textField.setText("Subtotal: $" + subTotal);
+			
+												tax = subTotal * 0.13;
+												tax = Math.round(tax * 100.0) / 100.0;
+												tax_textField.setText("Tax: $" + tax);
+													
+												total = subTotal + tax;
+												total = Math.round(total * 100.0) / 100.0;
+												total_textField.setText("Total: $" + total);	
+												
+												if(productBySearch.size() > 0){
+													for(int j = 0; j < productBySearch.size(); j++){
+														//Convert to string, other values always cause problem due to object type
+														int idValue = (int) model.getValueAt(i, id_column);
+														String idValueString = String.valueOf(idValue);
+														String productTempID = String.valueOf(productBySearch.get(j).getID());
+														if(idValueString.equals(productTempID)){
+															//Removes product from vector and its previous value
+															productBySearch.remove(j);
+															previousValue.remove(j);
+															
+														}
 													}
 												}
+												//Delete at end & put focus back to ID field
+												model.removeRow(i);
+												textField_productID_input.requestFocusInWindow();
+												
+												//Empty the product details field
+												textField_productID_input.setText("");
+												textField_name_input.setText("");
+												textField_description_input.setText("");		
+												textField_quantity_input.setText("");
 											}
-											//Delete at end & put focus back to ID field
-											model.removeRow(i);
-											textField_productID_input.requestFocusInWindow();
-											
-											//Empty the product details field
-											textField_productID_input.setText("");
-											textField_name_input.setText("");
-											textField_description_input.setText("");		
-											textField_quantity_input.setText("");
-										}
-									}catch(Exception e2){}
-								}
-								//After deleting, fixes the number order in table
-								for (int i = model.getRowCount()-1; i >= 0; --i) {
-					            	model.setValueAt(i+1, i, 0);
-					            }
-								if(model.getRowCount() == 0){
-									rowCount = 1;
+										}catch(Exception e2){}
+									}
+									//After deleting, fixes the number order in table
+									if(model.getRowCount() > 0){
+										for (int i = model.getRowCount()-1; i >= 0; --i) {
+							            	model.setValueAt(i+1, i, 0);
+							            }
+									}
+									if(model.getRowCount() == 0){
+										rowCount = 1;
+									}
 								}
 							}
 						}
@@ -1451,7 +1454,10 @@ public class Home extends JFrame implements KeyListener{
 				if(productBySearch.size() > 0){
 					productBySearch.clear();
 				}
-				if(productByLike.size() > 0){
+				if(productByLike == null){
+					
+				}
+				else if(productByLike.size() > 0){
 					previousValue.clear();
 				}
 				if(previousValue.size() > 0){
@@ -1459,9 +1465,9 @@ public class Home extends JFrame implements KeyListener{
 				}
 				
 				tempProductSearch = new Product();
-				subtotal_textField.setText("Subtotal: $");
-				tax_textField.setText("Tax: $");
-				total_textField.setText("Total: $");
+				subtotal_textField.setText("Subtotal: $0.0");
+				tax_textField.setText("Tax: $0.0");
+				total_textField.setText("Total: $0.0");
 				
 				textField_productID_input.setText("");
 				textField_name_input.setText("");
@@ -1472,6 +1478,7 @@ public class Home extends JFrame implements KeyListener{
 				//Table
 				//private JTable table;
 				removeTableRows(model); //Clears table rows, model.
+				
 				if(data.size() > 0){
 					data.clear();
 				}
@@ -4012,6 +4019,8 @@ public class Home extends JFrame implements KeyListener{
 				}
 				//private JTable table_refund;
 				removeTableRows(model_refund);	
+				model_refund.fireTableDataChanged(); //Tells table to update gui
+				
 				textField_refund_name.setText("");
 				textField_refund_description_input.setText("");
 				textField_refund_quantity_remaining_input.setText("");
@@ -4310,12 +4319,8 @@ public class Home extends JFrame implements KeyListener{
 		refund_keypad_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String i = e.getActionCommand();
-				System.out.println("test");
-				if(textField_transaction_input.hasFocus()){
-					System.out.println("test2");
-					String input = textField_transaction_input.getText();
-					textField_transaction_input.setText(input+i);
-				}
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
 			}
 		});
 		refund_keypad_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -4323,56 +4328,135 @@ public class Home extends JFrame implements KeyListener{
 		panel_refund_keypad.add(refund_keypad_1);
 		
 		JButton refund_keypad_2 = new JButton("2");
+		refund_keypad_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_2.setBounds(86, 0, 87, 93);
 		panel_refund_keypad.add(refund_keypad_2);
 		
 		JButton refund_keypad_3 = new JButton("3");
+		refund_keypad_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_3.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_3.setBounds(171, 0, 87, 93);
 		panel_refund_keypad.add(refund_keypad_3);
 		
 		JButton refund_keypad_4 = new JButton("4");
+		refund_keypad_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_4.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_4.setBounds(0, 93, 87, 93);
 		panel_refund_keypad.add(refund_keypad_4);
 		
 		JButton refund_keypad_5 = new JButton("5");
+		refund_keypad_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_5.setBounds(86, 93, 87, 93);
 		panel_refund_keypad.add(refund_keypad_5);
 		
 		JButton refund_keypad_6 = new JButton("6");
+		refund_keypad_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_6.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_6.setBounds(171, 93, 87, 93);
 		panel_refund_keypad.add(refund_keypad_6);
 		
 		JButton refund_keypad_7 = new JButton("7");
+		refund_keypad_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_7.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_7.setBounds(0, 186, 87, 93);
 		panel_refund_keypad.add(refund_keypad_7);
 		
 		JButton refund_keypad_8 = new JButton("8");
+		refund_keypad_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_8.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_8.setBounds(86, 186, 87, 93);
 		panel_refund_keypad.add(refund_keypad_8);
 		
 		JButton refund_keypad_9 = new JButton("9");
+		refund_keypad_9.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_9.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_9.setBounds(171, 186, 87, 93);
 		panel_refund_keypad.add(refund_keypad_9);
 		
 		JButton refund_keypad_decimal = new JButton(".");
+		refund_keypad_decimal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_decimal.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_decimal.setBounds(0, 278, 87, 93);
 		panel_refund_keypad.add(refund_keypad_decimal);
 		
 		JButton refund_keypad_0 = new JButton("0");
+		refund_keypad_0.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+			}
+		});
 		refund_keypad_0.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_0.setBounds(86, 278, 87, 93);
 		panel_refund_keypad.add(refund_keypad_0);
 		
 		JButton refund_keypad_enter = new JButton("Enter");
+		refund_keypad_enter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				/*
+				String i = e.getActionCommand();
+				String input = textField_transaction_input.getText();
+				textField_transaction_input.setText(input+i);
+				*/
+			}
+		});
 		refund_keypad_enter.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		refund_keypad_enter.setBounds(171, 278, 87, 93);
 		panel_refund_keypad.add(refund_keypad_enter);
@@ -4466,8 +4550,10 @@ public class Home extends JFrame implements KeyListener{
 	}
 	public void removeTableRows(DefaultTableModel model){
 		//Remove rows from table
-		for (int i = model.getRowCount()-1; i >= 0; --i) {
-			model.removeRow(i);
+		if(model.getRowCount() > 0){
+			for (int i = model.getRowCount()-1; i >= 0; --i) {
+				model.removeRow(i);
+			}
 		}
 	}
 }
