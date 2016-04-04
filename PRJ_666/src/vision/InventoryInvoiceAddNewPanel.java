@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -50,7 +51,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 
 
 			setBounds(0, 0, 500, 500);
-			setPreferredSize(new Dimension(600,500));
+			setPreferredSize(new Dimension(700, 500));
 			GridBagLayout gbl_super = new GridBagLayout();
 			gbl_super.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
 			gbl_super.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 100};
@@ -185,26 +186,28 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 			dataAmountDue.setColumns(10);
 			dataAmountDue.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			
-			JLabel lblAmountPaid = new JLabel("Amount Paid");
-			GridBagConstraints gbc_lblAmountPaid = new GridBagConstraints();
-			gbc_lblAmountPaid.anchor = GridBagConstraints.EAST;
-			gbc_lblAmountPaid.insets = new Insets(0, 0, 5, 5);
-			gbc_lblAmountPaid.gridx = 0;
-			gbc_lblAmountPaid.gridy = 7;
-			add(lblAmountPaid, gbc_lblAmountPaid);
-			lblAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			//JLabel lblAmountPaid = new JLabel("Amount Paid");
+			//GridBagConstraints gbc_lblAmountPaid = new GridBagConstraints();
+			//gbc_lblAmountPaid.anchor = GridBagConstraints.EAST;
+			//gbc_lblAmountPaid.insets = new Insets(0, 0, 5, 5);
+			//gbc_lblAmountPaid.gridx = 0;
+			//gbc_lblAmountPaid.gridy = 7;
+			//add(lblAmountPaid, gbc_lblAmountPaid);
+			//lblAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			
-			dataAmountPaid = new JTextField();
-			GridBagConstraints gbc_dataAmountPaid = new GridBagConstraints();
-			gbc_dataAmountPaid.gridwidth = 1;
-			gbc_dataAmountPaid.anchor = GridBagConstraints.NORTH;
-			gbc_dataAmountPaid.insets = new Insets(0, 0, 5, 5);
-			gbc_dataAmountPaid.fill = GridBagConstraints.HORIZONTAL;
-			gbc_dataAmountPaid.gridx = 1;
-			gbc_dataAmountPaid.gridy = 7;
-			add(dataAmountPaid, gbc_dataAmountPaid);
-			dataAmountPaid.setColumns(10);
-			dataAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
+			//dataAmountPaid = new JTextField();
+			//GridBagConstraints gbc_dataAmountPaid = new GridBagConstraints();
+			//gbc_dataAmountPaid.gridwidth = 1;
+			//gbc_dataAmountPaid.anchor = GridBagConstraints.NORTH;
+			//gbc_dataAmountPaid.insets = new Insets(0, 0, 5, 5);
+			//gbc_dataAmountPaid.fill = GridBagConstraints.HORIZONTAL;
+			//gbc_dataAmountPaid.gridx = 1;
+			//gbc_dataAmountPaid.gridy = 7;
+			//add(dataAmountPaid, gbc_dataAmountPaid);
+			//dataAmountPaid.setColumns(10);
+			//dataAmountPaid.setFont(new Font("Tahoma", Font.PLAIN, 15));
+			
 			
 			
 			JLabel lblSelectOrdersTo = new JLabel("Orders to associate");
@@ -329,29 +332,33 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 		public static void createTablePickOrder(int supID){
 			try {
 				Connection con_Inv = Connect.connectionSetup();
-				String query = "Select o.ID, o.InvoiceID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate "
-					+ "FROM `order` o "
-					+ "Inner JOIN Supplier s ON s.ID = o.SupplierID "
-					+ "WHERE s.ID = " + supID + " AND o.InvoiceID IS NULL ORDER BY ID DESC;";
+				String query = "Select o.ID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate ,0.Cost, o.AmountPaid"
+					+ " FROM `order` o "
+					+ " Inner JOIN Supplier s ON s.ID = o.SupplierID "
+					+ " WHERE s.ID = " + supID + " AND o.InvoiceID IS NULL ORDER BY ID DESC;";
 			
 				PreparedStatement pst = con_Inv.prepareStatement(query);
 				ResultSet rs = pst.executeQuery();
+				ResultSetMetaData md = rs.getMetaData();
+				int colCount = md.getColumnCount();
 				
 				Vector<Object> columnNames = new Vector<Object>();
 			    Vector<Object> data = new Vector<Object>();
 			    
 			    columnNames.addElement("Check");
 			    columnNames.addElement("Order ID");
-			    columnNames.addElement("Invoice ID");
+			    //columnNames.addElement("Invoice ID");
 			    columnNames.addElement("Supplier");
 			    columnNames.addElement("Created Date");
 			    columnNames.addElement("Received Date");
+			    columnNames.addElement("Cost");
+			    columnNames.addElement("Amount Paid");
 
 		    while(rs.next()){
 		    	Vector<Object> row = new Vector<Object>();
 		    	boolean check = false;
 		    	row.addElement(check);
-		    	for (int i = 1; i <= 5; i++){
+		    	for (int i = 1; i <= colCount; i++){
 		    		row.addElement(rs.getObject(i));
 		    	}
 		    	data.addElement(row);
@@ -387,6 +394,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 		    TMforOrderPick orderPickModel = new TMforOrderPick(data, columnNames);
 		    pickOrderTable.setModel(orderPickModel);
 		    pickOrderTable.setRowHeight(30);
+		    pickOrderTable.getTableHeader().setFont(new Font("Tahoma", Font.PLAIN, 15));
 		    
 			Dimension tableSize = pickOrderTable.getPreferredSize();
 			TableColumnModel tcm = pickOrderTable.getColumnModel();
@@ -396,8 +404,9 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 			tcm.getColumn(1).setPreferredWidth(Math.round((tableSize.width)* 0.05f));
 			tcm.getColumn(2).setPreferredWidth(Math.round((tableSize.width)* 0.10f));
 			tcm.getColumn(3).setPreferredWidth(Math.round((tableSize.width)* 0.30f)); 
-			tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.25f));
-			tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.25f));
+			tcm.getColumn(4).setPreferredWidth(Math.round((tableSize.width)* 0.20f));
+			tcm.getColumn(5).setPreferredWidth(Math.round((tableSize.width)* 0.20f));
+			tcm.getColumn(6).setPreferredWidth(Math.round((tableSize.width)* 0.10f));
 
 			/*
 			inv_orderListTable.addMouseListener(new MouseAdapter() {
