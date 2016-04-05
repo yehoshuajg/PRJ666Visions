@@ -67,12 +67,14 @@ public class Invoice extends JPanel {
         JTextField create_date = new JTextField();
         JTextField amount_due = new JTextField();
         JTextField amount_paid = new JTextField();
-        JButton btn_update = new JButton();
+//        JButton btn_update = new JButton();
         JButton btn_close = new JButton();
         
         invoice_id.setEditable(false);
         supplier_name.setEditable(false);
         create_date.setEditable(false);
+        amount_due.setEditable(false);
+        amount_paid.setEditable(false);
         
         jLabel1.setText("Billed Orders:");
 
@@ -199,7 +201,7 @@ public class Invoice extends JPanel {
                 .addContainerGap(204, Short.MAX_VALUE))
         );
 
-        btn_update.setText("Update");
+/*        btn_update.setText("Update");
         btn_update.addActionListener((java.awt.event.ActionEvent evt) -> {
             Statement s = null;
             ResultSet r = null;
@@ -241,7 +243,7 @@ public class Invoice extends JPanel {
                 JOptionPane.showMessageDialog(null, "Problem connecting to MySQL server.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-        
+*/        
         btn_close.setText("Close");
         btn_close.addActionListener((java.awt.event.ActionEvent evt) -> {
             fr.dispose();
@@ -263,7 +265,7 @@ public class Invoice extends JPanel {
                     .addComponent(jLabel2)
                     .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_invoice_detailsLayout.createSequentialGroup()
-                        .addComponent(btn_update, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
+//                        .addComponent(btn_update, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btn_close, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -281,7 +283,7 @@ public class Invoice extends JPanel {
                         .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                         .addGroup(panel_invoice_detailsLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(btn_update)
+//                            .addComponent(btn_update)
                             .addComponent(btn_close)))
                     .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
