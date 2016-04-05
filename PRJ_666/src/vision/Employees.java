@@ -196,6 +196,8 @@ public class Employees extends JFrame{
 	//private JCheckBox terminateBox;
 	private JCheckBox terminateCheckbox;
 	
+	JButton btnClear;
+	
 	public Employees() {
 		//Removed connect connection, create an instance of connect class and use the getters to grab the url, user, name
 		//Close connection when done using it. Add try/catch rather than throw exception in function prototype.
@@ -1579,7 +1581,7 @@ public class Employees extends JFrame{
         btnSubmit.setBounds(10, 450, 441, 75);
         panel_add_employee.add(btnSubmit);
         
-        JButton btnClear = new JButton("Clear");
+        btnClear = new JButton("Clear");
         btnClear.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		clearFields();
@@ -1621,25 +1623,25 @@ public class Employees extends JFrame{
         
         textPane_error_postalCode = new JTextPane();
         textPane_error_postalCode.setEditable(false);
-        textPane_error_postalCode.setBounds(254, 165, 482, 20);
+        textPane_error_postalCode.setBounds(254, 165, 680, 20);
         textPane_error_postalCode.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_postalCode);
         
         textPane_error_homePhone = new JTextPane();
         textPane_error_homePhone.setEditable(false);
-        textPane_error_homePhone.setBounds(262, 196, 474, 20);
+        textPane_error_homePhone.setBounds(262, 196, 680, 20);
         textPane_error_homePhone.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_homePhone);
         
         textPane_error_cellPhone = new JTextPane();
         textPane_error_cellPhone.setEditable(false);
-        textPane_error_cellPhone.setBounds(247, 229, 489, 20);
+        textPane_error_cellPhone.setBounds(247, 229, 700, 20);
         textPane_error_cellPhone.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_cellPhone);
         
         textPane_error_email = new JTextPane();
         textPane_error_email.setEditable(false);
-        textPane_error_email.setBounds(215, 261, 521, 20);
+        textPane_error_email.setBounds(215, 261, 650, 20);
         textPane_error_email.setBackground(Color.decode(defaultColor));
         panel_add_employee.add(textPane_error_email);
         
@@ -2261,6 +2263,7 @@ public class Employees extends JFrame{
 		}
 		
 		JOptionPane.showMessageDialog(null, "Employee created.");
+		btnClear.doClick();
 		
 		//removing vector elements
 		if(staffList != null){
@@ -2294,6 +2297,10 @@ public class Employees extends JFrame{
 			textPane_error_firstName.setText("First name must contain alphabets only.");
 			ok = false;
 		}
+		else if(textField_firstName.getText().length() > 15){
+			textPane_error_firstName.setText("First name is too long. Must be 15 characters or under.");
+			ok = false;
+		}
 		else{
 			textPane_error_firstName.setText(null);
 		}
@@ -2307,13 +2314,21 @@ public class Employees extends JFrame{
 			textPane_error_lastName.setText("Last name must contain alphabets only.");
 			ok = false;
 		}
+		else if(textField_lastName.getText().length() > 15){
+			textPane_error_lastName.setText("Last name is too long. Must be 15 characters or under.");
+			ok = false;
+		}
 		else{
 			textPane_error_lastName.setText(null);
 		}
 		
 		//Street
-		if(validateEmpty(textField_street.getText()) == false){
+		if(validateEmpty(textField_street.getText().trim()) == false){
 			textPane_error_street.setText("Street field cannot be Empty.");
+			check = false;
+		}
+		else if(textField_street.getText().trim().length() > 40){
+			textPane_error_street.setText("Street field is too long. Must be 40 characters or under.");
 			check = false;
 		}
 		else{
@@ -2327,12 +2342,16 @@ public class Employees extends JFrame{
 		}
 		
 		//City
-		if(validateEmpty(textField_city.getText()) == false){
+		if(validateEmpty(textField_city.getText().trim()) == false){
 			textPane_error_city.setText("City field cannot be Empty.");
 			check = false;
 		}
-		else if(checkForAlphabets(textField_city.getText()) == false){
+		else if(checkForAlphabets(textField_city.getText().trim()) == false){
 			textPane_error_city.setText("City field must contain alphabets only.");
+			ok = false;
+		}
+		else if(textField_city.getText().trim().length() > 15){
+			textPane_error_city.setText("City field is too long. Must be 15 characters or under.");
 			ok = false;
 		}
 		else{
@@ -2352,6 +2371,10 @@ public class Employees extends JFrame{
 			textPane_error_postalCode.setText("Postal Code cannot be Empty.");
 			check = false;
 		}
+		else if(textField_postalCode.getText().length() > 10){
+			textPane_error_postalCode.setText("Postal Code is too long. Must be 10 characters or under.");
+			check = false;
+		}
 		else{
 			if(textField_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
 				textPane_error_postalCode.setText(null);
@@ -2363,7 +2386,7 @@ public class Employees extends JFrame{
 				textPane_error_postalCode.setText(null);
 			}
 			else{
-				textPane_error_postalCode.setText("Postal code does not have a valid code pattern.");
+				textPane_error_postalCode.setText("Postal code does not have a valid code pattern. Example: 'A1B2C3', 'A1B 2C3', 'A1B-2C3'");
 				ok = false;
 			}
 		}
@@ -2371,6 +2394,10 @@ public class Employees extends JFrame{
 		//Home phone
 		if(validateEmpty(textField_homePhone.getText()) == false){
 			textPane_error_homePhone.setText("Home phone cannot be Empty.");
+			check = false;
+		}
+		else if(textField_homePhone.getText().length() > 15){
+			textPane_error_homePhone.setText("Home phone is too long. Must be 15 characters or under.");
 			check = false;
 		}
 		else{
@@ -2387,7 +2414,7 @@ public class Employees extends JFrame{
 				textPane_error_homePhone.setText(null);
 			}
 			else{
-				textPane_error_homePhone.setText("Home phone does not have a valid phone pattern.");
+				textPane_error_homePhone.setText("Home phone does not have a valid phone pattern. Example: '9999999999','(999) 999 9999'.");
 				check = false;
 			}
 		}
@@ -2395,6 +2422,10 @@ public class Employees extends JFrame{
 		//Cell phone
 		if(validateEmpty(textField_cellPhone.getText()) == false){
 			textPane_error_cellPhone.setText("Cell phone cannot be Empty.");
+			check = false;
+		}
+		else if(textField_cellPhone.getText().length() > 15){
+			textPane_error_cellPhone.setText("Cell phone is too long. Must be 15 characters or under.");
 			check = false;
 		}
 		else{
@@ -2411,9 +2442,16 @@ public class Employees extends JFrame{
 				textPane_error_cellPhone.setText(null);
 			}
 			else{
-				textPane_error_cellPhone.setText("Cell phone does not have a valid phone pattern.");
+				textPane_error_cellPhone.setText("Cell phone does not have a valid phone pattern. Example: '999-999-9999','999 999 9999'.");
 				ok = false;
 			}
+		}
+		
+		//Checking if home & cell are same
+		if(textField_homePhone.getText().trim().equals(textField_cellPhone.getText().trim())){
+			textPane_error_homePhone.setText("Home phone cannot be the same as Cell Phone.");
+			textPane_error_cellPhone.setText("Cell phone cannot be the same as Home Phone.");
+			check = false;
 		}
 		
 		//Email
@@ -2421,12 +2459,17 @@ public class Employees extends JFrame{
 			textPane_error_email.setText("Email cannot be Empty.");
 			check = false;
 		}
+		else if(textField_email.getText().length() > 50){
+			textPane_error_email.setText("Email is too long. Must be 50 characters or under.");
+			check = false;
+		}
 		else{
-			if(textField_email.getText().trim().matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+			if(textField_email.getText().trim().matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")){
 				textPane_error_email.setText(null);
 			}
 			else{
-				textPane_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-','@'.");
+				textPane_error_email.setText("Please enter a complete email address. Email can only contain alphabets, numbers, '_','-'.");
 				ok = false;
 			}
 		}
@@ -2450,6 +2493,10 @@ public class Employees extends JFrame{
 		//Username
 		if(validateEmpty(textField_userName.getText()) == false){
 			textPane_error_username.setText("Username cannot be Empty.");
+			check = false;
+		}
+		else if(textField_userName.getText().length() > 15){
+			textPane_error_username.setText("Username is too long. Must be 15 characters or under.");
 			check = false;
 		}
 		else{
@@ -2507,14 +2554,6 @@ public class Employees extends JFrame{
 			}
 		}
 		
-		//Hire date
-		/*if(validateEmpty(textField_hireDate.getText()) == false){
-			textPane_error_hireDate.setText("Hire Date cannot be Empty.");
-			check = false;
-		}
-		else{
-			textPane_error_hireDate.setText(null);
-		}*/
 		if(check && ok){
 			return true;
 		}
