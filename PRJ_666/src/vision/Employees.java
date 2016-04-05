@@ -1684,13 +1684,6 @@ public class Employees extends JFrame{
         comboBox_province = new JComboBox(provinces);
         comboBox_province.setBounds(111, 129, 150, 27);
         panel_add_employee.add(comboBox_province);
-        
-        JPanel panel_staff_edit = new JPanel();
-        tabbedPane.addTab("Edit", null, panel_staff_edit, null);
-        
-        JPanel panel_details = new JPanel();
-        tabbedPane.addTab("Details", null, panel_details, null);
-        panel_details.setLayout(null);
 	}
 	public void updateCurrentEmployee(){
 		Connect connect = new Connect();
