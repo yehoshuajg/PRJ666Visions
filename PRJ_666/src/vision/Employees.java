@@ -757,6 +757,10 @@ public class Employees extends JFrame{
 												textPane_edit_error_firstName.setText("First name must contain alphabets only.");
 												ok = false;
 											}
+											else if(textPane_details_firstName.getText().length() > 15){
+												textPane_edit_error_firstName.setText("First name  is too long. Must be 15 characters or under.");
+												ok = false;
+											}
 											else{
 												textPane_edit_error_firstName.setText(null);
 											}
@@ -770,6 +774,10 @@ public class Employees extends JFrame{
 												textPane_edit_error_lastName.setText("Last name must contain alphabets only.");
 												ok = false;
 											}
+											else if(textPane_details_lastName.getText().length() > 15){
+												textPane_edit_error_lastName.setText("Last name is too long. Must be 15 characters or under.");
+												ok = false;
+											}
 											else{
 												textPane_edit_error_lastName.setText(null);
 											}
@@ -777,6 +785,10 @@ public class Employees extends JFrame{
 											//Street
 											if(validateEmpty(textPane_details_street.getText()) == false){
 												textPane_edit_error_street.setText("Street field cannot be Empty.");
+												check = false;
+											}
+											else if(textPane_details_street.getText().length() > 40){
+												textPane_edit_error_street.setText("Street field is too long. Must be 40 characters or under.");
 												check = false;
 											}
 											else{
@@ -798,13 +810,46 @@ public class Employees extends JFrame{
 												textPane_edit_error_city.setText("City field must contain alphabets only.");
 												ok = false;
 											}
+											else if(textPane_details_city.getText().length() > 15){
+												textPane_edit_error_city.setText("City field is too long. Must be 15 characters or under.");
+												ok = false;
+											}
 											else{
 												textPane_edit_error_city.setText(null);
+											}
+											
+											//Postal Code
+											if(validateEmpty(textPane_details_postalCode.getText()) == false){
+												textPane_edit_error_postalCode.setText("Postal Code cannot be Empty.");
+												check = false;
+											}
+											else if(textPane_details_postalCode.getText().length() > 10){
+												textPane_edit_error_postalCode.setText("Postal Code is too long. Must be 10 characters or under.");
+												check = false;
+											}
+											else{
+												if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9])$")){ //A1B2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[ ]{1}([0-9][A-Za-z][0-9])$")){ //A1B 2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else if(textPane_details_postalCode.getText().trim().matches("^([A-Za-z][0-9][A-Za-z])[-]{1}([0-9][A-Za-z][0-9])$")){ //A1B-2C3
+													textPane_edit_error_postalCode.setText(null);
+												}
+												else{
+													textPane_edit_error_postalCode.setText("Postal code does not have a valid code pattern. Example: 'A1B2C3', 'A1B 2C3', 'A1B-2C3'");
+													ok = false;
+												}
 											}
 											
 											//Home phone
 											if(validateEmpty(textPane_details_homePhone.getText()) == false){
 												textPane_edit_error_homePhone.setText("Home phone cannot be Empty.");
+												check = false;
+											}
+											else if(textPane_details_homePhone.getText().length() > 15){
+												textPane_edit_error_homePhone.setText("Home phone is too long. Must be 15 characters or under.");
 												check = false;
 											}
 											else{
@@ -831,6 +876,10 @@ public class Employees extends JFrame{
 												textPane_error_edit_cellPhone.setText("Cell phone cannot be Empty.");
 												check = false;
 											}
+											else if(textPane_details_cellPhone.getText().length() > 15){
+												textPane_error_edit_cellPhone.setText("Cell phone is too long. Must be 15 characters or under.");
+												check = false;
+											}
 											else{
 												if(textPane_details_cellPhone.getText().trim().matches("^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$")){ //999-999-9999
 													textPane_error_edit_cellPhone.setText(null);
@@ -850,17 +899,29 @@ public class Employees extends JFrame{
 												}
 											}
 											
+											//Checking if home & cell are same
+											if(textPane_details_homePhone.getText().trim().equals(textPane_details_cellPhone.getText().trim())){
+												textPane_edit_error_homePhone.setText("Home phone cannot be the same as Cell Phone.");
+												textPane_error_edit_cellPhone.setText("Cell phone cannot be the same as Home Phone.");
+												check = false;
+											}
+											
 											//Email
 											if(validateEmpty(textPane_details_email.getText()) == false){
 												textPane_edit_error_email.setText("Email cannot be Empty.");
 												check = false;
 											}
+											else if(textPane_details_email.getText().length() > 50){
+												textPane_edit_error_email.setText("Email is too long. Must be 50 characters or under.");
+												check = false;
+											}
 											else{
-												if(textPane_details_email.getText().trim().matches("^[A-Za-z0-9+_.-]+@(.+)$")){
+												if(textPane_details_email.getText().trim().matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+														+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")){
 													textPane_edit_error_email.setText(null);
 												}
 												else{
-													textPane_edit_error_email.setText("Email can only contain alphabets, numbers, '+', '_', '.', '-'.");
+													textPane_edit_error_email.setText("Please enter a complete email address. Email can only contain alphabets, numbers, '_','-'.");
 													ok = false;
 												}
 											}
