@@ -33,6 +33,7 @@ import javax.swing.table.TableColumnModel;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
+import java.awt.Color;
 
 public class InventoryInvoiceAddNewPanel extends JPanel {
 
@@ -42,7 +43,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 		JTextField dataAmountDue;
 		JTextField dataAmountPaid;
 		JTextField dataOrderID;
-		JTextArea dataMessage;
+		static JTextArea dataMessage;
 		static JTable pickOrderTable;
 		JDatePickerImpl datePicker;
 		
@@ -212,7 +213,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 			
 			JLabel lblSelectOrdersTo = new JLabel("Orders to associate");
 			GridBagConstraints gbc_lblSelectOrdersTo = new GridBagConstraints();
-			gbc_lblSelectOrdersTo.anchor = GridBagConstraints.NORTHEAST;
+			gbc_lblSelectOrdersTo.anchor = GridBagConstraints.SOUTHEAST;
 			gbc_lblSelectOrdersTo.insets = new Insets(0, 0, 5, 5);
 			gbc_lblSelectOrdersTo.gridx = 0;
 			gbc_lblSelectOrdersTo.gridy = 8;
@@ -244,6 +245,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 			lblMessage.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			
 			dataMessage = new JTextArea();
+			dataMessage.setForeground(Color.RED);
 			dataMessage.setBackground(SystemColor.control);
 			dataMessage.setEditable(false);
 			dataMessage.setLineWrap(true);
@@ -332,7 +334,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 		public static void createTablePickOrder(int supID){
 			try {
 				Connection con_Inv = Connect.connectionSetup();
-				String query = "Select o.ID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate ,0.Cost, o.AmountPaid"
+				String query = "Select o.ID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate ,o.Cost, o.AmountPaid"
 					+ " FROM `order` o "
 					+ " Inner JOIN Supplier s ON s.ID = o.SupplierID "
 					+ " WHERE s.ID = " + supID + " AND o.InvoiceID IS NULL ORDER BY ID DESC;";
@@ -398,6 +400,12 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 		    
 			Dimension tableSize = pickOrderTable.getPreferredSize();
 			TableColumnModel tcm = pickOrderTable.getColumnModel();
+			
+			if(pickOrderTable.getModel().getRowCount() == 0){
+				dataMessage.setText("Currently no order to associate for this supplier.\nInvoice cannot be created.");
+			}else{
+				dataMessage.setText("Please select at least one order to create a new order");
+			}
 			
 		
 			tcm.getColumn(0).setPreferredWidth(Math.round((tableSize.width)* 0.05f)); 

@@ -421,10 +421,11 @@ public class InventoryFilterFrame extends JFrame {
 			PreparedStatement pst = con.prepareStatement(query);
 			ResultSet rs = pst.executeQuery();
 			
-			cb_filter_cat.addItem("--- Please select category ---");
+			cb_filter_cat.addItem("--- All Category ---");
 			while(rs.next()){
 				cb_filter_cat.addItem(rs.getString(1));
 			}
+			cb_filter_cat.setSelectedIndex(0);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -441,10 +442,11 @@ public class InventoryFilterFrame extends JFrame {
 			PreparedStatement pst = con.prepareStatement(query);
 			ResultSet rs = pst.executeQuery();
 			
-			cb_filter_subCat.addItem("--- Please select subcategory ---");
+			cb_filter_subCat.addItem("--- All Subcategory ---");
 			while(rs.next()){
 				cb_filter_subCat.addItem(rs.getString(1));
 			}
+			cb_filter_subCat.setSelectedIndex(0);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -464,14 +466,14 @@ public class InventoryFilterFrame extends JFrame {
 	public JTextField getSaleLt() { return tf_filter_salelt; }
 	public JTextField getNote() { return tf_filter_note; }
 	public String getCat() { 
-		if(cb_filter_cat.getSelectedItem() == null || cb_filter_cat.getSelectedItem().toString().equals("--- Please select category ---") ){
+		if(cb_filter_cat.getSelectedItem() == null || cb_filter_cat.getSelectedItem().toString().equals("--- All Category ---") ){
 			return "";
 		} else {
 			return cb_filter_cat.getSelectedItem().toString().trim(); 
 		}
 	}
 	public String getSubCat() { 
-		if(cb_filter_subCat.getSelectedItem() == null || cb_filter_subCat.getSelectedItem().toString().equals("--- Please select subcategory ---")){
+		if(cb_filter_subCat.getSelectedItem() == null || cb_filter_subCat.getSelectedItem().toString().equals("--- All Subcategory ---")){
 			return "";
 		} else {
 			return cb_filter_subCat.getSelectedItem().toString().trim(); 
