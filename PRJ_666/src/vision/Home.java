@@ -2240,7 +2240,7 @@ public class Home extends JFrame implements KeyListener{
 		});
 		
 		//Update tax
-		double v = TaxFileExists();
+		double v = taxFileExists();
 		if(v > 0){
 			v = v / 100;
 			taxValue = v;
@@ -2250,7 +2250,7 @@ public class Home extends JFrame implements KeyListener{
 		}
 		
 	}
-	public double TaxFileExists(){
+	public double taxFileExists(){
 		Scanner in;
 		String value = null;
 		File f = new File("SYNG-MGMT-SYS.properties");
@@ -2357,6 +2357,16 @@ public class Home extends JFrame implements KeyListener{
             			if(b){
             				error = "Sucessfully changed tax amount. For new tax to take effect program must be restarted!";
             				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.INFORMATION_MESSAGE);
+            				
+            				//Update tax
+            				double v = taxFileExists();
+            				if(v > 0){
+            					v = v / 100;
+            					taxValue = v;
+            				}
+            				else{
+            					taxValue = 0.13;
+            				}
             			} else {
             				error = "An error occured while updating tax amount.";
             				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
