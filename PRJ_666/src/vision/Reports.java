@@ -821,7 +821,7 @@ public class Reports extends JFrame implements AutoCloseable {
             String revenueless = revenue_less.getText();
             String revenuemore = revenue_more.getText();
             
-            if(!(revenueless.equals("") || revenuemore.equals(""))){
+            if(!(revenueless.trim().equals("") || revenuemore.trim().equals(""))){
             	try{
 	                float less = Float.parseFloat(revenueless);
 	                float more = Float.parseFloat(revenuemore);
@@ -834,6 +834,8 @@ public class Reports extends JFrame implements AutoCloseable {
 	                revenue_query += " HAVING Revenue BETWEEN " + less + " AND " + more;
             	} catch (NumberFormatException e){
                 	//parsing number failed.. defaulted to normal result.
+            		JOptionPane.showMessageDialog(null, "Entered input for revenue between amount is invalid, please do not enter symbols!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
             updateReport(Revenue_table, revenue_query);
@@ -841,7 +843,7 @@ public class Reports extends JFrame implements AutoCloseable {
             fr.dispose();
         });
 
-        jLabel1.setText("Find Revenue in between:");
+        jLabel1.setText("Find Revenue amount in between:");
 
         jLabel3.setText("And");
 
@@ -1597,15 +1599,20 @@ public class Reports extends JFrame implements AutoCloseable {
             String revenuemore = revenue_more.getText();
             
             if(!(revenueless.equals("") || revenuemore.equals(""))){
-                float less = Float.parseFloat(revenueless);
-                float more = Float.parseFloat(revenuemore);
+             try {
+            	 	float less = Float.parseFloat(revenueless);
+            	 	float more = Float.parseFloat(revenuemore);
                 
-                if(less > more){
-                    float temp = less;
-                    less = more;
-                    more = temp;
-                }
-                transactions_query += " AND Total BETWEEN " + less + " AND " + more;
+	                if(less > more){
+	                    float temp = less;
+	                    less = more;
+	                    more = temp;
+	                }
+	                transactions_query += " AND Total BETWEEN " + less + " AND " + more;
+             } catch (NumberFormatException e) {
+            	 JOptionPane.showMessageDialog(null, "Entered value for Sales with total cost in between is not recognize, please enter decimal/number values.",
+                         "Error", JOptionPane.ERROR_MESSAGE);
+             }
             }
             
             String method = (String)payment.getSelectedItem();
@@ -1619,7 +1626,7 @@ public class Reports extends JFrame implements AutoCloseable {
             fr.dispose();
         });
 
-        jLabel1.setText("View Sales in between:");
+        jLabel1.setText("View Sales with total cost in between:");
 
         jLabel3.setText("And");
 
