@@ -94,7 +94,7 @@ public class Supplier extends JFrame implements AutoCloseable {
         JTextField search_supplier_name = new JTextField();
         JButton btn_search = new JButton();
         JLabel jLabel1 = new JLabel();
-        JButton btn_filter = new JButton();
+        //JButton btn_filter = new JButton();
         JScrollPane jScrollPane1 = new JScrollPane();
         JTable list_of_suppliers = new JTable(){
             @Override
@@ -235,7 +235,7 @@ public class Supplier extends JFrame implements AutoCloseable {
 
         jLabel1.setText("Name:");
 
-        btn_filter.setText("Filter");
+        //btn_filter.setText("Filter");
 
         String query = "select s.Name, s.Street as 'Address', s.City, s.PhoneNumber as 'Phone Number', "
                 + " 'View Details' as '' from Supplier s";
@@ -353,8 +353,8 @@ public class Supplier extends JFrame implements AutoCloseable {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btn_search, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(btn_filter, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
+                                //.addComponent(btn_filter, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                //.addGap(18, 18, 18)
                                 .addComponent(view_all, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(supplier_add)))
@@ -368,7 +368,7 @@ public class Supplier extends JFrame implements AutoCloseable {
                     .addComponent(search_supplier_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_search)
                     .addComponent(jLabel1)
-                    .addComponent(btn_filter)
+                    //.addComponent(btn_filter)
                     .addComponent(supplier_add)
                     .addComponent(view_all))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -432,21 +432,33 @@ public class Supplier extends JFrame implements AutoCloseable {
             	if(details_streetAddress.getText().trim().length() < 10 && keep){
                     errors = "Error: Supplier address is invalid must be 10 characters long.";
                     keep = false;
+                } else if(details_streetAddress.getText().trim().length() > 40 && keep){
+                	errors = "Error: Supplier address is too long, must be less than 40 characters.";
+                    keep = false;
                 } else if(details_city.getText().trim().equals("") && keep){
                     errors = "Error: City field is empty.";
+                    keep = false;
+                } else if(details_city.getText().trim().length() > 15 && keep){
+                    errors = "Error: City field is too long, cannot be more than 15 characters long.";
                     keep = false;
                 } else if(details_state_province.getText().trim().equals("") && keep){
                     errors = "Error: State/Province field is empty.";
                     keep = false;
-                } else if(!(details_postalCode.getText().trim().matches("^[0-9]{5}$") || 
+                } else if(details_state_province.getText().trim().length() > 20 && keep){
+                    errors = "Error: State/Province field is is too long, cannot be more than 20 characters long..";
+                    keep = false;
+                } else if(!(details_postalCode.getText().trim().matches("^[0-9]{5}(?:-[0-9]{4})?$") || 
                 		details_postalCode.getText().trim().matches("^[a-zA-Z][0-9][a-zA-Z][ ]{0,2}[0-9][a-zA-Z][0-9]$")) && keep){
-                    errors = "Error: Invalid Postal/Zip code, must be north american, EX: ##### or X#X #X#.";
+                    errors = "Error: Invalid Postal/Zip code, must be north american, EX: ##### OR #####-#### OR X#X #X#.";
                     keep = false;
                 } else if(!details_phoneNumber.getText().trim().matches("^[1]-[0-9]{3}-[0-9]{3}-[0-9]{4}$") && keep){
                     errors = "Error: Phone Number must be north american and numbers separated by - (Ex: 1-XXX-XXX-XXXX).";
                     keep = false;
                 } else if(!details_email.getText().trim().matches("^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$") && keep){
                     errors = "Error: Email field is invalid, Ex: example@example.com";
+                    keep = false;
+                } else if(details_email.getText().trim().length() > 50 && keep){
+                    errors = "Error: Email field is too long, cannot be more than 50 characters long.";
                     keep = false;
                 } else if(details_orderCost.getText().trim().equals("") && keep){
                     errors = "Error: Minimum Order Cost is empty.";
@@ -758,24 +770,39 @@ public class Supplier extends JFrame implements AutoCloseable {
             if(supplierName.getText().trim().equals("")){
                 errors.setText("Error: Supplier Name field is empty.");
                 keep = false;
+            } else if(supplierName.getText().trim().length() > 35){
+                errors.setText("Error: Supplier Name is too long.");
+                keep = false;
             } else if(streetAddress.getText().trim().length() < 10 && keep){
                 errors.setText("Error: Supplier address is invalid must be 10 characters long.");
+                keep = false;
+            } else if(streetAddress.getText().trim().length() > 40 && keep){
+                errors.setText("Error: Supplier address is too long, must be less than 40 characters.");
                 keep = false;
             } else if(city.getText().trim().equals("") && keep){
                 errors.setText("Error: City field is empty.");
                 keep = false;
+            } else if(city.getText().trim().length() > 15 && keep){
+                errors.setText("Error: City field is too long, cannot be more than 15 characters long.");
+                keep = false;
             } else if(state_province.getText().trim().equals("") && keep){
                 errors.setText("Error: State/Province field is empty.");
                 keep = false;
-            } else if(!(postalCode.getText().trim().matches("^[0-9]{5}$") || 
+            } else if(state_province.getText().trim().length() > 20 && keep){
+                errors.setText("Error: State/Province field is is too long, cannot be more than 20 characters long..");
+                keep = false;
+            } else if(!(postalCode.getText().trim().matches("^[0-9]{5}(?:-[0-9]{4})?$") || 
             		postalCode.getText().trim().matches("^[a-zA-Z][0-9][a-zA-Z][ ]{0,2}[0-9][a-zA-Z][0-9]$")) && keep){
-                errors.setText("Error: Invalid Postal/Zip code, must be north american, EX: ##### or X#X #X#.");
+                errors.setText("Error: Invalid Postal/Zip code, must be north american, EX: ##### OR #####-#### OR X#X #X#.");
                 keep = false;
             } else if(!phoneNumber.getText().trim().matches("^[1]-[0-9]{3}-[0-9]{3}-[0-9]{4}$") && keep){
                 errors.setText("Error: Phone Number must be north american and numbers separated by - (Ex: 1-XXX-XXX-XXXX).");
                 keep = false;
             } else if(!email.getText().trim().matches("^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$") && keep){
                 errors.setText("Error: Email field is invalid, Ex: example@example.com");
+                keep = false;
+            } else if(email.getText().trim().length() > 50 && keep){
+                errors.setText("Error: Email field is too long, cannot be more than 50 characters long.");
                 keep = false;
             } else if(orderCost.getText().trim().equals("") && keep){
                 errors.setText("Error: Minimum Order Cost is empty.");
