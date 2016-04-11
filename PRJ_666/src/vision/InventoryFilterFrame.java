@@ -6,6 +6,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +29,7 @@ import java.awt.Insets;
 import javax.swing.JTextArea;
 import java.awt.SystemColor;
 import javax.swing.JComboBox;
+import javax.swing.SwingConstants;
 
 public class InventoryFilterFrame extends JFrame {
 	private JTextField tf_filter_ID;
@@ -37,11 +40,17 @@ public class InventoryFilterFrame extends JFrame {
 	private JTextField tf_filter_salegt;
 	private JTextField tf_filter_salelt;
 	private JTextField tf_filter_note;
-	private JComboBox<String> cb_filter_cat;
+	private JLabel qtygtWarning;
+	private JLabel qtyltWarning;
+	private JLabel salepricegtWarning;
+	private JLabel salepriceltWarning;
+	
+	
+	private JComboBox<CbCatItem> cb_filter_cat;
 	private JComboBox<String> cb_filter_subCat;
 	public InventoryFilterFrame() {
 		
-		setBounds(12, 94, 436, 599);
+		setBounds(12, 94, 501, 599);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -50,12 +59,12 @@ public class InventoryFilterFrame extends JFrame {
 		jp_filterMain.setLayout(null);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(12, 121, 390, 335);
+		panel.setBounds(12, 121, 467, 335);
 		jp_filterMain.add(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_panel.columnWidths = new int[]{0, 0, 146, 150, 0};
 		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
@@ -72,8 +81,9 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_ID = new JTextField();
 		tf_filter_ID.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_ID = new GridBagConstraints();
+		gbc_tf_filter_ID.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_ID.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_ID.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_ID.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_ID.gridx = 2;
 		gbc_tf_filter_ID.gridy = 0;
 		panel.add(tf_filter_ID, gbc_tf_filter_ID);
@@ -101,9 +111,10 @@ public class InventoryFilterFrame extends JFrame {
 		panel.add(lblCategory, gbc_lblCategory);
 		
 		
-		cb_filter_cat = new JComboBox<String>();
+		cb_filter_cat = new JComboBox<CbCatItem>();
 		GridBagConstraints gbc_cb_filter_cat = new GridBagConstraints();
-		gbc_cb_filter_cat.insets = new Insets(0, 0, 5, 0);
+		gbc_cb_filter_cat.gridwidth = 2;
+		gbc_cb_filter_cat.insets = new Insets(0, 0, 5, 5);
 		gbc_cb_filter_cat.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cb_filter_cat.gridx = 2;
 		gbc_cb_filter_cat.gridy = 1;
@@ -113,6 +124,8 @@ public class InventoryFilterFrame extends JFrame {
 		
 		cb_filter_cat.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
+		    	cb_filter_subCat.setEnabled(true);
+		    	fillCbSubCat();
 		    	Inventory.filterByMultiColumn2();
 		    }
 		});
@@ -128,13 +141,15 @@ public class InventoryFilterFrame extends JFrame {
 		
 		cb_filter_subCat = new JComboBox<String>();
 		GridBagConstraints gbc_cb_filter_subCat = new GridBagConstraints();
-		gbc_cb_filter_subCat.insets = new Insets(0, 0, 5, 0);
+		gbc_cb_filter_subCat.gridwidth = 2;
+		gbc_cb_filter_subCat.insets = new Insets(0, 0, 5, 5);
 		gbc_cb_filter_subCat.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cb_filter_subCat.gridx = 2;
 		gbc_cb_filter_subCat.gridy = 2;
 		panel.add(cb_filter_subCat, gbc_cb_filter_subCat);
+		cb_filter_subCat.setEditable(false);
 		
-		fillCbSubCat();
+		//
 		
 		cb_filter_subCat.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
@@ -154,8 +169,10 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_name = new JTextField();
 		tf_filter_name.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_name = new GridBagConstraints();
+		gbc_tf_filter_name.fill = GridBagConstraints.BOTH;
+		gbc_tf_filter_name.gridwidth = 2;
 		gbc_tf_filter_name.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_name.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_name.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_name.gridx = 2;
 		gbc_tf_filter_name.gridy = 3;
 		panel.add(tf_filter_name, gbc_tf_filter_name);
@@ -187,8 +204,10 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_desc = new JTextField();
 		tf_filter_desc.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_desc = new GridBagConstraints();
+		gbc_tf_filter_desc.gridwidth = 2;
+		gbc_tf_filter_desc.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_desc.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_desc.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_desc.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_desc.gridx = 2;
 		gbc_tf_filter_desc.gridy = 4;
 		panel.add(tf_filter_desc, gbc_tf_filter_desc);
@@ -220,8 +239,9 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_qtygt = new JTextField();
 		tf_filter_qtygt.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_qtygt = new GridBagConstraints();
+		gbc_tf_filter_qtygt.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_qtygt.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_qtygt.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_qtygt.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_qtygt.gridx = 2;
 		gbc_tf_filter_qtygt.gridy = 5;
 		panel.add(tf_filter_qtygt, gbc_tf_filter_qtygt);
@@ -229,17 +249,57 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_qtygt.setColumns(8);
 		tf_filter_qtygt.getDocument().addDocumentListener(
 				new DocumentListener(){
+
 					public void changedUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtygt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtygtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}
+						
 					}
 					public void insertUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtygt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtygtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}
 					}
 					public void removeUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtygt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtygtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtygtWarning.setText("");
+						}
 					}
 				}
 				);
+		
+		qtygtWarning = new JLabel("");
+		qtygtWarning.setHorizontalAlignment(SwingConstants.LEFT);
+		qtygtWarning.setForeground(Color.RED);
+		qtygtWarning.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		GridBagConstraints gbc_qtygtWarning = new GridBagConstraints();
+		gbc_qtygtWarning.anchor = GridBagConstraints.WEST;
+		gbc_qtygtWarning.insets = new Insets(0, 0, 5, 0);
+		gbc_qtygtWarning.gridx = 3;
+		gbc_qtygtWarning.gridy = 5;
+		panel.add(qtygtWarning, gbc_qtygtWarning);
 
 		JLabel lblLessThan = new JLabel("Quantity less than");
 		lblLessThan.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -254,8 +314,9 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_qtylt = new JTextField();
 		tf_filter_qtylt.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_qtylt = new GridBagConstraints();
+		gbc_tf_filter_qtylt.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_qtylt.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_qtylt.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_qtylt.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_qtylt.gridx = 2;
 		gbc_tf_filter_qtylt.gridy = 6;
 		panel.add(tf_filter_qtylt, gbc_tf_filter_qtylt);
@@ -263,16 +324,54 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_qtylt.getDocument().addDocumentListener(
 				new DocumentListener(){
 					public void changedUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtylt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtyltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}
 					}
 					public void insertUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtylt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtyltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}
 					}
 					public void removeUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_qtylt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}else if(!Inventory.validateStrToInt(input)){
+							qtyltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							qtyltWarning.setText("");
+						}
 					}
 				}
 				);
+		
+		qtyltWarning = new JLabel("");
+		qtyltWarning.setHorizontalAlignment(SwingConstants.LEFT);
+		qtyltWarning.setForeground(Color.RED);
+		qtyltWarning.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		GridBagConstraints gbc_qtyltWarning = new GridBagConstraints();
+		gbc_qtyltWarning.anchor = GridBagConstraints.WEST;
+		gbc_qtyltWarning.insets = new Insets(0, 0, 5, 0);
+		gbc_qtyltWarning.gridx = 3;
+		gbc_qtyltWarning.gridy = 6;
+		panel.add(qtyltWarning, gbc_qtyltWarning);
 		
 		
 		JLabel lblSalePriceGreater = new JLabel("Sale price greater than");
@@ -287,8 +386,9 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_salegt = new JTextField();
 		tf_filter_salegt.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_salegt = new GridBagConstraints();
+		gbc_tf_filter_salegt.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_salegt.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_salegt.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_salegt.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_salegt.gridx = 2;
 		gbc_tf_filter_salegt.gridy = 7;
 		panel.add(tf_filter_salegt, gbc_tf_filter_salegt);
@@ -296,16 +396,54 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_salegt.getDocument().addDocumentListener(
 				new DocumentListener(){
 					public void changedUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salegt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepricegtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}
 					}
 					public void insertUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salegt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepricegtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}
 					}
 					public void removeUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salegt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepricegtWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepricegtWarning.setText("");
+						}
 					}
 				}
 				);
+		
+		salepricegtWarning = new JLabel("");
+		salepricegtWarning.setForeground(Color.RED);
+		salepricegtWarning.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		salepricegtWarning.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_salepricegtWarning = new GridBagConstraints();
+		gbc_salepricegtWarning.anchor = GridBagConstraints.WEST;
+		gbc_salepricegtWarning.insets = new Insets(0, 0, 5, 0);
+		gbc_salepricegtWarning.gridx = 3;
+		gbc_salepricegtWarning.gridy = 7;
+		panel.add(salepricegtWarning, gbc_salepricegtWarning);
 		
 		JLabel lblSalePriceLess = new JLabel("Sale price less than");
 		lblSalePriceLess.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -320,8 +458,9 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_salelt = new JTextField();
 		tf_filter_salelt.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_salelt = new GridBagConstraints();
+		gbc_tf_filter_salelt.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_salelt.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_salelt.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_salelt.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_salelt.gridx = 2;
 		gbc_tf_filter_salelt.gridy = 8;
 		panel.add(tf_filter_salelt, gbc_tf_filter_salelt);
@@ -329,16 +468,54 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_salelt.getDocument().addDocumentListener(
 				new DocumentListener(){
 					public void changedUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salelt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepriceltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}
 					}
 					public void insertUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salelt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepriceltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}
 					}
 					public void removeUpdate(DocumentEvent e){
-						Inventory.filterByMultiColumn2();
+						String input = tf_filter_salelt.getText();
+						if(input.equals("")){
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}else if(!Inventory.validateStrToDouble(input)){
+							salepriceltWarning.setText("Invalid input");
+						}else{
+							Inventory.filterByMultiColumn2();
+							salepriceltWarning.setText("");
+						}
 					}
 				}
 				);
+		
+		salepriceltWarning = new JLabel("");
+		salepriceltWarning.setHorizontalAlignment(SwingConstants.LEFT);
+		salepriceltWarning.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		salepriceltWarning.setForeground(Color.RED);
+		GridBagConstraints gbc_salepriceltWarning = new GridBagConstraints();
+		gbc_salepriceltWarning.anchor = GridBagConstraints.WEST;
+		gbc_salepriceltWarning.insets = new Insets(0, 0, 5, 0);
+		gbc_salepriceltWarning.gridx = 3;
+		gbc_salepriceltWarning.gridy = 8;
+		panel.add(salepriceltWarning, gbc_salepriceltWarning);
 		
 		JLabel lblNote = new JLabel("Note");
 		lblNote.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -352,9 +529,10 @@ public class InventoryFilterFrame extends JFrame {
 		tf_filter_note = new JTextField();
 		tf_filter_note.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		GridBagConstraints gbc_tf_filter_note = new GridBagConstraints();
-		gbc_tf_filter_note.insets = new Insets(0, 0, 5, 0);
+		gbc_tf_filter_note.gridwidth = 2;
+		gbc_tf_filter_note.insets = new Insets(0, 0, 5, 5);
 		gbc_tf_filter_note.anchor = GridBagConstraints.WEST;
-		gbc_tf_filter_note.fill = GridBagConstraints.VERTICAL;
+		gbc_tf_filter_note.fill = GridBagConstraints.BOTH;
 		gbc_tf_filter_note.gridx = 2;
 		gbc_tf_filter_note.gridy = 9;
 		panel.add(tf_filter_note, gbc_tf_filter_note);
@@ -417,15 +595,18 @@ public class InventoryFilterFrame extends JFrame {
 		
 		try {
 			Connection con = Connect.connectionSetup();
-			String query = "Select Name FROM Category WHERE ParentID IS NULL ORDER BY NAME";
+			String query = "Select ID, Name FROM Category WHERE ParentID IS NULL ORDER BY NAME";
 			PreparedStatement pst = con.prepareStatement(query);
 			ResultSet rs = pst.executeQuery();
 			
-			cb_filter_cat.addItem("--- All Category ---");
+			CbCatItem item = new CbCatItem(0, "--- All Category ---");
+			cb_filter_cat.addItem(item);
 			while(rs.next()){
-				cb_filter_cat.addItem(rs.getString(1));
+				cb_filter_cat.addItem(new CbCatItem(rs.getInt(1), rs.getString(2)));
 			}
 			cb_filter_cat.setSelectedIndex(0);
+			
+			con.close();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -436,24 +617,54 @@ public class InventoryFilterFrame extends JFrame {
 	
 	
 	public void fillCbSubCat(){
-		try {
-			Connection con = Connect.connectionSetup();
-			String query = "Select Name FROM Category WHERE ParentID IS NOT NULL ORDER BY NAME";
-			PreparedStatement pst = con.prepareStatement(query);
-			ResultSet rs = pst.executeQuery();
-			
+		
+		if(cb_filter_cat.getSelectedIndex() <= 0){
+			cb_filter_subCat.removeAllItems();
 			cb_filter_subCat.addItem("--- All Subcategory ---");
-			while(rs.next()){
-				cb_filter_subCat.addItem(rs.getString(1));
+		}else {
+			try {
+				
+				CbCatItem selectedCat = (CbCatItem) cb_filter_cat.getSelectedItem();
+				int catID = selectedCat.getCatID();
+				cb_filter_subCat.removeAllItems();
+				
+				Connection con = Connect.connectionSetup();
+				String query = "Select Name FROM Category WHERE ParentID = " + catID + " ORDER BY NAME";
+				PreparedStatement pst = con.prepareStatement(query);
+				ResultSet rs = pst.executeQuery();
+
+				cb_filter_subCat.addItem("--- All Subcategory ---");
+				while(rs.next()){
+					cb_filter_subCat.addItem(rs.getString(1));
+				}
+				cb_filter_subCat.setSelectedIndex(0);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			cb_filter_subCat.setSelectedIndex(0);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
 	}
 	
+	class CbCatItem{
+		private int catID;
+		private String catName;
+		
+		CbCatItem(int id, String name){
+			catID = id;
+			catName = name;
+		}
+		public int getCatID(){
+			return catID;
+		}
+		public String getCatName(){
+			return catName;
+		}
+		public String toString(){
+			return catName;
+		}
+	}
 	
 	public JTextField getID() { return tf_filter_ID; }
 	public JTextField getProdName() { return tf_filter_name; }
@@ -493,16 +704,16 @@ public class InventoryFilterFrame extends JFrame {
 	private JTextField tf_filter_salelt;
 	 */
 	public void clearFilter(){
+		tf_filter_ID.setText("");
 		tf_filter_name.setText("");
 		tf_filter_desc.setText("");
 		tf_filter_qtygt.setText("");
 		tf_filter_qtylt.setText("");
-		//tf_filter_category.setText("");
-		//tf_filter_subCategory.setText("");
 		tf_filter_salegt.setText("");
 		tf_filter_salelt.setText("");
 		tf_filter_note.setText("");
 		cb_filter_cat.setSelectedIndex(-1);
 		cb_filter_subCat.setSelectedIndex(-1);
+		cb_filter_subCat.setEnabled(false);;
 	}
 }

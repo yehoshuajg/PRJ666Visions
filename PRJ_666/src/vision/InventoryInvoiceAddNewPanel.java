@@ -326,6 +326,9 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 				return (Date) datePicker.getModel().getValue(); 
 			}else {return new Date();}
 		}
+		public void setAmountDue(String s){
+			dataAmountDue.setText(s);
+		}
 		public void setMessage(String str){
 			dataMessage.setText(str);
 		}
@@ -335,7 +338,7 @@ public class InventoryInvoiceAddNewPanel extends JPanel {
 			try {
 				Connection con_Inv = Connect.connectionSetup();
 				String query = "Select o.ID, s.Name as 'Supplier Name', o.CreateDate, o.ReceivedDate ,o.Cost, o.AmountPaid"
-					+ " FROM `order` o "
+					+ " FROM `Order` o "
 					+ " Inner JOIN Supplier s ON s.ID = o.SupplierID "
 					+ " WHERE s.ID = " + supID + " AND o.InvoiceID IS NULL ORDER BY ID DESC;";
 			
