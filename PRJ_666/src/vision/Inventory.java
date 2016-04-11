@@ -339,6 +339,7 @@ JMenuItem menuInvSetPrice = new JMenuItem( new AbstractAction("Price Adjustment"
 		if(currentPage != 0){
 			cardlayout.show(inventoryMainPanel, "000");
 			JOptionPane.showMessageDialog(null, "Please check mark product(s) and click \"Price Adjustment\" again");
+			currentPage = 0;
 		}else {
 			createTableSetPrice();
 		}
