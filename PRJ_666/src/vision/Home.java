@@ -775,7 +775,7 @@ public class Home extends JFrame implements KeyListener{
 														subTotal = Math.round(subTotal * 100.0) / 100.0;
 														subtotal_textField.setText("Subtotal: $" + subTotal);
 														
-														tax = subTotal * 0.13;
+														tax = subTotal * taxValue;
 														tax = Math.round(tax * 100.0) / 100.0;
 														tax_textField.setText("Tax: $" + tax);
 														
@@ -892,7 +892,7 @@ public class Home extends JFrame implements KeyListener{
 												subTotal = Math.round(subTotal * 100.0) / 100.0;
 												subtotal_textField.setText("Subtotal: $" + subTotal);
 			
-												tax = subTotal * 0.13;
+												tax = subTotal * taxValue;
 												tax = Math.round(tax * 100.0) / 100.0;
 												tax_textField.setText("Tax: $" + tax);
 													
@@ -1064,7 +1064,7 @@ public class Home extends JFrame implements KeyListener{
 						subTotal = Math.round(subTotal * 100.0) / 100.0;
 						subtotal_textField.setText("Subtotal: $" + subTotal);
 
-						tax = subTotal * 0.13;
+						tax = subTotal * taxValue;
 						tax = Math.round(tax * 100.0) / 100.0;
 						tax_textField.setText("Tax: $" + tax);
 								
@@ -1491,7 +1491,6 @@ public class Home extends JFrame implements KeyListener{
 				//Sales Total
 				subTotal = 0;
 				tax = 0;
-				//taxValue = 0;
 				total = 0;
 				c = 0;
 				stringTempPrice = null;
@@ -2239,7 +2238,48 @@ public class Home extends JFrame implements KeyListener{
 				*/
 			}
 		});
+		
+		//Update tax
+		double v = taxFileExists();
+		if(v > 0){
+			v = v / 100;
+			taxValue = v;
+		}
+		else{
+			taxValue = 0.13;
+		}
+		
 	}
+	public double taxFileExists(){
+		Scanner in;
+		String value = null;
+		File f = new File("SYNG-MGMT-SYS.properties");
+		if(f.exists() && !f.isDirectory()) { 
+			//System.out.println("exists");
+			try{
+                in = new Scanner(f);
+                while(in.hasNext()){
+                    String input = in.nextLine();
+                    if(input != null){
+                    	value = input;
+                    }
+                }
+                in.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+			int index = value.indexOf('=');
+			String newValue = value.substring(index+1, value.length());
+			double t = Double.parseDouble(newValue.trim());
+			return t;
+		}
+		else{
+			//System.out.println("does not exist");
+			return 0;
+		}
+		
+	}
+	
 	public void setEmployee(Employees e){
 		employee = e;
 		welcome.setText("Welcome, " + employee.getFirstName() + " " + employee.getLastName());
@@ -2317,6 +2357,16 @@ public class Home extends JFrame implements KeyListener{
             			if(b){
             				error = "Sucessfully changed tax amount. For new tax to take effect program must be restarted!";
             				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.INFORMATION_MESSAGE);
+            				
+            				//Update tax
+            				double v = taxFileExists();
+            				if(v > 0){
+            					v = v / 100;
+            					taxValue = v;
+            				}
+            				else{
+            					taxValue = 0.13;
+            				}
             			} else {
             				error = "An error occured while updating tax amount.";
             				JOptionPane.showMessageDialog (null, error, "Update Tax", JOptionPane.ERROR_MESSAGE);
@@ -2604,7 +2654,7 @@ public class Home extends JFrame implements KeyListener{
 			subTotal = Math.round(subTotal * 100.0) / 100.0;
 			subtotal_textField.setText("Subtotal: $" + subTotal);
 
-			tax = subTotal * 0.13;
+			tax = subTotal * taxValue;
 			tax = Math.round(tax * 100.0) / 100.0;
 			tax_textField.setText("Tax: $" + tax);
 					
@@ -3238,7 +3288,7 @@ public class Home extends JFrame implements KeyListener{
 		subTotal = Math.round(subTotal * 100.0) / 100.0;
 		subtotal_textField.setText("Subtotal: $" + subTotal);
 		
-		tax = subTotal * 0.13;
+		tax = subTotal * taxValue;
 		tax = Math.round(tax * 100.0) / 100.0;
 		tax_textField.setText("Tax: $" + tax);
 			
@@ -4046,7 +4096,7 @@ public class Home extends JFrame implements KeyListener{
 												txtpnrefund_change.setText("Change: $" + refundChange);
 												
 												//Calculating new tax
-												finalRefundTax = finalRefundSubtotal * 0.13;
+												finalRefundTax = finalRefundSubtotal * taxValue;
 												finalRefundTax = Math.round(finalRefundTax * 100.0) / 100.0;
 												txtpnrefund_tax.setText("New Tax: $" + finalRefundTax);
 														

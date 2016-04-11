@@ -84,7 +84,7 @@ public class Order extends JPanel {
         JTextField cost = new JTextField();
         JTextField amount_paid = new JTextField();
         JTextField invoice_id = new JTextField();
-        JCheckBox received_date_box = new JCheckBox();
+        JTextField received_date_box = new JTextField();
         //JButton btn_update = new JButton();
         JButton btn_close = new JButton();
         
@@ -95,6 +95,7 @@ public class Order extends JPanel {
         cost.setEditable(false);
         amount_paid.setEditable(false);
         invoice_id.setEditable(false);
+        received_date_box.setEditable(false);
         
         jLabel2.setText("Order Details:");
 
@@ -128,7 +129,8 @@ public class Order extends JPanel {
                 return null;
             }
             
-            sql = "select o.ID, s.Name, CONCAT(e.FirstName, ' ', e.LastName), o.CreateDate, o.ReceivedDate,"
+            sql = "select o.ID, s.Name, CONCAT(e.FirstName, ' ', e.LastName), DATE_FORMAT(o.CreateDate, '%d-%M-%Y %H:%i') as CreateDate, "
+            	+ "DATE_FORMAT(o.ReceivedDate, '%d-%M-%Y %H:%i')  as ReceivedDate,"
                 + " o.Cost, o.AmountPaid, o.InvoiceID from `Order` o join Supplier s on o.SupplierID = s.ID" 
                 + " join Employee e on o.EmployeeID = e.ID where o.ID = " + id;
 
@@ -145,10 +147,12 @@ public class Order extends JPanel {
                     
                     String received = rs.getString(5);
                     if(received == null || received.equals("null")){
-                        received_date_box.setSelected(false);
+                        //received_date_box.setSelected(false);
+                    	received_date_box.setText("Not Received");
                     } else {
-                        received_date_box.setSelected(true);
-                        check_received = true;
+                        //received_date_box.setSelected(true);
+                    	received_date_box.setText(received);
+                        //check_received = true;
                     }
                 } else {
                   return null;
@@ -215,9 +219,9 @@ public class Order extends JPanel {
                             .addComponent(cost)
                             .addComponent(amount_paid)
                             .addComponent(invoice_id)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(received_date_box)
-                                .addGap(0, 110, Short.MAX_VALUE)))))
+                            //.addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(received_date_box))))
+                                //.addGap(0, 110, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
