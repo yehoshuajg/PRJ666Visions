@@ -2383,8 +2383,8 @@ public class Home extends JFrame implements KeyListener{
             setJMenuBar(mb);
 			
 			//Get Help
-			JPanel panel_getHelp = new JPanel();
-			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+			//JPanel panel_getHelp = new JPanel();
+			//tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
 		else if(position.getId() == 4){
 			//Loads Cashier panel
@@ -2464,8 +2464,8 @@ public class Home extends JFrame implements KeyListener{
             setJMenuBar(mb);
 			
 			//Get Help
-			JPanel panel_getHelp = new JPanel();
-			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+			//JPanel panel_getHelp = new JPanel();
+			//tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
 		else if(position.getId() == 5){
 			//Report

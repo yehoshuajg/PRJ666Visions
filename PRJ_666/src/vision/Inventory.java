@@ -3435,7 +3435,7 @@ public static void createTablePickOrderForEdit(int invoiceID){
 								
 						JasperDesign jd = JRXmlLoader.load("order.jrxml");
 						String sql = "SELECT DATE_FORMAT(o.CreateDate, '%d %M %Y %H:%i')  as CreateDate, o.Cost, "
-								+ " ROUND(o.Cost * 0.13, 2) as 'Tax', ROUND(o.Cost + (o.Cost * 0.13) + s.DeliveryCost, 2) as 'Total', "
+								+ " ROUND(o.Cost * " + (connect.tax / 100) + ", 2) as 'Tax', ROUND(o.Cost + (o.Cost * " + (connect.tax / 100) + ") + s.DeliveryCost, 2) as 'Total', "
 			                    + " s.Name, s.Street, s.City, s.State_Province, s.PostalCode, s.PhoneNumber, s.Email, s.DeliveryCost, "
 			                    + " od.ProductID, p.Name as 'ProductName', p.Description, od.OrderedQuantity, od.Cost as 'EstimateCost' " 
 			                    + " FROM  StoreDB.Order o, StoreDB.Supplier s, StoreDB.OrderDetail od, StoreDB.Product p " 
