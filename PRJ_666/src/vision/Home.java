@@ -28,6 +28,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.DateFormatter;
 
 import org.omg.Messaging.SyncScopeHelper;
 
@@ -63,7 +64,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -2028,19 +2032,44 @@ public class Home extends JFrame implements KeyListener{
 											i+1,tr.get(i).getProductID(),tr.get(i).getQuantitySold(),
 											tr.get(i).getReturned(),tr.get(i).getDateReturned()});
 											
-											//Removed tr.getEmployeeID() (reminder)
 											Cashier refundCashier = new Cashier();
 											productByRefund.add(refundCashier.findProductID(tr.get(i).getProductID()));
 											previousRefundValue.add(tr.get(i).getReturned());
 										}
+										DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+										Date date = null;
+										Date date2 = null;
+										try {
+											date = dateFormat.parse(t.getCreateDate());
+											Calendar cal = Calendar.getInstance();
+											cal.setTime(date);
+											cal.add(Calendar.DATE, 30); // add 10 days
+											date2 = cal.getTime();
+											//System.out.println("Date: " + date);
+											//System.out.println("Date2: " + date2);
+										} catch (ParseException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+										DateFormat dateFormatNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+										Date dateNow = new Date();
+										if(dateNow.after(date) && dateNow.before(date2)){
+											//System.out.println("Valid");
+										}
+										else if(dateNow.after(date) && dateNow.after(date2)){
+											//System.out.println("Invalid");
+											JOptionPane.showMessageDialog(null,"This transaction is older than 30 days.","Warning!",JOptionPane.ERROR_MESSAGE);
+										}
 									}
 									else{
 										JOptionPane.showMessageDialog(null,"Transaction Record for Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+										btnClearAll.doClick();
 										textField_transaction_input.requestFocus();
 									}
 								}
 								else{
 									JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+									btnClearAll.doClick();
 									textField_transaction_input.requestFocus();
 								}
 							}
