@@ -1696,10 +1696,12 @@ public class Home extends JFrame implements KeyListener{
 									boolean check = true;
 					        		//Previous Quantity
 									int previousQuantity = 0;
-									String nID = model.getValueAt(row, id_column).toString();
-									for(int i = 0; i < productBySearch.size(); i++){
-										if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
-											previousQuantity = previousValue.get(i);
+									if(model.getRowCount() > 0){
+										String nID = model.getValueAt(row, id_column).toString();
+										for(int i = 0; i < productBySearch.size(); i++){
+											if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
+												previousQuantity = previousValue.get(i);
+											}
 										}
 									}
 					        		if(model.getValueAt(row, col).equals("") || model.getValueAt(row, col) == null){
