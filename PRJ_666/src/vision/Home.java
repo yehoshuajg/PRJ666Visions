@@ -4136,25 +4136,54 @@ public class Home extends JFrame implements KeyListener{
 										br.setBackupRestorePath();
 										br.initialize();
 										br.backupDB();*/
-										
+										System.out.println("TransactionID: " + tr.get(0).getTransactionID());
 										Object[] options = {"Yes","No"};
 										int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
 										    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 										
 										if(cashCredit == JOptionPane.YES_OPTION){
 											//System.out.println("yes");
-											Thread t2 = new Thread(new Runnable() {
+											Thread t4 = new Thread(new Runnable() {
 												public void run() {
-													//Enter printing recept code here
+													try {
+														//Once printing is complete, reset the cashier screen, close window and put focus on product id input field
+														Connect connect = new Connect();
+														Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+														
+														JasperDesign jd = JRXmlLoader.load("returnRecipt.jrxml");
+														String sql = "SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, "
+																+ "tr.ProductID, p.Name, tr. QuantitySold, tr.UnitPrice, "
+																+ "(tr.QuantitySold * tr.UnitPrice) as PTotal, CASE WHEN r.ProductID = tr.ProductID "
+																+ "THEN r.ReturnedQTY ELSE 0 END AS QuantityReturned FROM StoreDB.Transaction t, "
+																+ "StoreDB.TransactionRecord tr, StoreDB.Product p, StoreDB.ProductReturned r  "
+																+ "WHERE t.ID = tr.TransactionID AND t.ID = r.TransactionID AND tr.ProductID = p.ID "
+																+ "AND t.ID = " + tr.get(0).getTransactionID();
+														JRDesignQuery jdq = new JRDesignQuery();
+														jdq.setText(sql);
+														jd.setQuery(jdq);
+														
+														JasperReport jr = JasperCompileManager.compileReport(jd);
+														JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+														
+														JasperPrintManager.printReport(jp, true);
+														
+														btnClearAll.doClick();
+														refund_confirm.dispose();
+														textField_transaction_input.requestFocusInWindow();
+													
+													} catch (Exception e) {
+														JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
+																"Error with printing", JOptionPane.ERROR_MESSAGE);
+													}
 												}
 											});
-											t2.start();
+											t4.start();
 										}
 										else if(cashCredit == JOptionPane.NO_OPTION){
 											//System.out.println("no");
 											btnClearAll.doClick();
 											refund_confirm.dispose();
-											textField_productID_input.requestFocusInWindow();
+											textField_transaction_input.requestFocusInWindow();
 										}
 									}
 								});
