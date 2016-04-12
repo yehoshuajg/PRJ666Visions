@@ -92,6 +92,14 @@ public class Employees extends JFrame{
 	private String hireDate;
 	private String terminationDate;
 	private String salt;
+	private String createdBy;
+	private String terminatedBy;
+	private String alteredBy;
+	
+	//Temp but needed
+	private String tempCreatedBy = null;
+	private String tempTerminatedBy = null;
+	private String tempAlteredBy = null;
 	
 	// Windowbuilder vars
 	
@@ -602,6 +610,41 @@ public class Employees extends JFrame{
 							        	btn_edit.setVisible(false);
 							        	btn_edit.setEnabled(false);
 							        }
+							        
+							        JButton btn_editDetails = new JButton("More info");
+							        if(currentEmployee.getPositionID() == 4 || currentEmployee.getPositionID() == 3){
+							        	//Edit Details
+							        	btn_editDetails.setVisible(true);
+							        	btn_editDetails.setEnabled(true);
+							        	btn_editDetails.setBounds(475, 570, 150, 40);
+							        	btn_editDetails.setFont(new Font("Tahoma", Font.PLAIN, 20));
+								        btn_editDetails.setFocusable(false);
+										staffDetails.add(btn_editDetails);
+							        }
+							        else{
+							        	btn_editDetails.setVisible(false);
+							        	btn_editDetails.setEnabled(false);
+							        }
+							        
+							        btn_editDetails.addActionListener(new ActionListener() {
+										
+										@Override
+										public void actionPerformed(ActionEvent e) {
+											// TODO Auto-generated method stub
+											if(tempCreatedBy == null){
+												tempCreatedBy = "";
+											}
+											if(tempAlteredBy == null){
+												tempAlteredBy = "";
+											}
+											if(tempTerminatedBy == null){
+												tempTerminatedBy = "";
+											}
+											JOptionPane.showMessageDialog(null,"Created By: " + tempCreatedBy + "\n" + 
+											"Altered By: " + tempAlteredBy + "\n" +  
+											"Terminated By: " + tempTerminatedBy + "\n");
+										}
+									});
 							        
 							        //Save button initialize
 							        JButton btn_save = new JButton("Save");
@@ -1412,6 +1455,9 @@ public class Employees extends JFrame{
 								        		else{
 								        			textPane_details_terminateDate.setText(staffList.get(i).getTerminationDate());
 								        		}
+								        		tempCreatedBy = staffList.get(i).getCreatedBy();
+								        		tempTerminatedBy = staffList.get(i).getTerminatedBy();
+								        		tempAlteredBy = staffList.get(i).getAlteredBy();
 								        		break;
 								        	}
 								        }
@@ -2216,7 +2262,7 @@ public class Employees extends JFrame{
 	}
 	public Employees(int id,String firstName,String lastName,String street,String city,String stateProvince,String postalCode,String homePhone,
 		String cellPhone,String email,int positionID,String jobType,String username,String password,String hireDate,
-		String terminationDate,String salt){
+		String terminationDate,String salt, String createdBy, String terminatedBy, String alteredBy){
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -2234,6 +2280,9 @@ public class Employees extends JFrame{
 		this.hireDate = hireDate;
 		this.terminationDate = terminationDate;
 		this.salt = salt;
+		this.createdBy = createdBy;
+		this.terminatedBy = terminatedBy;
+		this.alteredBy = alteredBy;
 	}
 	public Employees(String username){
 		
@@ -2266,8 +2315,11 @@ public class Employees extends JFrame{
 		    	String hireDate = rs.getString("HireDate");
 		    	String terminationDate = rs.getString("TerminationDate");
 		    	String salt = rs.getString("Salt");
+		    	String createdBy = rs.getString("CreatedBy");
+		    	String terminatedBy = rs.getString("TerminatedBy");
+		    	String alteredBy = rs.getString("AlteredBy");
 		    	
-		    	Employees e = new Employees(id,firstName,lastName,street,city,stateProvince,postalCode,homePhone,cellPhone,email,positionID,jobType,username,password,hireDate,terminationDate,salt);
+		    	Employees e = new Employees(id,firstName,lastName,street,city,stateProvince,postalCode,homePhone,cellPhone,email,positionID,jobType,username,password,hireDate,terminationDate,salt,createdBy,terminatedBy,alteredBy);
 		    	staffList.add(e);
 			}
 			//Clean-up environment
@@ -2784,7 +2836,10 @@ public class Employees extends JFrame{
 		public void setPassword(String password){ this.password = password; }
 		public void setHireDate(String hireDate){ this.hireDate = hireDate; }
 		public void setTerminationDate(String terminationDate){ this.terminationDate = terminationDate; }
-		public void setSalt(){ this.salt = salt; }
+		public void setSalt(String salt){ this.salt = salt; }
+		public void setCreatedBy(String createdBy){ this.createdBy = createdBy; }
+		public void setTerminatedBy(String terminatedBy){ this.terminatedBy = terminatedBy; }
+		public void setAlteredBy(String alteredBy){ this.alteredBy = alteredBy; }
 		
 		//Getters
 		public int getID(){ return this.id; }
@@ -2803,5 +2858,8 @@ public class Employees extends JFrame{
 		public String getPassword(){ return this.password; }
 		public String getHireDate(){ return this.hireDate; }
 		public String getTerminationDate(){ return this.terminationDate; }
-		public String salt(){ return this.salt; }
+		public String getSalt(){ return this.salt; }
+		public String getCreatedBy(){ return this.createdBy; }
+		public String getTerminatedBy(){ return this.terminatedBy; }
+		public String getAlteredBy(){ return this.alteredBy; }
 }
