@@ -3894,9 +3894,19 @@ tcm = inv_orderListTable.getColumnModel();
 			for (int i = 1; i <= columnCount; i++){
 				
 				if(i == 6){
-					int tobeDel = rs.getInt(6);
+					int tobeDel = rs.getInt(6); //to apply left alighnment
 					row.addElement(tobeDel);
-				}else {
+				}else if(i == 8){
+					double prevCost = rs.getDouble(i);
+					prevCost = (double)Math.round(prevCost * 100);
+					prevCost = prevCost/100;	
+					row.addElement(prevCost);
+				}else if(i == 10){
+					double estimate = rs.getDouble(i);
+					estimate = (double)Math.round(estimate * 100);
+					estimate = estimate/100;	
+					row.addElement(estimate);
+				}else{
 					row.addElement(rs.getObject(i));
 				}
 			}
@@ -4240,7 +4250,10 @@ tcm = inv_orderListTable.getColumnModel();
 					if(model.getValueAt(i, 10) != null ){
 						int ID = Integer.parseInt(model.getValueAt(i, 1).toString());
 						double price = Double.parseDouble(model.getValueAt(i, 10).toString());
-						String reason = model.getValueAt(i, 11).toString();
+						String reason = "---";
+						if (model.getValueAt(i, 11) != null){
+							reason = model.getValueAt(i, 11).toString();
+						}
 						pst.setInt(1, ID );
 						pst.setDouble(2, price );
 						pst.setString(3, reason);
@@ -4782,7 +4795,7 @@ tcm = inv_orderListTable.getColumnModel();
 				
 				String prodIDStr = dataProdID.getText();
 				
-				String query = "Select ProductID, NewPrice, EffectiveDate "
+				String query = "Select ProductID, NewPrice, EffectiveDate, Reason "
 						+ "From PriceHistory WHERE ProductID =" + prodIDStr + " Order by EffectiveDate Desc";
 			 PreparedStatement pst = con.prepareStatement(query);
 			 ResultSet rs = pst.executeQuery();
@@ -4793,13 +4806,19 @@ tcm = inv_orderListTable.getColumnModel();
 			    columnNames.addElement("Prodct ID");
 			    columnNames.addElement("Price");
 			    columnNames.addElement("Set Date");
+			    columnNames.addElement("Reason");
 			    
 			    while(rs.next()){
 			    	Vector<Object> row = new Vector<Object>();
-			    	for (int i = 1; i <= 3; i++){
-			    		
-			    		row.addElement(rs.getObject(i));
-			    		
+			    	for (int i = 1; i <= 4; i++){
+			    		if(i == 2){
+			    			double price = rs.getDouble(i);
+			    			price = (double)Math.round(price * 100);
+			    			price = price / 100;
+			    			row.addElement(price);
+			    		}else {
+			    			row.addElement(rs.getObject(i));
+			    		}
 			    	}
 			    	data.addElement(row);
 			    }
