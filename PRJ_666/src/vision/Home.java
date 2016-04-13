@@ -28,6 +28,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.DateFormatter;
 
 import org.omg.Messaging.SyncScopeHelper;
 
@@ -63,7 +64,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -1692,10 +1696,12 @@ public class Home extends JFrame implements KeyListener{
 									boolean check = true;
 					        		//Previous Quantity
 									int previousQuantity = 0;
-									String nID = model.getValueAt(row, id_column).toString();
-									for(int i = 0; i < productBySearch.size(); i++){
-										if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
-											previousQuantity = previousValue.get(i);
+									if(model.getRowCount() > 0){
+										String nID = model.getValueAt(row, id_column).toString();
+										for(int i = 0; i < productBySearch.size(); i++){
+											if(nID.equals(String.valueOf(productBySearch.get(i).getID()))){
+												previousQuantity = previousValue.get(i);
+											}
 										}
 									}
 					        		if(model.getValueAt(row, col).equals("") || model.getValueAt(row, col) == null){
@@ -2028,19 +2034,44 @@ public class Home extends JFrame implements KeyListener{
 											i+1,tr.get(i).getProductID(),tr.get(i).getQuantitySold(),
 											tr.get(i).getReturned(),tr.get(i).getDateReturned()});
 											
-											//Removed tr.getEmployeeID() (reminder)
 											Cashier refundCashier = new Cashier();
 											productByRefund.add(refundCashier.findProductID(tr.get(i).getProductID()));
 											previousRefundValue.add(tr.get(i).getReturned());
 										}
+										DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+										Date date = null;
+										Date date2 = null;
+										try {
+											date = dateFormat.parse(t.getCreateDate());
+											Calendar cal = Calendar.getInstance();
+											cal.setTime(date);
+											cal.add(Calendar.DATE, 30); // add 10 days
+											date2 = cal.getTime();
+											//System.out.println("Date: " + date);
+											//System.out.println("Date2: " + date2);
+										} catch (ParseException e1) {
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
+										
+										Date dateNow = new Date();
+										if(dateNow.after(date) && dateNow.before(date2)){
+											//System.out.println("Valid");
+										}
+										else if(dateNow.after(date) && dateNow.after(date2)){
+											//System.out.println("Invalid");
+											JOptionPane.showMessageDialog(null,"This transaction is older than 30 days.","Warning!",JOptionPane.ERROR_MESSAGE);
+										}
 									}
 									else{
 										JOptionPane.showMessageDialog(null,"Transaction Record for Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+										btnClearAll.doClick();
 										textField_transaction_input.requestFocus();
 									}
 								}
 								else{
 									JOptionPane.showMessageDialog(null,"Transaction " + '"'+ tempTransactionID + '"' + ", could not be found.");
+									btnClearAll.doClick();
 									textField_transaction_input.requestFocus();
 								}
 							}
@@ -2383,8 +2414,8 @@ public class Home extends JFrame implements KeyListener{
             setJMenuBar(mb);
 			
 			//Get Help
-			JPanel panel_getHelp = new JPanel();
-			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+			//JPanel panel_getHelp = new JPanel();
+			//tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
 		else if(position.getId() == 4){
 			//Loads Cashier panel
@@ -2464,8 +2495,8 @@ public class Home extends JFrame implements KeyListener{
             setJMenuBar(mb);
 			
 			//Get Help
-			JPanel panel_getHelp = new JPanel();
-			tabbedPane.addTab("Get Help", null, panel_getHelp, null);
+			//JPanel panel_getHelp = new JPanel();
+			//tabbedPane.addTab("Get Help", null, panel_getHelp, null);
 		}
 		else if(position.getId() == 5){
 			//Report
@@ -3576,13 +3607,7 @@ public class Home extends JFrame implements KeyListener{
 							Runnable run2 = new Runnable() {
 								@Override
 								public void run() {
-									String tempQuantity = model_refund.getValueAt(row2, refund_returned).toString();
-									char c = 0;
-									char c2 = 0;
-									if(!tempQuantity.isEmpty()){
-										c = tempQuantity.charAt(0);
-										c2 = tempQuantity.charAt(tempQuantity.length()-1);
-									}	
+									boolean ok = true;
 									//Previous Quantity
 									int previousQuantity2 = 0;
 									if(model_refund.getRowCount() > 0){
@@ -3593,159 +3618,191 @@ public class Home extends JFrame implements KeyListener{
 											}
 										}
 									}
-									if(validateEmpty(tempQuantity) == false){
+									if(model_refund.getValueAt(row2, col2).equals("") || model_refund.getValueAt(row2, col2) == null){
 										JOptionPane.showMessageDialog(null,"Remaining field cannot be left empty. "
 												+ "Please enter a remaining quantity above 0 for row #" + (row2+1) + ".");
 										model_refund.setValueAt(previousQuantity2, row2, col2);
 										table_refund.setRowSelectionInterval(row2, row2);
 										table_refund.setColumnSelectionInterval(0, 0);
-									}
-									else if(checkForNumbers(tempQuantity) == false){
-										JOptionPane.showMessageDialog(null,"Remaining quantity entered for row #" + (row2+1) + 
-												" must contain numbers only.","Error",JOptionPane.ERROR_MESSAGE);
-										model_refund.setValueAt(previousQuantity2, row2, col2);
-										table_refund.setRowSelectionInterval(row2, row2);
-										table_refund.setColumnSelectionInterval(0, 0);
-									}
-									else if(tempQuantity.length() > inputLength){
-										JOptionPane.showMessageDialog(null,"The input '" + tempQuantity + "' for row #" + (row2+1) + " is too long. Please enter a valid quantity.");
-										model_refund.setValueAt(previousQuantity2, row2, col2);
-										table_refund.setRowSelectionInterval(row2, row2);
-										table_refund.setColumnSelectionInterval(0, 0);
-									}
-									else if(tempQuantity.charAt(0) == '0' && tempQuantity.charAt(tempQuantity.length()-1) >= '0'){
-										JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
-										model_refund.setValueAt(previousQuantity2, row2, col2);
-										table_refund.setRowSelectionInterval(row2, row2);
-										table_refund.setColumnSelectionInterval(0, 0);
+										ok = false;
 									}
 									else{
-										int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
-							
-										int sold = Integer.parseInt(model_refund.getValueAt(row2, refund_QuantitySold).toString().trim());
-										if(newReturn > sold){
-											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be above the number of quantity bought.");
+										String tempQuantity = model_refund.getValueAt(row2, refund_returned).toString();
+										if(tempQuantity.length() > inputLength){
+											JOptionPane.showMessageDialog(null,"The input '" + tempQuantity + "' for row #" + (row2+1) + " is too long. Please enter a valid quantity.");
 											model_refund.setValueAt(previousQuantity2, row2, col2);
 											table_refund.setRowSelectionInterval(row2, row2);
 											table_refund.setColumnSelectionInterval(0, 0);
-										}
-										else if(underReturn(newReturn, tr.get(row2)) == true){
-											JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be below the previous returned quantity.");
-											model_refund.setValueAt(previousQuantity2, row2, col2);
-											table_refund.setRowSelectionInterval(row2, row2);
-											table_refund.setColumnSelectionInterval(0, 0);
+											ok = false;
 										}
 										else{
-											//Sets previous value for the selected row
-											if(model_refund.getRowCount() > 0){
-												if(productByRefund.size() > 0){
-													for(int i = 0; i < productByRefund.size(); i++){
-														String tableValue = model_refund.getValueAt(row2, refund_productID).toString();
-														String vectorValue = String.valueOf(productByRefund.get(i).getID());
-														if(tableValue.equals(vectorValue)){
-															String value = model_refund.getValueAt(row2, col2).toString();
-															int convertedValue = Integer.valueOf(value);
-															previousRefundValue.remove(i);
-															previousRefundValue.insertElementAt(convertedValue, i);
-															break;
-														}
-													}
-												}
-											}	
-											
-											if(tr.size() > 0){
-												String table_productID = model_refund.getValueAt(row2, refund_productID).toString().trim();
-												for(int i = 0; i < tr.size(); i++){
-													if(table_productID.equals(String.valueOf(tr.get(i).getProductID()))){
-														if(newReturn == tr.get(i).getReturned()){
-															if(returning.size() > 0){
-																for(int j = 0; j < returning.size(); j++){
-																	if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
-																		//System.out.println("Before:" + returning.size());
-																		returning.remove(j);
-																		//System.out.println("After:" + returning.size());
-																	}
-																	else{
-																		//System.out.println("else");
-																	}
-																}
-															}
-															else{
-																returning.clear();
-															}
-															
-														}
-														else{
-															if(returning.size() > 0){
-																boolean check = true;
-																for(int j = 0; j < returning.size(); j++){
-																	if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
-																		TransactionRecord r = new TransactionRecord();
-																		r.setTransactionID(tr.get(i).getTransactionID());
-																		r.setProductID(tr.get(i).getProductID());
-																		r.setQuantitySold(tr.get(i).getQuantitySold());
-																		r.setUnitPrice(tr.get(i).getUnitPrice());
-																		r.setReturned(newReturn);
-																		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-																		Date date = new Date();
-																		String dateString = dateFormat.format(date);
-																		r.setDateReturned(dateString);
-																		//Change to current user later
-																		r.setEmployeeID(1);
-																		r.setUnitCost(tr.get(i).getUnitCost());
-																		returning.remove(j);
-																		returning.insertElementAt(r, j);	
-																		check = true;
-																		break;
-																	}
-																	else{
-																		check = false;
-																	}
-																}
-																if(check == false){
-																	TransactionRecord r = new TransactionRecord();
-																	r.setTransactionID(tr.get(i).getTransactionID());
-																	r.setProductID(tr.get(i).getProductID());
-																	r.setQuantitySold(tr.get(i).getQuantitySold());
-																	r.setUnitPrice(tr.get(i).getUnitPrice());
-																	r.setReturned(newReturn);
-																	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-																	Date date = new Date();
-																	String dateString = dateFormat.format(date);
-																	r.setDateReturned(dateString);
-																	//Change to current user later
-																	r.setEmployeeID(1);
-																	r.setUnitCost(tr.get(i).getUnitCost());
-																	returning.add(r);	
-																}
-															}
-															else{
-																TransactionRecord r = new TransactionRecord();
-																r.setTransactionID(tr.get(i).getTransactionID());
-																r.setProductID(tr.get(i).getProductID());
-																r.setQuantitySold(tr.get(i).getQuantitySold());
-																r.setUnitPrice(tr.get(i).getUnitPrice());
-																r.setReturned(newReturn);
-																DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-																Date date = new Date();
-																String dateString = dateFormat.format(date);
-																r.setDateReturned(dateString);
-																//Change to current user later
-																r.setEmployeeID(1);
-																r.setUnitCost(tr.get(i).getUnitCost());
-																returning.add(r);
-															}
-														}
-													}
+											for(int i = 0; i < tempQuantity.length(); i++){
+												char c = tempQuantity.charAt(i);
+												if(c == ' '){
+													JOptionPane.showMessageDialog(null,"Remaining quantity entered for row #" + (row2+1) + 
+															" contains space. Please enter a valid quantity.","Error",JOptionPane.ERROR_MESSAGE);
+													model_refund.setValueAt(previousQuantity2, row2, col2);
+													table_refund.setRowSelectionInterval(row2, row2);
+													table_refund.setColumnSelectionInterval(0, 0);
+													ok = false;
+													break;
 												}
 											}
+											if(ok){
+												tempQuantity = tempQuantity.trim();
+												//Check if numbers only
+						        				String regexStr = "^[0-9]+$";
+						        				if(!tempQuantity.trim().matches(regexStr)){
+						        					JOptionPane.showMessageDialog(null,"Remaining quantity entered for row #" + (row2+1) + 
+															" must contain numbers only. Please enter a valid quantity.","Error",JOptionPane.ERROR_MESSAGE);
+													model_refund.setValueAt(previousQuantity2, row2, col2);
+													table_refund.setRowSelectionInterval(row2, row2);
+													table_refund.setColumnSelectionInterval(0, 0);
+													ok = false;
+						        				}
+						        				else{
+						        					//Checking for first digit as 0
+						        					char c = tempQuantity.charAt(0);
+						        					char c2 = tempQuantity.charAt(tempQuantity.length()-1);
+						        					if(c == '0' && c2 >= '0'){
+						        						//JOptionPane.showMessageDialog(null,"Please enter a quantity that does not begin with 0 for row #" + (row2+1) + ".");
+														model_refund.setValueAt(previousQuantity2, row2, col2);
+														table_refund.setRowSelectionInterval(row2, row2);
+														table_refund.setColumnSelectionInterval(0, 0);
+														ok = false;
+						        					}
+						        					else{
+						        						int newReturn = Integer.parseInt(model_refund.getValueAt(row2, refund_returned).toString().trim());
+						    							
+														int sold = Integer.parseInt(model_refund.getValueAt(row2, refund_QuantitySold).toString().trim());
+														if(newReturn > sold){
+															JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be above the number of quantity bought.");
+															model_refund.setValueAt(previousQuantity2, row2, col2);
+															table_refund.setRowSelectionInterval(row2, row2);
+															table_refund.setColumnSelectionInterval(0, 0);
+														}
+														else if(underReturn(newReturn, tr.get(row2)) == true){
+															JOptionPane.showMessageDialog(null,"Remaining quantity entered cannot be below the previous returned quantity.");
+															model_refund.setValueAt(previousQuantity2, row2, col2);
+															table_refund.setRowSelectionInterval(row2, row2);
+															table_refund.setColumnSelectionInterval(0, 0);
+														}
+														else{
+															//Sets previous value for the selected row
+															if(model_refund.getRowCount() > 0){
+																if(productByRefund.size() > 0){
+																	for(int i = 0; i < productByRefund.size(); i++){
+																		String tableValue = model_refund.getValueAt(row2, refund_productID).toString();
+																		String vectorValue = String.valueOf(productByRefund.get(i).getID());
+																		if(tableValue.equals(vectorValue)){
+																			String value = model_refund.getValueAt(row2, col2).toString();
+																			int convertedValue = Integer.valueOf(value);
+																			previousRefundValue.remove(i);
+																			previousRefundValue.insertElementAt(convertedValue, i);
+																			break;
+																		}
+																	}
+																}
+															}	
+															
+															if(tr.size() > 0){
+																String table_productID = model_refund.getValueAt(row2, refund_productID).toString().trim();
+																for(int i = 0; i < tr.size(); i++){
+																	if(table_productID.equals(String.valueOf(tr.get(i).getProductID()))){
+																		if(newReturn == tr.get(i).getReturned()){
+																			if(returning.size() > 0){
+																				for(int j = 0; j < returning.size(); j++){
+																					if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
+																						//System.out.println("Before:" + returning.size());
+																						returning.remove(j);
+																						//System.out.println("After:" + returning.size());
+																					}
+																					else{
+																						//System.out.println("else");
+																					}
+																				}
+																			}
+																			else{
+																				returning.clear();
+																			}
+																			
+																		}
+																		else{
+																			if(returning.size() > 0){
+																				boolean check = true;
+																				for(int j = 0; j < returning.size(); j++){
+																					if(table_productID.equals(String.valueOf(returning.get(j).getProductID()))){
+																						TransactionRecord r = new TransactionRecord();
+																						r.setTransactionID(tr.get(i).getTransactionID());
+																						r.setProductID(tr.get(i).getProductID());
+																						r.setQuantitySold(tr.get(i).getQuantitySold());
+																						r.setUnitPrice(tr.get(i).getUnitPrice());
+																						r.setReturned(newReturn);
+																						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																						Date date = new Date();
+																						String dateString = dateFormat.format(date);
+																						r.setDateReturned(dateString);
+																						//Change to current user later
+																						r.setEmployeeID(1);
+																						r.setUnitCost(tr.get(i).getUnitCost());
+																						returning.remove(j);
+																						returning.insertElementAt(r, j);	
+																						check = true;
+																						break;
+																					}
+																					else{
+																						check = false;
+																					}
+																				}
+																				if(check == false){
+																					TransactionRecord r = new TransactionRecord();
+																					r.setTransactionID(tr.get(i).getTransactionID());
+																					r.setProductID(tr.get(i).getProductID());
+																					r.setQuantitySold(tr.get(i).getQuantitySold());
+																					r.setUnitPrice(tr.get(i).getUnitPrice());
+																					r.setReturned(newReturn);
+																					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																					Date date = new Date();
+																					String dateString = dateFormat.format(date);
+																					r.setDateReturned(dateString);
+																					//Change to current user later
+																					r.setEmployeeID(1);
+																					r.setUnitCost(tr.get(i).getUnitCost());
+																					returning.add(r);	
+																				}
+																			}
+																			else{
+																				TransactionRecord r = new TransactionRecord();
+																				r.setTransactionID(tr.get(i).getTransactionID());
+																				r.setProductID(tr.get(i).getProductID());
+																				r.setQuantitySold(tr.get(i).getQuantitySold());
+																				r.setUnitPrice(tr.get(i).getUnitPrice());
+																				r.setReturned(newReturn);
+																				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+																				Date date = new Date();
+																				String dateString = dateFormat.format(date);
+																				r.setDateReturned(dateString);
+																				//Change to current user later
+																				r.setEmployeeID(1);
+																				r.setUnitCost(tr.get(i).getUnitCost());
+																				returning.add(r);
+																			}
+																		}
+																	}
+																}
+															}
+														}
+														//After entering value, movies selection to next column (does not leave user in same colum)
+														table_refund.setRowSelectionInterval(row2, row2);
+														table_refund.setColumnSelectionInterval(0, 0);
+														textField_transaction_input.requestFocusInWindow();
+						        					}
+						        				}
+											}
 										}
-										//After entering value, movies selection to next column (does not leave user in same colum)
-										table_refund.setRowSelectionInterval(row2, row2);
-										table_refund.setColumnSelectionInterval(0, 0);
-										textField_transaction_input.requestFocusInWindow();
-										}
+
 									}
+								}
 							};
 							SwingUtilities.invokeLater(run2);
 			        	}
@@ -4136,25 +4193,54 @@ public class Home extends JFrame implements KeyListener{
 										br.setBackupRestorePath();
 										br.initialize();
 										br.backupDB();*/
-										
+										System.out.println("TransactionID: " + tr.get(0).getTransactionID());
 										Object[] options = {"Yes","No"};
 										int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
 										    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 										
 										if(cashCredit == JOptionPane.YES_OPTION){
 											//System.out.println("yes");
-											Thread t2 = new Thread(new Runnable() {
+											Thread t4 = new Thread(new Runnable() {
 												public void run() {
-													//Enter printing recept code here
+													try {
+														//Once printing is complete, reset the cashier screen, close window and put focus on product id input field
+														Connect connect = new Connect();
+														Connection c = DriverManager.getConnection(connect.getURL(),connect.getUsername(),connect.getPassword());
+														
+														JasperDesign jd = JRXmlLoader.load("returnRecipt.jrxml");
+														String sql = "SELECT t.ID, t.CreateDate, t.SubTotal, t.Tax, t.Total, t.EmployeeID, "
+																+ "tr.ProductID, p.Name, tr. QuantitySold, tr.UnitPrice, "
+																+ "(tr.QuantitySold * tr.UnitPrice) as PTotal, CASE WHEN r.ProductID = tr.ProductID "
+																+ "THEN r.ReturnedQTY ELSE 0 END AS QuantityReturned FROM StoreDB.Transaction t, "
+																+ "StoreDB.TransactionRecord tr, StoreDB.Product p, StoreDB.ProductReturned r  "
+																+ "WHERE t.ID = tr.TransactionID AND t.ID = r.TransactionID AND tr.ProductID = p.ID "
+																+ "AND t.ID = " + tr.get(0).getTransactionID();
+														JRDesignQuery jdq = new JRDesignQuery();
+														jdq.setText(sql);
+														jd.setQuery(jdq);
+														
+														JasperReport jr = JasperCompileManager.compileReport(jd);
+														JasperPrint jp = JasperFillManager.fillReport(jr, null, c);
+														
+														JasperPrintManager.printReport(jp, true);
+														
+														btnClearAll.doClick();
+														refund_confirm.dispose();
+														textField_transaction_input.requestFocusInWindow();
+													
+													} catch (Exception e) {
+														JOptionPane.showMessageDialog(null,"There is an error with printing recipt. " + e.getMessage(), 
+																"Error with printing", JOptionPane.ERROR_MESSAGE);
+													}
 												}
 											});
-											t2.start();
+											t4.start();
 										}
 										else if(cashCredit == JOptionPane.NO_OPTION){
 											//System.out.println("no");
 											btnClearAll.doClick();
 											refund_confirm.dispose();
-											textField_productID_input.requestFocusInWindow();
+											textField_transaction_input.requestFocusInWindow();
 										}
 									}
 								});

@@ -1099,7 +1099,6 @@ update `Order` SET InvoiceID = 15 where ID = 43;
 update `Order` SET InvoiceID = 30 where ID = 44;
 update `Order` SET InvoiceID = 23 where ID = 45;
 
-
 /*Altering employee (had problems doing so above)*/
 /*jross0:Jr@2*/
 ALTER Table Employee Add Salt VARCHAR(50);
@@ -1128,7 +1127,6 @@ update Employee Set Salt = '[B@13c52566' Where ID = 5;
 update Employee Set PositionID = 3 Where ID = 5;
 UPDATE Employee Set Password='09adc62de2603b230f99a22afc73485ce9b292ec2388e9588419e11f7c7e92dcf7f78f5347f49b1941c3b14b11ce63a5c50f2256b3f1a024e12e5d28366381c9' WHERE ID = 5;
 
-
 /* Adding a UnitCost column in product table that will be average cost from product from multiple supplier. */
 alter table Product
 add column UnitCost double default 0;
@@ -1149,6 +1147,7 @@ create table ProductReturned (
     FOREIGN KEY (ProductID) References Product(ID),
     CONSTRAINT ProductsReturn_returned_qty CHECK (ReturnedQTY > 0)
 );
+
 
 /*Adding column’s in Employee, keeping track of who created the account, terminated or altered the employee record.*/
 ALTER TABLE Employee ADD CreatedBy VARCHAR(30);
