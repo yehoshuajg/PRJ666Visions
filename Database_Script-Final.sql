@@ -599,24 +599,24 @@ insert into Employee (FirstName, LastName, Street, City, State_Province, PostalC
 
 
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Adam', 'Bowman', '140 Meadow Ridge Place', 'Hamilton', 'Ontario', 's4U 7u2', null, '123-162-8681', null, '3', 'Casual ', 'abowman5', 'Z', '2015-12-14', '2015-11-04');
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Eugene', 'Ruiz', '7 Superior Way', 'Hamilton', 'Ontario', 'U8B 2s5', '947-463-1407', '914-743-6033', null, '5', 'Part Time ', 'eruiz6', 't', '2014-11-21', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Eugene', 'Ruiz', '7 Superior Way', 'Hamilton', 'Ontario', 'U8B 2s5', '947-463-1407', '914-743-6033', null, '5', 'Part Time ', 'eruiz6', 't', '2014-11-21', '2015-11-04');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Linda', 'Ray', '9 Schiller Way', 'Ajax', 'Ontario', 'b7m 4X8', '321-376-0530', '564-943-7241', 'lray7@github.io', '4', 'Casual ', 'lray7', 'e', '2014-12-18', '2016-01-13');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Phyllis', 'Gonzalez', '4037 Crest Line Circle', 'Orangeville', 'Ontario', 'h1C 5z4', '776-145-9449', null, 'pgonzalez8@huffingtonpost.com', '5', 'Part Time ', 'pgonzalez8', 'B', '2015-02-19', '2015-11-27');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Peter', 'Hicks', '6976 Schiller Crossing', 'Orangeville', 'Ontario', 'v8F 5N0', '430-051-8662', null, 'phicks9@ftc.gov', '5', 'Part Time ', 'phicks9', 'j', '2014-11-28', '2015-11-14');
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Denise', 'Cooper', '5734 Arkansas Street', 'Ajax', 'Ontario', 'v0L 4e3', '828-593-0125', '756-438-1539', null, '4', 'Full Time ', 'dcoopera', 'r', '2015-05-03', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('John', 'Henderson', '18 Bobwhite Junction', 'Hamilton', 'Ontario', 'N8Z 4P8', '113-122-2004', null, 'jhendersonb@wikia.com', '5', 'Casual ', 'jhendersonb', 'z', '2015-07-15', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Lisa', 'Shaw', '9790 Rockefeller Junction', 'Hamilton', 'Ontario', 'j5w 4R0', '343-295-0118', '603-641-8736', null, '5', 'Casual ', 'lshawc', 'm', '2015-10-26', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Denise', 'Cooper', '5734 Arkansas Street', 'Ajax', 'Ontario', 'v0L 4e3', '828-593-0125', '756-438-1539', null, '4', 'Full Time ', 'dcoopera', 'r', '2015-05-03', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('John', 'Henderson', '18 Bobwhite Junction', 'Hamilton', 'Ontario', 'N8Z 4P8', '113-122-2004', null, 'jhendersonb@wikia.com', '5', 'Casual ', 'jhendersonb', 'z', '2015-07-15', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Lisa', 'Shaw', '9790 Rockefeller Junction', 'Hamilton', 'Ontario', 'j5w 4R0', '343-295-0118', '603-641-8736', null, '5', 'Casual ', 'lshawc', 'm', '2015-10-26', '2015-11-04');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Mark', 'Gordon', '1516 Prentice Hill', 'Hamilton', 'Ontario', 'E2N 0y1', '956-941-4460', '210-556-3446', null, '5', 'Casual ', 'mgordond', 'J', '2014-12-11', '2015-12-17');
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Roger', 'Bennett', '1 Carberry Plaza', 'Ajax', 'Ontario', 'c4V 4m0', '641-342-7364', null, null, '5', 'Casual ', 'rbennette', 'R', '2015-02-04', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Martha', 'Alvarez', '6092 Miller Lane', 'Hamilton', 'Ontario', 'i6w 3y5', '137-811-2645', '309-999-6010', 'malvarezf@engadget.com', '4', 'Casual ', 'malvarezf', 'H', '2015-07-13', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Fred', 'Perry', '118 Lindbergh Way', 'Orangeville', 'Ontario', 'b9X 9X1', '918-085-0680', null, 'fperryg@state.tx.us', '5', 'Part Time ', 'fperryg', 'r', '2014-11-05', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Carolyn', 'Hicks', '316 Crowley Court', 'Orangeville', 'Ontario', 'g3j 3Y8', '515-570-4504', '531-547-6964', null, '4', 'Casual ', 'chicksi', 'b', '2014-11-13', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jason', 'Pierce', '33 Memorial Lane', 'Hamilton', 'Ontario', 'f6i 3q3', '795-342-5865', '164-434-1476', null, '4', 'Casual ', 'jpiercej', 'i', '2015-12-28', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Kathryn', 'Powell', '447 Morning Circle', 'Orangeville', 'Ontario', 'M1K 4t9', '624-281-0680', '313-127-1944', null, '3', 'Casual ', 'kpowellk', 'o', '2015-08-07', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Roger', 'Bennett', '1 Carberry Plaza', 'Ajax', 'Ontario', 'c4V 4m0', '641-342-7364', null, null, '5', 'Casual ', 'rbennette', 'R', '2015-02-04', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Martha', 'Alvarez', '6092 Miller Lane', 'Hamilton', 'Ontario', 'i6w 3y5', '137-811-2645', '309-999-6010', 'malvarezf@engadget.com', '4', 'Casual ', 'malvarezf', 'H', '2015-07-13', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Fred', 'Perry', '118 Lindbergh Way', 'Orangeville', 'Ontario', 'b9X 9X1', '918-085-0680', null, 'fperryg@state.tx.us', '5', 'Part Time ', 'fperryg', 'r', '2014-11-05', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Carolyn', 'Hicks', '316 Crowley Court', 'Orangeville', 'Ontario', 'g3j 3Y8', '515-570-4504', '531-547-6964', null, '4', 'Casual ', 'chicksi', 'b', '2014-11-13', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jason', 'Pierce', '33 Memorial Lane', 'Hamilton', 'Ontario', 'f6i 3q3', '795-342-5865', '164-434-1476', null, '4', 'Casual ', 'jpiercej', 'i', '2015-12-28', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Kathryn', 'Powell', '447 Morning Circle', 'Orangeville', 'Ontario', 'M1K 4t9', '624-281-0680', '313-127-1944', null, '3', 'Casual ', 'kpowellk', 'o', '2015-08-07', '2015-11-04');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Brenda', 'Baker', '301 Talisman Road', 'Ajax', 'Ontario', 'e1V 9C3', '442-012-3228', '017-135-8359', null, '3', 'Full Time ', 'bbakerl', 'w', '2015-02-12', '2015-12-14');
 insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Rose', 'Little', '0 Transport Point', 'Hamilton', 'Ontario', 'K3z 9b6', '866-047-3057', null, null, '5', 'Full Time ', 'rlittlem', 'A', '2015-01-09', '2015-12-07');
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('George', 'Cruz', '0 Gina Center', 'Hamilton', 'Ontario', 'j9f 0h7', '685-131-0180', null, null, '3', 'Full Time ', 'gcruzn', 'C', '2014-12-16', null);
-insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jeremy', 'Mason', '8 Sycamore Center', 'Orangeville', 'Ontario', 'X9X 8H2', '213-244-1460', '217-912-9031', null, '5', 'Full Time ', 'jmasono', 'P', '2015-08-12', null);
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('George', 'Cruz', '0 Gina Center', 'Hamilton', 'Ontario', 'j9f 0h7', '685-131-0180', null, null, '3', 'Full Time ', 'gcruzn', 'C', '2014-12-16', '2015-11-04');
+insert into Employee (FirstName, LastName, Street, City, State_Province, PostalCode, HomePhone, CellPhone, Email, PositionID, JobType, UserName, Password, HireDate, TerminationDate) values ('Jeremy', 'Mason', '8 Sycamore Center', 'Orangeville', 'Ontario', 'X9X 8H2', '213-244-1460', '217-912-9031', null, '5', 'Full Time ', 'jmasono', 'P', '2015-08-12', '2015-11-04');
 
 
 /*-------------------------- TRANSACTION -----------------------------*/
@@ -1100,17 +1100,24 @@ update `Order` SET InvoiceID = 30 where ID = 44;
 update `Order` SET InvoiceID = 23 where ID = 45;
 
 
+/*Adding column’s in Employee, keeping track of who created the account, terminated or altered the employee record.*/
+ALTER TABLE Employee ADD CreatedBy VARCHAR(30);
+ALTER TABLE Employee ADD TerminatedBy VARCHAR(30);
+ALTER TABLE Employee ADD AlteredBy VARCHAR(30);
+
 /*Altering employee (had problems doing so above)*/
 /*jross0:Jr@2*/
 ALTER Table Employee Add Salt VARCHAR(50);
 update Employee Set Salt = '[B@168eb7b3' Where ID = 1;
 update Employee Set PositionID = 5 Where ID = 1;
 UPDATE Employee Set Password='61d9dcd7aace91c408b7665a9c82b601c74e06087c630eca15955549a02b35af87b12b82280da3d5934fccdc1636c2255513052333a39e2984a0896c0ff2a75c' WHERE ID = 1;
+/*update Employee set Email = "jross0@myseneca.ca" where ID = 1;*/
 
 /*wchavez1:Wc@2*/
 update Employee Set Salt = '[B@6247126a' Where ID = 2;
 update Employee Set PositionID = 4 Where ID = 2;
 UPDATE Employee Set Password='616e0f0f7055d88709c63f4a94d294dc9e1fa5304aeec308224b7b9dfeaaa6ab974e9debd806f23c158b9eacfa146256a2d1f2846f034412a9fa27a50b15de34' WHERE ID = 2;
+/*update Employee set Email = "wchavez1@myseneca.ca" where ID = 2;*/
 
 /*dward2:Dw@2*/
 update Employee Set Salt = '[B@4567545' Where ID = 3;
@@ -1127,6 +1134,9 @@ update Employee set TerminationDate = NULL where ID = 4;
 update Employee Set Salt = '[B@13c52566' Where ID = 5;
 update Employee Set PositionID = 3 Where ID = 5;
 UPDATE Employee Set Password='09adc62de2603b230f99a22afc73485ce9b292ec2388e9588419e11f7c7e92dcf7f78f5347f49b1941c3b14b11ce63a5c50f2256b3f1a024e12e5d28366381c9' WHERE ID = 5;
+
+/*All employees that are not needed, terminated by:*/
+update Employee set CreatedBy = "Wayne Chavez" where ID > 0;
 
 
 /* Adding a UnitCost column in product table that will be average cost from product from multiple supplier. */
@@ -1150,7 +1160,3 @@ create table ProductReturned (
     CONSTRAINT ProductsReturn_returned_qty CHECK (ReturnedQTY > 0)
 );
 
-/*Adding column’s in Employee, keeping track of who created the account, terminated or altered the employee record.*/
-ALTER TABLE Employee ADD CreatedBy VARCHAR(30);
-ALTER TABLE Employee ADD TerminatedBy VARCHAR(30);
-ALTER TABLE Employee ADD AlteredBy VARCHAR(30);

@@ -1063,7 +1063,7 @@ public class Employees extends JFrame{
 																		ps.setString(9, textPane_details_email.getText().trim());
 																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
 																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
-																		ps.setString(12, currentEmployee.getUsername().trim());
+																		ps.setString(12, currentEmployee.getFirstName().trim() + " " + currentEmployee.getLastName().trim());
 																		ps.setString(13, textPane_details_id.getText().trim());
 																		ps.executeUpdate();
 																	}
@@ -1083,8 +1083,8 @@ public class Employees extends JFrame{
 																		ps.setInt(10, (comboBox_detail_positions.getSelectedIndex()+1));
 																		ps.setString(11, jobtypes[comboBox_detail_jobtypes.getSelectedIndex()]);
 																		ps.setString(12, tDate); // Termination date
-																		ps.setString(13, currentEmployee.getUsername().trim());
-																		ps.setString(14, currentEmployee.getUsername().trim());
+																		ps.setString(13, currentEmployee.getFirstName().trim() + " " + currentEmployee.getLastName().trim());
+																		ps.setString(14, currentEmployee.getFirstName().trim() + " " + currentEmployee.getLastName().trim());
 																		ps.setString(15, textPane_details_id.getText().trim());
 																	    ps.executeUpdate();
 																	    terminateCheckbox.setEnabled(false);
@@ -1143,22 +1143,6 @@ public class Employees extends JFrame{
 										}
 									});
 							        
-									//Print button
-							        /*JButton btn_print = new JButton("Print");
-							        btn_print.setBounds(485, 570, 150, 40);
-							        btn_print.setFont(new Font("Tahoma", Font.PLAIN, 20));
-							        btn_print.setFocusable(false);
-									staffDetails.add(btn_print);
-									btn_print.addActionListener(new ActionListener() {
-										@Override
-										public void actionPerformed(ActionEvent e) {
-											if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
-												JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
-											}
-										}
-									});
-							        */
-									
 									//Cancel button
 							        JButton btn_cancel = new JButton("Cancel");
 							        btn_cancel.setBounds(670, 570, 150, 40);
@@ -1296,112 +1280,6 @@ public class Employees extends JFrame{
 																}
 															});
 														}
-														/*
-														JButton btn_forgot = new JButton("Forgot password?");
-														//For manager
-														if(currentEmployee.getPositionID() == 5){
-															btn_edit.setVisible(false);
-															//JOptionPane.showMessageDialog(null,"You are not authorized to alter employee information.","Error",JOptionPane.ERROR_MESSAGE);
-														}
-														else if(currentEmployee.getPositionID() == 3 &&  staffList.get(i).getPositionID() == 4){
-															btn_edit.setVisible(false);
-															btn_forgot.setVisible(false);
-														}
-														else{
-															//Forgot Password for managers
-															btn_forgot.setBounds(90, 570, 200, 40);
-															btn_forgot.setFont(new Font("Tahoma", Font.PLAIN, 20));
-															btn_forgot.setFocusable(false);
-															staffDetails.add(btn_forgot);
-															tempResetUserEmail = staffList.get(i).getEmail();
-															btn_forgot.addActionListener(new ActionListener() {
-																@Override
-																public void actionPerformed(ActionEvent e) {
-																	if(btn_edit.isVisible() == false && btn_save.isVisible() == true){
-																		JOptionPane.showMessageDialog(null,"Please make sure the fields are not in edit mode.");
-																	}
-																	else{
-																		if(tempResetUserEmail != null && !tempResetUserEmail.isEmpty() && tempResetUserEmail.length() > 0){
-																			Object[] options = {"Cancel","Enter Code","Send Email"};
-																			int selection = JOptionPane.showOptionDialog(null,"Reset password using: ","Forgot Password?",
-																				JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-																				
-																			//Cancel
-																			if(selection == JOptionPane.YES_OPTION){
-																				
-																			}
-																			//Enter Code
-																			else if(selection == JOptionPane.NO_OPTION){
-																				
-																			}
-																			//Send Email
-																			else if(selection == JOptionPane.CANCEL_OPTION){
-																				//
-																				Random random = new Random();
-																				//random.nextInt(max - min + 1) + min
-																				int value = random.nextInt(9999 - 1000 + 1) + 1000;
-																				String sValue = String.valueOf(value);
-																				if(!sValue.isEmpty() && sValue.length() == 4){
-																					//Send Generated code to Email
-																					resetUserEmail.put(tempResetUserEmail, sValue);
-																					//System.out.println("Size: " + resetUserEmail.size());
-																					// Recipient's email ID needs to be mentioned.
-																				    //String to = tempResetUserEmail;
-																					String to = "nitish111@hotmail.com";
-																					
-																				    // Sender's email ID needs to be mentioned
-																				    //Change to senders email (current signed in employee), or zenit
-																				    String from = "nsbajaj@myseneca.com";
-																				    
-																				    // Assuming you are sending email from localhost
-																				    //Change localhost to host
-																				    String host = "localhost";
-																				    
-																				    // Get system properties
-																				    Properties properties = System.getProperties();
-																				    
-																				    // Setup mail server
-																				    properties.setProperty("mail.smtp.host", host);
-			
-																				    // Get the default Session object.
-																				    Session session = Session.getDefaultInstance(properties);
-																					
-																				    try{
-																				         // Create a default MimeMessage object.
-																				         MimeMessage message = new MimeMessage(session);
-			
-																				         // Set From: header field of the header.
-																				         message.setFrom(new InternetAddress(from));
-			
-																				         // Set To: header field of the header.
-																				         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-			
-																				         // Set Subject: header field
-																				         message.setSubject("This is the Subject Line!");
-			
-																				         // Now set the actual message
-																				         message.setText("This is actual message");
-			
-																				         // Send message
-																				         Transport.send(message);
-																				         System.out.println("Sent message successfully....");
-																				      }catch (MessagingException mex) {
-																				         mex.printStackTrace();
-																				      }
-																					
-																					//Reset to null, just to be safe
-																					tempResetUserEmail = null;
-																				}
-																			//}
-																		}
-																		else{
-																			JOptionPane.showMessageDialog(null,"This account does not have an email associated with it.");
-																		}
-																	}
-																}
-															});
-														}
-													*/
 													}
 												}
 												break;
@@ -2365,7 +2243,7 @@ public class Employees extends JFrame{
 			ps.setString(13, hashedPassword);
 			ps.setString(14, getDate());
 			ps.setString(15, salt);
-			ps.setString(16, currentEmployee.getUsername());
+			ps.setString(16, currentEmployee.getFirstName().trim() + " " + currentEmployee.getLastName().trim());
 			ps.execute();
 		
 			//Clean-up environment
