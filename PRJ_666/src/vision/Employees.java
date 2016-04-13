@@ -281,7 +281,7 @@ public class Employees extends JFrame{
 	  	centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 	  	
 		JScrollPane jsp = new JScrollPane(employeeTable);
-		jsp.setBounds(0, 0, 1196, 560);
+		jsp.setBounds(0, 0, 1196, 534);
 		jsp.setVisible(true);
 		panel_listOfEmployees.add(jsp);
 	   
