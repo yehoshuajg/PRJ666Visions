@@ -498,7 +498,7 @@ public class Home extends JFrame implements KeyListener{
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
-		//loadCashier();
+		loadCashier();
 	}
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();
@@ -1000,7 +1000,7 @@ public class Home extends JFrame implements KeyListener{
 				
 				//Discount details
 				JTabbedPane tabbedPane_discount = new JTabbedPane(JTabbedPane.TOP);
-				tabbedPane_discount.setBounds(60, 10, 400, 300);
+				tabbedPane_discount.setBounds(60, 10, 400, 200);
 				panel_discount2.add(tabbedPane_discount);
 							
 				JPanel panel_discount_details = new JPanel();
@@ -1095,7 +1095,7 @@ public class Home extends JFrame implements KeyListener{
 		        JFrame topFrame = (JFrame) SwingUtilities.getRoot(component);
 				d8 = new JDialog(topFrame, "", Dialog.ModalityType.DOCUMENT_MODAL);
 				d8.getContentPane().add(panel_discount2);
-				d8.setBounds(0, 0, 500, 650);
+				d8.setBounds(0, 0, 500, 250);
 				d8.setLocationRelativeTo(null);
 				//d8.getRootPane().setDefaultButton(discountOption_btnEnter);
 				d8.setVisible(true);
@@ -1508,6 +1508,10 @@ public class Home extends JFrame implements KeyListener{
 				oneTimeDiscountCheck = false;
 				//discount_option.setText("");
 				detail_discountValue = 0;
+				
+				//Discount buttons
+				button_discount.setVisible(true);
+				btnDiscountDetails.setVisible(false);
 				
 				textField_productID_input.requestFocusInWindow();
 			}
