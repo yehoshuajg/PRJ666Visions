@@ -498,7 +498,7 @@ public class Home extends JFrame implements KeyListener{
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
-		loadCashier();
+		//loadCashier();
 	}
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();

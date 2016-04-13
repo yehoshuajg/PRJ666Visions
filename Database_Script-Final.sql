@@ -144,7 +144,7 @@ create table Employee
 	LastName		varchar(15)		not null,
 	Street			varchar(40),
 	City			varchar(15),
-	State_Province	varchar(20),
+	State_Province	varchar(30),
 	PostalCode		varchar(10),
 	HomePhone		varchar(15),
 	CellPhone		varchar(15),
