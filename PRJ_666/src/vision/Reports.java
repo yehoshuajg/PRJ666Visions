@@ -240,10 +240,10 @@ public class Reports extends JFrame implements AutoCloseable {
         });
 
 	revenue_query = "select Year(CreateDate) as 'Year', MonthName(CreateDate) as 'Month',"
-            + " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
+            + " ROUND(sum(IFNULL(i.AmountDue, 0)),2) as 'Order Cost', ROUND(sum(IFNULL(i.AmountPaid, 0)), 2) as 'Order Paid',"
             + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
             + " sum(ROUND(Total, 2)) as 'Revenue', "
-            + " ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2) - sum(ROUND(Tax, 2))"
+            + " ROUND(sum(ROUND(Total, 2)) - (sum(IFNULL(i.AmountDue, 0)) - sum(IFNULL(i.AmountPaid, 0))), 2) - sum(ROUND(Tax, 2))"
             + " as 'Profit' from Transaction Left join Invoice i"
             + " ON Year(i.ReceivedDate) = Year(CreateDate)"
             + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
@@ -783,10 +783,10 @@ public class Reports extends JFrame implements AutoCloseable {
             }
             
             if(!remove_order.isSelected()){
-                revenue_query += " IFNULL(i.AmountDue, 0) as 'Order Cost', IFNULL(i.AmountPaid, 0) as 'Order Paid',"
+                revenue_query += " ROUND(sum(IFNULL(i.AmountDue, 0)),2) as 'Order Cost', ROUND(sum(IFNULL(i.AmountPaid, 0)), 2) as 'Order Paid',"
                     + " sum(ROUND(SubTotal, 2)) as 'SubTotal', sum(ROUND(Tax, 2)) as 'Tax',"
                     + " sum(ROUND(Total, 2)) as 'Revenue', "
-                    + " (ROUND(sum(ROUND(Total, 2)) - (IFNULL(i.AmountDue, 0) - IFNULL(i.AmountPaid, 0)), 2)) - sum(ROUND(Tax, 2))"
+                    + " ROUND(sum(ROUND(Total, 2)) - (sum(IFNULL(i.AmountDue, 0)) - sum(IFNULL(i.AmountPaid, 0))), 2) - sum(ROUND(Tax, 2))"
                     + " as 'Profit' from Transaction Left join Invoice i"
                     + " ON Year(i.ReceivedDate) = Year(CreateDate)"
                     + " AND MonthName(i.ReceivedDate) = MonthName(CreateDate)"
