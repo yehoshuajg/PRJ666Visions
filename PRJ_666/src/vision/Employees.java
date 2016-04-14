@@ -704,7 +704,8 @@ public class Employees extends JFrame{
 											}
 											//Manager and Cashier <=
 											else if(currentEmployee.getPositionID() == 3 && (comboBox_detail_positions.getSelectedIndex()+1) <= 2){
-							        			comboBox_detail_jobtypes.setEnabled(true);
+												comboBox_detail_positions.setEnabled(true);
+												comboBox_detail_jobtypes.setEnabled(true);
 							        		}
 											
 											if(textPane_details_terminateDate.getText().isEmpty()){
@@ -1028,7 +1029,7 @@ public class Employees extends JFrame{
 																textPane_details_email.setBackground(Color.decode(defaultColor));
 																textPane_details_email.setEditable(false);
 																
-																if(currentEmployee.getPositionID() == 4){
+																if(currentEmployee.getPositionID() == 4 || currentEmployee.getPositionID() == 3){
 																	//Position ID
 																	//textPane_positionID.setBackground(Color.decode(defaultColor));
 																	comboBox_detail_positions.setEnabled(false);
