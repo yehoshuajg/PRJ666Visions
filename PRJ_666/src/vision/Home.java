@@ -498,7 +498,7 @@ public class Home extends JFrame implements KeyListener{
 		//Employees staff = new Employees();
 		//JPanel panel_staff = staff.getWindow();
 		//tabbedPane.addTab("Staff", panel_staff);
-		//loadCashier();
+		loadCashier();
 	}
 	public void loadCashier(){
 		JPanel panel_cashier = new JPanel();
@@ -1896,7 +1896,7 @@ public class Home extends JFrame implements KeyListener{
 		JTextPane productName_refund = new JTextPane();
 		productName_refund.setText("Product Name:");
 		productName_refund.setEditable(false);
-		productName_refund.setBackground(SystemColor.window);
+		productName_refund.setBackground(Color.decode(defaultColor));
 		productName_refund.setBounds(10, 52, 92, 20);
 		panel_1.add(productName_refund);
 		
@@ -1906,20 +1906,20 @@ public class Home extends JFrame implements KeyListener{
 		
 		textField_refund_name = new JTextPane();
 		textField_refund_name.setEditable(false);
-		textField_refund_name.setBackground(SystemColor.window);
+		textField_refund_name.setBackground(Color.decode(defaultColor));
 		textField_refund_name.setBounds(105, 52, 616, 20);
 		panel_1.add(textField_refund_name);
 		
 		JTextPane productDescription_refund = new JTextPane();
 		productDescription_refund.setText("Product Description:");
 		productDescription_refund.setEditable(false);
-		productDescription_refund.setBackground(SystemColor.window);
+		productDescription_refund.setBackground(Color.decode(defaultColor));
 		productDescription_refund.setBounds(10, 91, 132, 20);
 		panel_1.add(productDescription_refund);
 		
 		textField_refund_description_input = new JTextPane();
 		textField_refund_description_input.setEditable(false);
-		textField_refund_description_input.setBackground(SystemColor.window);
+		textField_refund_description_input.setBackground(Color.decode(defaultColor));
 		textField_refund_description_input.setBounds(142, 90, 579, 20);
 		panel_1.add(textField_refund_description_input);
 		
@@ -1930,13 +1930,13 @@ public class Home extends JFrame implements KeyListener{
 		JTextPane txtpnProductRemaining = new JTextPane();
 		txtpnProductRemaining.setText("Quantity Remaining:");
 		txtpnProductRemaining.setEditable(false);
-		txtpnProductRemaining.setBackground(SystemColor.window);
+		txtpnProductRemaining.setBackground(Color.decode(defaultColor));
 		txtpnProductRemaining.setBounds(10, 130, 132, 20);
 		panel_1.add(txtpnProductRemaining);
 		
 		textField_refund_quantity_remaining_input = new JTextPane();
 		textField_refund_quantity_remaining_input.setEditable(false);
-		textField_refund_quantity_remaining_input.setBackground(SystemColor.window);
+		textField_refund_quantity_remaining_input.setBackground(Color.decode(defaultColor));
 		textField_refund_quantity_remaining_input.setBounds(142, 129, 64, 20);
 		panel_1.add(textField_refund_quantity_remaining_input);
 		
@@ -1948,13 +1948,13 @@ public class Home extends JFrame implements KeyListener{
 		JTextPane txtpnProductUnitPrice = new JTextPane();
 		txtpnProductUnitPrice.setText("Unit Price:");
 		txtpnProductUnitPrice.setEditable(false);
-		txtpnProductUnitPrice.setBackground(SystemColor.window);
+		txtpnProductUnitPrice.setBackground(Color.decode(defaultColor));
 		txtpnProductUnitPrice.setBounds(241, 130, 64, 20);
 		panel_1.add(txtpnProductUnitPrice);
 		
 		textField_refund_product_unitPrice_input = new JTextPane();
 		textField_refund_product_unitPrice_input.setEditable(false);
-		textField_refund_product_unitPrice_input.setBackground(SystemColor.window);
+		textField_refund_product_unitPrice_input.setBackground(Color.decode(defaultColor));
 		textField_refund_product_unitPrice_input.setBounds(310, 130, 104, 20);
 		panel_1.add(textField_refund_product_unitPrice_input);
 		
@@ -1966,13 +1966,13 @@ public class Home extends JFrame implements KeyListener{
 		JTextPane txtpnProductTotalPrice = new JTextPane();
 		txtpnProductTotalPrice.setText("Row Price:");
 		txtpnProductTotalPrice.setEditable(false);
-		txtpnProductTotalPrice.setBackground(SystemColor.window);
+		txtpnProductTotalPrice.setBackground(Color.decode(defaultColor));
 		txtpnProductTotalPrice.setBounds(435, 130, 64, 20);
 		panel_1.add(txtpnProductTotalPrice);
 		
 		textField_refund_total_unitPrice_input = new JTextPane();
 		textField_refund_total_unitPrice_input.setEditable(false);
-		textField_refund_total_unitPrice_input.setBackground(SystemColor.window);
+		textField_refund_total_unitPrice_input.setBackground(Color.decode(defaultColor));
 		textField_refund_total_unitPrice_input.setBounds(505, 130, 141, 20);
 		panel_1.add(textField_refund_total_unitPrice_input);
 		
@@ -4197,7 +4197,7 @@ public class Home extends JFrame implements KeyListener{
 										br.setBackupRestorePath();
 										br.initialize();
 										br.backupDB();*/
-										System.out.println("TransactionID: " + tr.get(0).getTransactionID());
+										
 										Object[] options = {"Yes","No"};
 										int cashCredit = JOptionPane.showOptionDialog(null,"Would you like to print receipt?","",
 										    JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
